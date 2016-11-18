@@ -56,14 +56,15 @@ class Animation:
     def _init_func(self):
         return self.imobj.set_data(np.zeros(self.imshape[:2])),
 
-    def save_as_mp4(self, odir, oname):
+    def save_as_mp4(self, odir, oname, bitrate=1372000):
         """
         Save as an mp4 format file.
         :param odir:
         :param oname:
+        ;param bitrate:
         :return:
         """
-        self.anim.save(os.path.join(odir,oname))
+        self.anim.save(os.path.join(odir,oname), bitrate=bitrate)
 
     def peek(self):
         plt.show()
