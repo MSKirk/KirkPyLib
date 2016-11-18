@@ -61,10 +61,10 @@ class Animation:
         Save as an mp4 format file.
         :param odir:
         :param oname:
-        ;param bitrate:
+        ;param bitrate: in bps
         :return:
         """
-        self.anim.save(os.path.join(odir,oname), bitrate=bitrate)
+        self.anim.save(os.path.join(odir,oname), bitrate=bitrate, savefig_kwargs={'bbox':'tight'})
 
     def peek(self):
         plt.show()
