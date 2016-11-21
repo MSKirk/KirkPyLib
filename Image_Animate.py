@@ -68,4 +68,3 @@ class Animation:
 
     def peek(self):
         plt.show()
-
