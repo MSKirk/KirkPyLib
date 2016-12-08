@@ -1,12 +1,11 @@
 
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import fnmatch
 from astropy.time import Time
+from sunpy.time import parse_time
 import pandas as pd
 from gatspy import periodic
 from scipy import signal
@@ -17,18 +16,20 @@ class PCH:
 
         self.directory = directory
         self.filelist = fnmatch.filter(os.listdir(self.directory), '*Area*.txt')
-        self.data_sets = {}  # initialize a null dictionary
+        self.data_sets = pd.DataFrame()  # initialize a null dictionary
         self.filter_keys = {}
 
         for file in self.filelist:
             name = ''
             name = name.join(file.split('_Area')[0].split('_'))
-            self.data_sets[name] = self.pch_data_parse(os.path.join(self.directory, file))
+            self.data_sets = pd.concat([self.data_sets, self.pch_data_parse(os.path.join(self.directory, file))])
             self.filter_keys[name] = name[0]+name[-4]+name[-1]
 
-        self.data_names = np.sort([k for k in self.data_sets])
+        self.data_names = np.sort([k for k in self.filter_keys])
+        self.data_sets =self.data_sets.sort_index()
 
         plt.ion()
+
 
     def plot_everything(self):
 
@@ -38,11 +39,9 @@ class PCH:
         self.S_Cent_periodogram()
         self.N_Cent_periodogram()
 
-
-    def pch_data_parse(self, file_path, df=True):
+    def pch_data_parse(self, file_path):
         """
-        :param file_path: full path of the file to read
-        :param df: If true, returns a pandas data frame, otherwise an NP object
+        :param file_path: full path of the file to readt
         :return: Parsed PCH data
         """
 
@@ -51,39 +50,38 @@ class PCH:
                                                                      'N_Cent_CoLat', 'S_Cent_Lon', 'S_Cent_CoLat'),
                                                            'formats': ('f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f')})
 
-        pch_obj = pd.DataFrame(data=pch_obj)
+        pch_obj = pd.DataFrame(data=pch_obj, index=parse_time(self.HarRot2JD(pch_obj['Harvey_Rotation'], duplicates=False)))
 
         # Create data masks for non-measurements - less than 0 or unphysical.
         pch_obj['North_Size'] = pch_obj['North_Size'].mask(pch_obj['North_Size'] < 0)
         pch_obj['North_Spread'] = pch_obj['North_Spread'].mask(pch_obj['North_Size'] < 0)
-        pch_obj['North_Spread'] = pch_obj['North_Spread'].mask(pch_obj['North_Size'] < pch_obj['North_Spread'])
         pch_obj['N_Cent_Lon'] = pch_obj['N_Cent_Lon'].mask(pch_obj['North_Size'] < 0)
         pch_obj['N_Cent_CoLat'] = pch_obj['N_Cent_CoLat'].mask(pch_obj['North_Size'] < 0)
 
         pch_obj['South_Size'] = pch_obj['South_Size'].mask(pch_obj['South_Size'] < 0)
         pch_obj['South_Spread'] = pch_obj['South_Spread'].mask(pch_obj['South_Size'] < 0)
-        pch_obj['South_Spread'] = pch_obj['South_Spread'].mask(pch_obj['South_Size'] < pch_obj['South_Spread'])
         pch_obj['S_Cent_Lon'] = pch_obj['S_Cent_Lon'].mask(pch_obj['South_Size'] < 0)
         pch_obj['S_Cent_CoLat'] = pch_obj['S_Cent_CoLat'].mask(pch_obj['South_Size'] < 0)
 
         # NAN hunting - periodogram does not deal with nans so well.
 
-        good = ~pch_obj['North_Size'].isnull()
-        temp_n_spread = pch_obj['North_Spread'][good]
-        temp_s_spread = pch_obj['South_Spread'][good]
+        pch_obj = pch_obj.dropna(subset=['North_Size'])
+
+        pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Spread'] = \
+            pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Size']
+
+        pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Spread'] = \
+            pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Size']
         
-        clean_pch_obj = {'Harvey_Rotation' : pch_obj['Harvey_Rotation'][good],
-                         'North_Size' : pch_obj['North_Size'][good],
-                         'North_Spread' : np.nan_to_num(temp_n_spread),
-                         'N_Cent_Lon' : pch_obj['N_Cent_Lon'][good],
-                         'N_Cent_CoLat' : pch_obj['N_Cent_CoLat'][good],
+        # Adding explicit Filters for periodogram
+        name = ''
+        name = name.join(file_path.split('/')[-1].split('_Area')[0].split('_'))
+        pch_obj['Filter'] = np.repeat(name[0]+name[-4]+name[-1], pch_obj['North_Size'].size)
 
-                         'South_Size' : pch_obj['South_Size'][good],
-                         'South_Spread' : np.nan_to_num(temp_s_spread),
-                         'S_Cent_Lon' : pch_obj['S_Cent_Lon'][good],
-                         'S_Cent_CoLat' : pch_obj['S_Cent_CoLat'][good]}
+        pch_obj['Hole_Separation'] = self.haversine(pch_obj['N_Cent_Lon'], pch_obj['N_Cent_CoLat']-90.,
+                                                    pch_obj['S_Cent_Lon'],pch_obj['S_Cent_CoLat']-90.)
 
-        return clean_pch_obj
+        return pch_obj
 
     def HarRot2JD(self, hr, duplicates=True):
         """
