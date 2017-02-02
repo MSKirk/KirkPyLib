@@ -30,7 +30,7 @@ class PCH:
 
         plt.ion()
 
-        self.S_Cent_periodogram()
+        #self.S_Cent_periodogram()
 
     def plot_everything(self):
 
