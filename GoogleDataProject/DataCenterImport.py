@@ -5,7 +5,6 @@ import fnmatch
 import astropy.units as u
 from astropy.table import Table
 import pandas as pd
-from datetime import timedelta
 
 class DataCenter:
     def __init__(self, directory):
@@ -67,16 +66,16 @@ class DataCenter:
     def parse_wx(self):
         self.wx_set = pd.DataFrame()
 
-        self.wx_filelist = fnmatch.filter(os.listdir(self.dir), 'WX_*.txt')
+        self.wx_filelist = fnmatch.filter(os.listdir(self.dir), 'Wx*.txt')
 
         for file in self.wx_filelist:
-            self.wx_set = pd.concat([self.wx_set, pd.read_csv(os.path.join(self.dir, file), index_col=0, delimiter='\s+',usecols=[0]+list(range(10,13))+[21,22], na_values='nan')])
+            temp_set=pd.read_table(os.path.join(self.dir, file), index_col=13)
+            self.wx_set = pd.concat([self.wx_set, temp_set[['Sea Level PressureIn','loc_id']] ])
 
-        # set index to noon local time
-        self.wx_set.index = pd.to_datetime(self.wx_set.index)+timedelta(hours=12)
+        self.wx_set=(self.wx_set.rename(columns = {'Sea Level PressureIn':'MeanSeaLevelPressureIn'})).dropna(subset=['MeanSeaLevelPressureIn'])
 
-        # adjust for time zone and convert to UTC
-        self.wx_set.index = pd.to_datetime([(self.wx_set.index[ii].tz_localize(self.wx_set['GMTOffset'][ii])).tz_convert('UTC') for ii in range(self.wx_set.shape[0])], utc=True)
+        # set index to UTC
+        self.wx_set.index = pd.to_datetime(self.wx_set.index, utc=True)
 
         self.wx_set = self.wx_set.sort_index()
 
