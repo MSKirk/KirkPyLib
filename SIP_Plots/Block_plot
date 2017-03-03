@@ -1,0 +1,32 @@
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.patches as mpatches
+import matplotlib.path as mpath
+import matplotlib.lines as mlines
+from matplotlib.collections import PatchCollection
+
+plt.rcdefaults()
+
+class BlockPlot:
+    def __init__(self, source_data):
+        '''
+        Create a billion-o-gram
+        '''
+
+        self.source_data=source_data
+
+        self.shape_size = self.size_function(source_data)
+
+        fig, ax = plt.subplots()
+
+
+
+    def size_function(self, data):
+        '''
+        Eventually, we can add in more ways to scale the data
+        :param data: Input data
+        :return: a function of the data for shape scaling
+        '''
+        return np.sqrt(data)
