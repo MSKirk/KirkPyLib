@@ -6,10 +6,13 @@ from scipy import ndimage
 
 
 class Sort_Spikes:
-    def __init__(self, directory):
-
+    def __init__(self, directory, count_index=0):
+        # This isn't fast enough yet....
+        # Bench marking is putting the processing rate at about 1 file per sec. (
+        #
         # Root directory of the Database: e.g. '/Volumes/BigSolar/AIA_Spikes'
         self.dir = os.path.abspath(directory)
+        self.count_index = int(count_index)
 
         # Number of Coincident spikes needed for a positive detection.
         # !!!!! Set for 2 or more coincidence hits. Change for more stringent parameters. !!!!!
@@ -39,7 +42,7 @@ class Sort_Spikes:
 
         raw_spikes = fits.open(spike_file)[1].data
         spike_vector = np.zeros((4096, 4096), dtype='int32').flatten()
-        lev1_vector =np.zeros_like(spike_vector)
+        lev1_vector = np.zeros_like(spike_vector)
 
         spike_vector[raw_spikes[0,:]] = raw_spikes[1,:]
         lev1_vector[raw_spikes[0,:]] = raw_spikes[2,:]
@@ -66,17 +69,19 @@ class Sort_Spikes:
         # Create a new file database with only good spikes.
         # The file name is identical to the generating file except it is .filtered.fits
 
-        for group_number in self.spikes_db.GroupNumber.unique():
-            subset = self.spikes_db.loc[self.spikes_db['GroupNumber'] == group_number]
+        for count, group_number in enumerate(self.spikes_db.GroupNumber.unique()):
+            # Selecting every 8th file for crappy multi threading
+            if count % 8 == self.count_index:
+                subset = self.spikes_db.loc[self.spikes_db['GroupNumber'] == group_number]
 
-            spike_filter = self.good_spike_filter(subset)
+                spike_filter = self.good_spike_filter(subset)
 
-            for ind_num in subset.index:
-                good_spikes_vector = (self.spikes_to_image(subset.Path[ind_num])[0,:,:]*spike_filter).flatten()
-                good_spikes_lev1 = (self.spikes_to_image(subset.Path[ind_num])[1,:,:]*spike_filter).flatten()
-                good_spikes_index = np.where((good_spikes_vector > 0))[0]
+                for ind_num in subset.index:
+                    good_spikes_vector = (self.spikes_to_image(subset.Path[ind_num])[0,:,:]*spike_filter).flatten()
+                    good_spikes_lev1 = (self.spikes_to_image(subset.Path[ind_num])[1,:,:]*spike_filter).flatten()
+                    good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
-                hdu = fits.PrimaryHDU(np.stack((good_spikes_index,good_spikes_vector[good_spikes_index],good_spikes_lev1[good_spikes_index])))
-                hdu.writeto(self.filter_spike_file_rename(subset.Path[ind_num]), overwrite=True)
+                    hdu = fits.PrimaryHDU(np.stack((good_spikes_index,good_spikes_vector[good_spikes_index],good_spikes_lev1[good_spikes_index])))
+                    hdu.writeto(self.filter_spike_file_rename(subset.Path[ind_num]), overwrite=True)
 
-            print('Group number '+str(group_number)+' is complete.')
+                print('Group number '+str(group_number)+' is complete.')
