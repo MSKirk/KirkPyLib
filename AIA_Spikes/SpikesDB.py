@@ -3,6 +3,7 @@ from astropy.time import Time
 import os
 import numpy as np
 import glob
+import sys
 
 class SpikesDB:
 
