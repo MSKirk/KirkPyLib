@@ -70,9 +70,12 @@ class Sort_Spikes:
         # The file name is identical to the generating file except it is .filtered.fits
 
         for count, group_number in enumerate(self.spikes_db.GroupNumber.unique()):
+
             # Selecting every 8th file for crappy multi threading
             if count % 8 == self.count_index:
                 subset = self.spikes_db.loc[self.spikes_db['GroupNumber'] == group_number]
+
+                # should create a file checking to see if it already exists.
 
                 spike_filter = self.good_spike_filter(subset)
 
