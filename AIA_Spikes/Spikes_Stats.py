@@ -39,14 +39,14 @@ class Spikes_Stats:
                 raw_spikes = fits.open(self.spikes_db.Path[db_index])[0].data
 
                 temp_df.Pix_i = raw_spikes[0] % 4096
-                temp_df.Pix_j = int((raw_spikes[0] - raw_spikes[0] % 4096)/4096)
+                temp_df.Pix_j = np.int_((raw_spikes[0] - raw_spikes[0] % 4096)/4096)
                 temp_df.Int = raw_spikes[1]
                 temp_df.Im_int = raw_spikes[2]
 
                 temp_df.GroupNumber = self.spikes_db.GroupNumber[db_index]
-                temp_df.MJDTime = self.time_gen(self.spikes_db.Path[db_index]).mjd
-                temp_df.YMDTime = self.time_gen(self.spikes_db.Path[db_index]).datetime
-                temp_df.Wavelength = self.wave_gen(self.spikes_db.Path[db_index])
+                temp_df.MJDTime = np.repeat(self.time_gen(self.spikes_db.Path[db_index]).mjd, len(temp_df.Pix_i))
+                temp_df.YMDTime = np.repeat(self.time_gen(self.spikes_db.Path[db_index]).datetime, len(temp_df.Pix_i))
+                temp_df.Wavelength = np.repeat(self.wave_gen(self.spikes_db.Path[db_index]), len(temp_df.Pix_i))
 
                 self.spikes_df = pd.concat([self.spikes_df,temp_df], ignore_index=True)
 
