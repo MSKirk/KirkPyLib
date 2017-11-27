@@ -20,14 +20,14 @@ class Spikes_Stats:
         self.spikes_db = pd.read_hdf(self.dir + '/Table_SpikesDB.h5', 'table')
         self.db_groups()
 
-        # Number of Groups to sample from
-        self.n_sample_groups = len(self.spikes_db.GroupNumber.unique())
-
     def db_groups(self):
         # group the spikes into 12 second intervals
         self.spikes_db['GroupNumber'] = self.spikes_db.groupby(pd.Grouper(key='YMDTime', freq='12s')).ngroup()
 
-    def spikes_dataframe_gen(self,n_sample_groups=self.n_sample_groups):
+    def spikes_dataframe_gen(self, n_sample_groups=False):
+
+        if n_sample_groups == False:
+            n_sample_groups = len(self.spikes_db.GroupNumber.unique())
 
         sample_groups = np.random.choice(self.spikes_db.GroupNumber.unique(), size=n_sample_groups)
         self.spikes_df = pd.DataFrame(columns={'MJDTime','YMDTime','Wavelength','Pix_i','Pix_j','Int','GroupNumber','Im_int'})
