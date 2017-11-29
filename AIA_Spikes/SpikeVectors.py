@@ -84,6 +84,7 @@ class Sort_Spikes:
                     good_spikes_lev1 = (self.spikes_to_image(subset.Path[ind_num])[1,:,:]*spike_filter).flatten()
                     good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
+                    # Need to compress the output CompImageHDU maybe?
                     hdu = fits.PrimaryHDU(np.stack((good_spikes_index,good_spikes_vector[good_spikes_index],good_spikes_lev1[good_spikes_index])))
                     hdu.writeto(self.filter_spike_file_rename(subset.Path[ind_num]), overwrite=True)
 
