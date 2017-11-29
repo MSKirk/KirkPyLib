@@ -10,7 +10,8 @@ import pandas as pd
 from astropy.io import fits
 from astropy.time import Time
 from scipy import ndimage
-
+import pyupset as pyu
+import matplotlib.pyplot as plt
 
 class Spikes_Stats:
     def __init__(self, directory):
@@ -43,7 +44,7 @@ class Spikes_Stats:
         labeled_array, num_features = ndimage.measurements.label(np.int_(spike_filter > (self.n_co_spikes - 1)))
         return labeled_array
 
-    def spikes_dataframe_gen(self, n_sample_groups=False):
+    def spikes_dataframe_gen(self, n_sample_groups=0):
 
         if not n_sample_groups:
             n_sample_groups = len(self.spikes_db.TimeGroup.unique())
@@ -101,3 +102,42 @@ class Spikes_Stats:
         lev1_vector[raw_spikes[0,:]] = raw_spikes[2,:]
 
         return np.stack((spike_vector.reshape((4096, 4096)),lev1_vector.reshape((4096, 4096))))
+
+    def pyupset_format(self):
+
+        return {'94': self.spikes_df.query('Wavelength == 94'),'131': self.spikes_df.query('Wavelength == 131'),
+               '171': self.spikes_df.query('Wavelength == 171'),'193': self.spikes_df.query('Wavelength == 193'),
+               '211': self.spikes_df.query('Wavelength == 211'),'304': self.spikes_df.query('Wavelength == 304'),
+               '335': self.spikes_df.query('Wavelength == 335')}
+
+    def upset_plots_gen(self):
+
+            self.spikes_dataframe_gen(n_sample_groups=50)
+            ups = self.pyupset_format()
+
+            plt.rc('font', size=12)
+            pyu.plot(ups, unique_keys=['SpaceGroup', 'TimeGroup'], inters_degree_bounds=(2, 2), sort_by='size')
+            plt.title('Pairwise Spike Coincidences', {'fontsize': 18, 'fontweight':'bold'})
+            plt.savefig('/Users/mskirk/Documents/Conferences/AGU 2017/2-way.png')
+
+            plt.rc('font', size=12)
+            pyu.plot(ups, unique_keys=['SpaceGroup', 'TimeGroup'], inters_degree_bounds=(2, 2), sort_by='size',
+                    query=[('304','94'),('211','193'),('335','131')])
+            plt.title('Pairwise Spike Coincidences', {'fontsize': 18, 'fontweight':'bold'})
+            plt.savefig('/Users/mskirk/Documents/Conferences/AGU 2017/2-way_c.png')
+
+            plt.rc('font', size=12)
+            pyu.plot(ups, unique_keys=['SpaceGroup', 'TimeGroup'], inters_degree_bounds=(3, 3), sort_by='size')
+            plt.title('3-Way Spike Coincidences', {'fontsize': 18, 'fontweight':'bold'})
+            plt.savefig('/Users/mskirk/Documents/Conferences/AGU 2017/3-way.png')
+
+            plt.rc('font', size=12)
+            pyu.plot(ups, unique_keys=['SpaceGroup', 'TimeGroup'], inters_degree_bounds=(4, 4), sort_by='size')
+            plt.title('4-way Spike Coincidences', {'fontsize': 18, 'fontweight':'bold'})
+            plt.savefig('/Users/mskirk/Documents/Conferences/AGU 2017/4-way.png')
+
+            plt.rc('font', size=12)
+            pyu.plot(ups, unique_keys=['SpaceGroup', 'TimeGroup'], inters_degree_bounds=(5, 7), sort_by='degree',
+                     query=[('304', '94','211', '193', '335', '131','171')])
+            plt.title('5, 6, and 7-way Spike Coincidences', {'fontsize': 18, 'fontweight':'bold'})
+            plt.savefig('/Users/mskirk/Documents/Conferences/AGU 2017/567-way.png')
