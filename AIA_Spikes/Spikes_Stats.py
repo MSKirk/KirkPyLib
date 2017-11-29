@@ -112,7 +112,7 @@ class Spikes_Stats:
 
     def upset_plots_gen(self):
 
-            self.spikes_dataframe_gen(n_sample_groups=50)
+            self.spikes_dataframe_gen(n_sample_groups=500)
             ups = self.pyupset_format()
 
             plt.rc('font', size=12)
