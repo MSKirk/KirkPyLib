@@ -112,6 +112,7 @@ class Spikes_Stats:
 
     def upset_plots_gen(self):
 
+        # Takes about 3.5 hours to process in total.
             self.spikes_dataframe_gen(n_sample_groups=300)
             ups = self.pyupset_format()
 
@@ -138,6 +139,13 @@ class Spikes_Stats:
 
             plt.rc('font', size=12)
             pyu.plot(ups, unique_keys=['SpaceGroup', 'TimeGroup'], inters_degree_bounds=(5, 7), sort_by='degree',
-                     query=[('304', '94','211', '193', '335', '131','171')])
+                     query=[('304', '94', '211', '193', '335', '131', '171')])
             plt.title('5, 6, and 7-way Spike Coincidences', {'fontsize': 18, 'fontweight':'bold'})
             plt.savefig('/Users/mskirk/Documents/Conferences/AGU 2017/567-way.png')
+
+    def hist_gen(self):
+        all_intensity = np.array(self.spikes_df['Int'].values - self.spikes_df['Im_int'].values)
+        histogram, bins = np.histogram(all_intensity, bins=1000)
+        plt.bar(np.array(bins[0:-1]), np.array(histogram), width=(bins[1] - bins[0]), bottom=1)
+        plt.yscale('log')
+        plt.xlim((0,5000))

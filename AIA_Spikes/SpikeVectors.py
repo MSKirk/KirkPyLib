@@ -89,3 +89,9 @@ class Sort_Spikes:
                     hdu.writeto(self.filter_spike_file_rename(subset.Path[ind_num]), overwrite=True)
 
                 print('Group number '+str(group_number)+' is complete.')
+    def plot_example(self):
+        # Plotting an example of a spikes image
+        sp_im = self.spikes_to_image('/Volumes/BigSolar/AIA_Spikes/2010/06/04/H1600/2010-06-04T16:00:23.07Z_0131.spikes.fits')
+        plt.imshow(sp_im[0, :, :] > 1, cmap='binary_r')
+        plt.axis('off')
+        plt.title('All Spikes Removed from an AIA 131 Image')
