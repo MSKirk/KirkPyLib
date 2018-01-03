@@ -22,6 +22,7 @@ def directory_setup():
         for dd in dirlist:
             CleanDirs.write("%s\n" % dd)
 
+
 def spikes_unzip():
     for file in listdir('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'):
         if fnmatch.fnmatch(file, '*.tar'):
@@ -29,6 +30,7 @@ def spikes_unzip():
             tar_ref = tarfile.open('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'+file, 'r')
             tar_ref.extractall(save_dir)
             tar_ref.close()
+
 
 def reg_spikes_move():
     rootdir='/Volumes/BigSolar/AIA_Spikes/'
