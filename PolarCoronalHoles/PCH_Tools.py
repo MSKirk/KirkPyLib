@@ -15,6 +15,8 @@ A collection of tools used in PCH detection. This replicates the following IDL r
 
 
 def trigfit(theta, rho, sigma=None, degree=1):
+    # A cosine expansion fit for data
+
     tt = np.array(theta)
     yy = np.array(rho)
     # assume uniform spacing
