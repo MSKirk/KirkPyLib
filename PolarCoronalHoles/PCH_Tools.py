@@ -210,6 +210,7 @@ def center_of_mass(coords, mass=1, distance=False):
 
     return np.sum(coords*mm,axis=0)/np.sum(mass)
 
+
 def hrot2date(hrot):
     # Returns an astropy time object
     if hrot < 0:
@@ -220,6 +221,7 @@ def hrot2date(hrot):
     jd = (((hr - 1.) * 360.) / (360. / 33.)) + 2415023.5
 
     return Time(jd, format='jd', scale='utc')
+
 
 def date2hrot(date, fractional=False):
     # 2415023.5 JD = Jan 4, 1900 => 1st Harvey Rotation
@@ -232,6 +234,7 @@ def date2hrot(date, fractional=False):
     else:
         return np.int(np.floor((((360. / 33.) * (date.jd - 2415023.5)) / 360.)) + 1)
 
+
 def get_harvey_lon(date, radians=False):
     # 2415023.5 JD = Jan 4, 1900 => 1st Harvey Rotation
     # 1 Harvey Rotation => 360 degrees in 33 days
@@ -243,6 +246,7 @@ def get_harvey_lon(date, radians=False):
         return math.radians(((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.))
     else:
         return ((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.)
+
 
 def hist_percent(array, fraction, number_of_bins=200):
     # returns the value at which a fraction of a given array falls below
