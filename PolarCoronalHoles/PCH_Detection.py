@@ -26,3 +26,25 @@ class PCH_Detection:
         self.dir = os.path.abspath(image_dir)
 
     def recenter_data(theta, rho):
+
+    def chole_mask(self, map, factor=0.5):
+        # To isolate the lim of the sun to study coronal holes
+        # returns a binary array of the outer lim of the sun
+
+        #Class check
+        if not isinstance(map, sunpy.map.GenericMap):
+            raise ValueError('Input needs to be an sunpy map object.')
+
+        # Bad image check
+        if np.max(map.data) < 1:
+            map.mask = np.zeros_like(map.data)
+
+        # EUVI Wavelet adjustment
+        if np.max(map.data) < 100:
+            map.data *= map.data
+
+        # Range Clipping
+        map.data[map.data > 10000] = 10000
+
+        map.data[map.data < 0] = 0
+

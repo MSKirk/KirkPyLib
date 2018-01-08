@@ -1,4 +1,3 @@
-from sunpy import map
 import numpy as np
 from scipy import optimize
 from astropy.time import Time
@@ -194,10 +193,10 @@ def trigfit(theta, rho, sigma=None, degree=1):
 
 def center_of_mass(coords, mass=1, distance=False):
     #
-    #:param coords: an M-element x N-dimensional array of coordinates to find the center of mass. e.g. [[x1,y1,z1],[x2,y2,z2]]
-    #:param mass: optional mass of each point
-    #:param distance: boolean if true will scale the mass based upon distance from origin
-    #:return: an N length array of the coordinate center of mass
+    # :param coords: an M-element x N-dimensional array of coordinates to find the center of mass. e.g. [[x1,y1,z1],[x2,y2,z2]]
+    # :param mass: optional mass of each point
+    # :param distance: boolean if true will scale the mass based upon distance from origin
+    # :return: an N length array of the coordinate center of mass
     #
 
     if type(mass) == int:
@@ -214,9 +213,9 @@ def center_of_mass(coords, mass=1, distance=False):
 def hrot2date(hrot):
     # Returns an astropy time object
     if hrot < 0:
-        raise ValueError('The rotation number dates before 1900.')
+        raise ValueError('Dubious date: The rotation number dates before 1900.')
     if hrot > 2000:
-        raise ValueError('The rotation number dates after 2080.')
+        raise ValueError('Dubious date: The rotation number dates after 2080.')
 
     jd = (((hr - 1.) * 360.) / (360. / 33.)) + 2415023.5
 
