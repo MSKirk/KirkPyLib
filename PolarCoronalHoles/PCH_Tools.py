@@ -7,7 +7,6 @@ import math
 '''
 A collection of tools used in PCH detection. This replicates the following IDL routines:
     trigfit.pro
-    new_center.pro
     get_harlon.pro
     harrot2date.pro
     date2harrot.pro
@@ -192,8 +191,6 @@ def trigfit(theta, rho, sigma=None, degree=1):
 
     return {'popt': popt, 'pcov': pcov, 'fitfunc': fitfunc}
 
-def recenter_data(theta, rho):
-    # not sure if this is the right place for this
 
 def center_of_mass(coords, mass=1, distance=False):
     #

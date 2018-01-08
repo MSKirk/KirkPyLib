@@ -16,6 +16,7 @@ A pure python version reproducing the following IDL routines:
     what_image.pro
     chole_series_area.pro
     **_image_check.pro
+    new_center.pro
 '''
 
 
@@ -24,3 +25,4 @@ class PCH_Detection:
     def __init__(self, image_dir):
         self.dir = os.path.abspath(image_dir)
 
+    def recenter_data(theta, rho):
