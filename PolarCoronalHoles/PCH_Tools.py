@@ -193,6 +193,7 @@ def trigfit(theta, rho, sigma=None, degree=1):
     return {'popt': popt, 'pcov': pcov, 'fitfunc': fitfunc}
 
 def recenter_data(theta, rho):
+    # not sure if this is the right place for this
 
 def center_of_mass(coords, mass=1, distance=False):
     #
@@ -215,9 +216,9 @@ def center_of_mass(coords, mass=1, distance=False):
 def hrot2date(hrot):
     # Returns an astropy time object
     if hrot < 0:
-        raise ValueError('You are trying to measure polar coronal holes before 1900.')
+        raise ValueError('The rotation number dates before 1900.')
     if hrot > 2000:
-        raise ValueError('You are trying to measure polar coronal holes after 2080.')
+        raise ValueError('The rotation number dates after 2080.')
 
     jd = (((hr - 1.) * 360.) / (360. / 33.)) + 2415023.5
 
@@ -245,3 +246,33 @@ def get_harvey_lon(date, radians=False):
         return math.radians(((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.))
     else:
         return ((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.)
+
+def hist_percent(array, fraction, number_of_bins=200):
+    # returns the value at which a fraction of a given array falls below
+
+    histogram, bins = np.histogram(array, bins=number_of_bins)
+
+    if np.max(np.abs(array)) == 0:
+        return 0
+    h = len(histogram)
+    n = h
+    i0 = 0.
+    i = 0.
+    a1 = 0.
+    a = np.sum(histogram)
+
+    while ((a1 / a) != fraction) and ((n - i0) > 1.):
+        i = np.round((n - i0) / 2. + i0)
+        n = np.round(n)
+        i0 = np.round(i0)
+
+        a1 = np.sum(histogram[0:int(i)])
+        if (a1 / a) > fraction:
+            n=i
+        if (a1 / a) < fraction:
+            n = i * 1.5
+            i0 = i
+            if n > h:
+                n=h
+
+    return (i*(bins[1]-bins[0])) + np.min(array)
