@@ -33,12 +33,11 @@ class PCH_Detection:
         # Recenter polar data for fitting.
         return (theta,rho)
 
-
     def chole_mask(self, map, factor=0.5):
         # To isolate the lim of the sun to study coronal holes
         # returns a binary array of the outer lim of the sun
 
-        #Class check
+        # Class check
         if not isinstance(map, sunpy.map.GenericMap):
             raise ValueError('Input needs to be an sunpy map object.')
 
@@ -119,6 +118,18 @@ class PCH_Detection:
 
         # Extracting annulus
         map.mask[PCH_Tools.annulus_mask(map.data.shape, rsun_pix*0.965, rsun_pix*0.995, center=map.wcs.wcs.crpix) == False] = np.nan
-        # binary representation
-        map.mask = np.logical_not(map.mask).astype('int')
 
+        # Filter for hole size
+
+
+    def chole_mark(self, masked_map):
+        # Marks the edge of a polar hole on a map and returns the heliographic coordinates
+        # Returns a [4,3] array of the [lat, lon, quality] for nw, ne, sw, and se points
+
+        # Class check
+        if not isinstance(map, sunpy.map.GenericMap):
+            raise ValueError('Input needs to be an sunpy map object.')
+
+        # Check if mask assigned
+        if (np.nanmax(masked_map.mask) <= 0) or (np.nanmin(masked_map.mask) != 0):
+            return np.zeros((3,4))*np.nan

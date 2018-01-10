@@ -282,10 +282,15 @@ def annulus_mask(array_shape, inner_radius, outer_radius, center=(0,0)):
     # returns a boolean array with an annulus mask for an ellipse
     # expects the inner_radius and outer_radius to be a tuple of (a,b)
 
+    array_shape = np.array(array_shape)
+    inner_radius = np.array(inner_radius)
+    outer_radius = np.array(outer_radius)
+    center = np.array(center)
+
     yy = np.tile(np.arange(0, array_shape[1], 1), (array_shape[0], 1))-center[1]+1
     xx = np.rot90(np.tile(np.arange(0, array_shape[0], 1), (array_shape[1], 1))-center[0]+1)
 
-    inner_radius = np.where(np.array(inner_radius) <= 0, np.array(inner_radius),0.00001)
+    inner_radius[np.where(np.array(inner_radius) <= 0)] = 0.00001
 
     rr_in = (xx/inner_radius[0])**2 + (yy/inner_radius[1])**2 >= 1
     rr_out = (xx/outer_radius[0])**2 + (yy/outer_radius[1])**2 < 1
