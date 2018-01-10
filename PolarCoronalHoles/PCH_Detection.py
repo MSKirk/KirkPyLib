@@ -3,7 +3,8 @@ import numpy as np
 import os
 import PCH_Tools
 import astropy.units as u
-from skimage import exposure
+from skimage import exposure, morphology
+
 
 '''
 Detection of polar coronal holes given a directory of images. 
@@ -51,8 +52,67 @@ class PCH_Detection:
 
         map.data[map.data < 0] = 0
 
+        rsun = np.array([map.rsun_obs.to('deg').value])
+        rsun_pix = np.array([map.wcs.all_world2pix(rsun, rsun, 0)[0] - map.wcs.all_world2pix(0, 0, 0)[0],
+                             map.wcs.all_world2pix(rsun, rsun, 0)[1] - map.wcs.all_world2pix(0, 0, 0)[1]])
+
+        # EUVI Wavelet adjustment
         if map.detector == 'EUVI':
             if map.wavelength > 211*u.AA:
-                rsun = np.array([map.rsun_obs.to('deg').value])
-                rsun_pix = np.array([map.wcs.all_world2pix(rsun,rsun,0)[0]-map.wcs.all_world2pix(0,0,0)[0], map.wcs.all_world2pix(rsun,rsun,0)[1]-map.wcs.all_world2pix(0,0,0)[1]])
-                map.mask = exposure.equalize_hist(map.data, mask=PCH_Tools.annulus_mask(map.data.shape, (0,0), rsun_pix, center=map.wcs.wcs.crpix)
+                   map.mask = exposure.equalize_hist(map.data, mask=np.logical_not(PCH_Tools.annulus_mask(map.data.shape, (0,0), rsun_pix, center=map.wcs.wcs.crpix)))
+            else:
+                map.mask = exposure.equalize_hist(map.data)
+        else:
+            map.mask = np.copy(map.data)
+
+        # Found through experiment...
+        if map.detector == 'AIA':
+            if map.wavelength == 193 * u.AA:
+                factor = 0.30
+            if map.wavelength == 171 * u.AA:
+                factor = 0.62
+            if map.wavelength == 304 * u.AA:
+                factor = 0.15
+        if map.detector == 'EIT':
+            if map.wavelength == 195 * u.AA:
+                factor = 0.27
+            if map.wavelength == 171 * u.AA:
+                factor = 0.37
+            if map.wavelength == 304 * u.AA:
+                factor = 0.14
+            if map.wavelength == 284 * u.AA:
+                factor = 0.22
+        if map.detector == 'EUVI':
+            if map.wavelength == 195 * u.AA:
+                factor = 0.53
+            if map.wavelength == 171 * u.AA:
+                factor = 0.55
+            if map.wavelength == 304 * u.AA:
+                factor = 0.35
+            if map.wavelength == 284 * u.AA:
+                factor = 0.22
+        if map.detector == 'SWAP':
+            if map.wavelength == 174 * u.AA:
+                factor = 0.55
+
+        # Creating a kernel for the morphological transforms
+        if map.wavelength == 304 * u.AA:
+            structelem = morphology.disk(np.average(rsun_pix) * 0.007)
+        else:
+            structelem = morphology.disk(np.average(rsun_pix) * 0.004)
+
+        # First morphological pass...
+        if map.wavelength == 304 * u.AA:
+            map.mask = morphology.opening(morphology.closing(map.mask, selem=structelem))
+        else:
+            map.mask = morphology.closing(morphology.opening(map.mask, selem=structelem))
+
+        # Masking off limb structures and Second morphological pass...
+        map.mask = morphology.opening(map.mask * PCH_Tools.annulus_mask(map.data.shape, (0,0), rsun_pix, center=map.wcs.wcs.crpix), selem=structelem)
+
+        # Extracting holes...
+        thresh = PCH_Tools.hist_percent(map.mask[np.nonzero(map.mask)], factor, number_of_bins=1000.)
+        map.mask = np.where(map.mask >= thresh, map.mask, 0)
+
+
+

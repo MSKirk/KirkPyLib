@@ -217,7 +217,7 @@ def hrot2date(hrot):
     if hrot > 2000:
         raise ValueError('Dubious date: The rotation number dates after 2080.')
 
-    jd = (((hr - 1.) * 360.) / (360. / 33.)) + 2415023.5
+    jd = (((hrot - 1.) * 360.) / (360. / 33.)) + 2415023.5
 
     return Time(jd, format='jd', scale='utc')
 
@@ -225,7 +225,7 @@ def hrot2date(hrot):
 def date2hrot(date, fractional=False):
     # 2415023.5 JD = Jan 4, 1900 => 1st Harvey Rotation
 
-    if type(date) != astropy.time.core.Time:
+    if not isinstance(date, astropy.time.core.Time):
         raise ValueError('Input needs to be an astropy time object.')
 
     if fractional:
@@ -238,7 +238,7 @@ def get_harvey_lon(date, radians=False):
     # 2415023.5 JD = Jan 4, 1900 => 1st Harvey Rotation
     # 1 Harvey Rotation => 360 degrees in 33 days
 
-    if type(date) != astropy.time.core.Time:
+    if not isinstance(date, astropy.time.core.Time):
         raise ValueError('Input needs to be an astropy time object.')
 
     if radians:
@@ -282,8 +282,8 @@ def annulus_mask(array_shape, inner_radius, outer_radius, center=(0,0)):
     # returns a boolean array with an annulus mask for an ellipse
     # expects the inner_radius and outer_radius to be a tuple of (a,b)
 
-    xx = np.tile(np.arange(0, array_shape[1], 1), (array_shape[0], 1))-center[0]+1
-    yy = np.rot90(np.tile(np.arange(0, array_shape[0], 1), (array_shape[1], 1))-center[1]+1)
+    yy = np.tile(np.arange(0, array_shape[1], 1), (array_shape[0], 1))-center[1]+1
+    xx = np.rot90(np.tile(np.arange(0, array_shape[0], 1), (array_shape[1], 1))-center[0]+1)
 
     rr_in = (xx/inner_radius[0])**2 + (yy/inner_radius[1])**2 >= 1
     rr_out = (xx/outer_radius[0])**2 + (yy/outer_radius[1])**2 < 1
