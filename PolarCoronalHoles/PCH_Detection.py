@@ -30,6 +30,9 @@ class PCH_Detection:
         self.dir = os.path.abspath(image_dir)
 
     def recenter_data(theta, rho):
+        # Recenter polar data for fitting.
+        return (theta,rho)
+
 
     def chole_mask(self, map, factor=0.5):
         # To isolate the lim of the sun to study coronal holes
