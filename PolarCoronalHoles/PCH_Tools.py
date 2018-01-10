@@ -276,3 +276,16 @@ def hist_percent(array, fraction, number_of_bins=200):
                 n=h
 
     return (i*(bins[1]-bins[0])) + np.min(array)
+
+
+def annulus_mask(array_shape, inner_radius, outer_radius, center=(0,0)):
+    # returns a boolean array with an annulus mask for an ellipse
+    # expects the inner_radius and outer_radius to be a tuple of (a,b)
+
+    xx = np.tile(np.arange(0, array_shape[1], 1), (array_shape[0], 1))-center[0]+1
+    yy = np.rot90(np.tile(np.arange(0, array_shape[0], 1), (array_shape[1], 1))-center[1]+1)
+
+    rr_in = (xx/inner_radius[0])**2 + (yy/inner_radius[1])**2 >= 1
+    rr_out = (xx/outer_radius[0])**2 + (yy/outer_radius[1])**2 < 1
+
+    return rr_in * rr_out

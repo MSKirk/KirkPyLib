@@ -1,6 +1,9 @@
 from sunpy import map
 import numpy as np
 import os
+import PCH_Tools
+import astropy.units as u
+from skimage import exposure
 
 '''
 Detection of polar coronal holes given a directory of images. 
@@ -37,7 +40,7 @@ class PCH_Detection:
 
         # Bad image check
         if np.max(map.data) < 1:
-            map.mask = np.zeros_like(map.data)
+            map.mask = np.ones_like(map.data)
 
         # EUVI Wavelet adjustment
         if np.max(map.data) < 100:
@@ -48,3 +51,8 @@ class PCH_Detection:
 
         map.data[map.data < 0] = 0
 
+        if map.detector == 'EUVI':
+            if map.wavelength > 211*u.AA:
+                rsun = np.array([map.rsun_obs.to('deg').value])
+                rsun_pix = np.array([map.wcs.all_world2pix(rsun,rsun,0)[0]-map.wcs.all_world2pix(0,0,0)[0], map.wcs.all_world2pix(rsun,rsun,0)[1]-map.wcs.all_world2pix(0,0,0)[1]])
+                map.mask = exposure.equalize_hist(map.data, mask=PCH_Tools.annulus_mask(map.data.shape, (0,0), rsun_pix, center=map.wcs.wcs.crpix)
