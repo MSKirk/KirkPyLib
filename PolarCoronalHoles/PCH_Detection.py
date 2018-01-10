@@ -100,9 +100,9 @@ class PCH_Detection:
 
         # Creating a kernel for the morphological transforms
         if map.wavelength == 304 * u.AA:
-            structelem = morphology.disk(np.average(rsun_pix) * 0.007)
+            structelem = morphology.disk(np.round(np.average(rsun_pix) * 0.007))
         else:
-            structelem = morphology.disk(np.average(rsun_pix) * 0.004)
+            structelem = morphology.disk(np.round(np.average(rsun_pix) * 0.004))
 
         # First morphological pass...
         if map.wavelength == 304 * u.AA:
@@ -114,8 +114,11 @@ class PCH_Detection:
         map.mask = morphology.opening(map.mask * PCH_Tools.annulus_mask(map.data.shape, (0,0), rsun_pix, center=map.wcs.wcs.crpix), selem=structelem)
 
         # Extracting holes...
-        thresh = PCH_Tools.hist_percent(map.mask[np.nonzero(map.mask)], factor, number_of_bins=1000.)
+        thresh = PCH_Tools.hist_percent(map.mask[np.nonzero(map.mask)], factor, number_of_bins=1000)
         map.mask = np.where(map.mask >= thresh, map.mask, 0)
 
-
+        # Extracting annulus
+        map.mask[PCH_Tools.annulus_mask(map.data.shape, rsun_pix*0.965, rsun_pix*0.995, center=map.wcs.wcs.crpix) == False] = np.nan
+        # binary representation
+        map.mask = np.logical_not(map.mask).astype('int')
 
