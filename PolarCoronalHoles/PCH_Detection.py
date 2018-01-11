@@ -3,7 +3,7 @@ import numpy as np
 import os
 import PCH_Tools
 import astropy.units as u
-from skimage import exposure, morphology
+from skimage import exposure, morphology, measure
 
 
 '''
@@ -119,8 +119,16 @@ class PCH_Detection:
         # Extracting annulus
         map.mask[PCH_Tools.annulus_mask(map.data.shape, rsun_pix*0.965, rsun_pix*0.995, center=map.wcs.wcs.crpix) == False] = np.nan
 
-        # Filter for hole size
+        # Filter for hole size scaled to resolution of the image
 
+        regions = measure.label(np.logical_not(map.mask).astype(int), connectivity=1, background=0)
+
+        if np.max(regions) > 0:
+            for r_number in range(1,np.max(regions),1):
+                if np.where(regions == r_number)[0].size < (0.4 * map.mask.shape[0]):
+                    regions[np.where(regions == r_number)] = 0
+            regions[np.where(regions >= 1)] = 1
+        map.mask = np.logical_not(regions)
 
     def chole_mark(self, masked_map):
         # Marks the edge of a polar hole on a map and returns the heliographic coordinates
