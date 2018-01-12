@@ -157,7 +157,7 @@ def pick_hole_extremes(hole_coordinates):
 
     for ii, point1 in enumerate(test_coords):
         for jj, point2 in enumerate(test_coords):
-            if ii >= jj:
+            if ii > jj:
                 inner_angles[ii,jj] = GreatArc(point1,point2).inner_angle.value
 
     return [test_coords[np.where(inner_angles == inner_angles.max())[0][0]], test_coords[np.where(inner_angles == inner_angles.max())[1][0]]]
