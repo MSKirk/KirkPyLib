@@ -183,7 +183,7 @@ def pch_mark(self, masked_map):
 
     for r_number in range(1, np.max(holes)+1, 1):
 
-        hole_coords = masked_map.pixel_to_world(np.where(holes == r_number)[1]*u.pixel, np.where(holes == r_number)[0]*u.pixel,0)
+        hole_coords = masked_map.pixel_to_world(np.where(holes == r_number)[1]*u.pixel, np.where(holes == r_number)[0] * u.pixel,0)
 
         # filtering points below 50 deg lat, i.e. not polar any more
         hole_coords = hole_coords[np.where(np.abs(hole_coords.heliographic_stonyhurst.lat) >= 50 * u.deg)]
