@@ -2,7 +2,7 @@ import sunpy
 from sunpy import map
 import numpy as np
 import os
-import PCH_Tools
+from PolarCoronalHoles import PCH_Tools
 import astropy.units as u
 from skimage import exposure, morphology, measure
 from sunpy.coordinates.utils import GreatArc
@@ -130,6 +130,52 @@ def pch_mask(map, factor=0.5):
         regions[np.where(regions >= 1)] = 1
     map.mask = np.logical_not(regions)
 
+
+def pch_quality(self, masked_map, hole_start, hole_end, n_hole_pixels):
+    # hole_start and hole_end are tuples of (lat, lon)
+    # returns a fractional hole quality between 0 and 1
+    # 1 is a very well defined hole, 0 is an undefined hole (not actually possible)
+
+    start = SkyCoord(hole_start[0], hole_start[1], frame=masked_map.coordinate_frame)
+    end = SkyCoord(hole_end[0], hole_end[1], frame=masked_map.coordinate_frame)
+
+    arc_width = self.rsun_pix(masked_map) * (0.995 - 0.965)
+    degree_sep = GreatArc(start, end).inner_angles().to(u.deg)
+    arc_length = 2 * np.pi * self.rsun_pix(masked_map) * (degree_sep/360.)
+    quality_ratio = n_hole_pixels / (arc_length * arc_width)
+
+    return quality_ratio
+
+def pch_mark(self, masked_map):
+    # Marks the edge of a polar hole on a map and returns the heliographic coordinates
+    # Returns an astropy table of the ['StartLat','StartLon','EndLat','EndLon','Quality']
+    # for the edge points of the holes detected
+    # This is a change from the IDL chole_mark in that it doesn't assume just one north and south hole.
+
+    # Class check
+    if not isinstance(masked_map, sunpy.map.GenericMap):
+        raise ValueError('Input needs to be an sunpy map object.')
+
+    # Check if mask assigned
+    if (np.nanmax(masked_map.mask) <= 0) or (np.nanmin(masked_map.mask) != 0):
+        return Table(names=('StartLat','StartLon','EndLat','EndLon','Quality'))
+
+    holes = measure.label(np.logical_not(masked_map.mask).astype(int), connectivity=1, background=0)
+
+    edge_points = Table(names=('StartLat','StartLon','EndLat','EndLon','Quality'))
+
+    for r_number in range(1, np.max(holes), 1):
+        hole_coords = masked_map.pixel_to_world(np.where(holes == r_number)[0]*u.pixel, np.where(holes == r_number)[1]*u.pixel,0)
+
+        edge_points.add_row((hole_coords.heliographic_stonyhurst.lat.min(),
+                             hole_coords.heliographic_stonyhurst.lon[np.where(hole_coords.heliographic_stonyhurst.lat == hole_coords.heliographic_stonyhurst.lat.min())][0],
+                             hole_coords.heliographic_stonyhurst.lat.max(),
+                             hole_coords.heliographic_stonyhurst.lon[np.where(hole_coords.heliographic_stonyhurst.lat == hole_coords.heliographic_stonyhurst.lat.max())][0],
+                             self.pch_quality(masked_map, (edge_points['StartLat'][r_number-1], edge_points['StartLon'][r_number-1]),
+                                                  (edge_points['EndLat'][r_number-1], edge_points['EndLon'][r_number-1]), np.where(holes == r_number)[0].size)))
+
+    return edge_points
+
 class PCH_Detection:
 
     def __init__(self, image_dir):
@@ -139,47 +185,5 @@ class PCH_Detection:
         # Recenter polar data for fitting.
         return (theta,rho)
 
-    def pch_mark(self, masked_map):
-        # Marks the edge of a polar hole on a map and returns the heliographic coordinates
-        # Returns an astropy table of the ['StartLat','StartLon','EndLat','EndLon','Quality']
-        # for the edge points of the holes detected
-        # This is a change from the IDL chole_mark in that it doesn't assume just one north and south hole.
 
-        # Class check
-        if not isinstance(masked_map, sunpy.map.GenericMap):
-            raise ValueError('Input needs to be an sunpy map object.')
 
-        # Check if mask assigned
-        if (np.nanmax(masked_map.mask) <= 0) or (np.nanmin(masked_map.mask) != 0):
-            return Table(names=('StartLat','StartLon','EndLat','EndLon','Quality'))
-
-        holes = measure.label(np.logical_not(masked_map.mask).astype(int), connectivity=1, background=0)
-
-        edge_points = Table(names=('StartLat','StartLon','EndLat','EndLon','Quality'))
-
-        for r_number in range(1, np.max(holes), 1):
-            hole_coords = masked_map.pixel_to_world(np.where(holes == r_number)[0]*u.pixel, np.where(holes == r_number)[1]*u.pixel,0)
-
-            edge_points.add_row((hole_coords.heliographic_stonyhurst.lat.min(),
-                                 hole_coords.heliographic_stonyhurst.lon[np.where(hole_coords.heliographic_stonyhurst.lat == hole_coords.heliographic_stonyhurst.lat.min())][0],
-                                 hole_coords.heliographic_stonyhurst.lat.max(),
-                                 hole_coords.heliographic_stonyhurst.lon[np.where(hole_coords.heliographic_stonyhurst.lat == hole_coords.heliographic_stonyhurst.lat.max())][0],
-                                 self.pch_quality(masked_map, (edge_points['StartLat'][r_number-1], edge_points['StartLon'][r_number-1]),
-                                                      (edge_points['EndLat'][r_number-1], edge_points['EndLon'][r_number-1]), np.where(holes == r_number)[0].size)))
-
-        return edge_points
-
-    def pch_quality(self, masked_map, hole_start, hole_end, n_hole_pixels):
-        # hole_start and hole_end are tuples of (lat, lon)
-        # returns a fractional hole quality between 0 and 1
-        # 1 is a very well defined hole, 0 is an undefined hole (not actually possible)
-
-        start = SkyCoord(hole_start[0], hole_start[1], frame=masked_map.coordinate_frame)
-        end = SkyCoord(hole_end[0], hole_end[1], frame=masked_map.coordinate_frame)
-
-        arc_width = self.rsun_pix(masked_map) * (0.995 - 0.965)
-        degree_sep = GreatArc(start, end).inner_angles().to(u.deg)
-        arc_length = 2 * np.pi * self.rsun_pix(masked_map) * (degree_sep/360.)
-        quality_ratio = n_hole_pixels / (arc_length * arc_width)
-
-        return quality_ratio

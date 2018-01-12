@@ -2,6 +2,7 @@ import numpy as np
 from scipy import optimize
 from astropy.time import Time
 import math
+import astropy
 
 '''
 A collection of tools used in PCH detection. This replicates the following IDL routines:
