@@ -6,8 +6,7 @@ from PolarCoronalHoles import PCH_Tools
 import astropy.units as u
 from skimage import exposure, morphology, measure
 from sunpy.coordinates.utils import GreatArc
-from astropy.coordinates import SkyCoord
-from astropy.table import Table, Column
+from astropy.table import Table
 
 '''
 Detection of polar coronal holes given a directory of images. 
@@ -144,6 +143,26 @@ def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
     return quality_ratio
 
 
+def pick_hole_extremes(hole_coordinates):
+
+    inner_angles = np.zeros([4,4])
+
+    hole_lat_max = np.where(hole_coordinates.heliographic_stonyhurst.lat == hole_coordinates.heliographic_stonyhurst.lat.max())[0]
+    hole_lat_min = np.where(hole_coordinates.heliographic_stonyhurst.lat == hole_coordinates.heliographic_stonyhurst.lat.min())[0]
+    hole_lon_max = np.where(hole_coordinates.heliographic_stonyhurst.lon == hole_coordinates.heliographic_stonyhurst.lon.max())[0]
+    hole_lon_min = np.where(hole_coordinates.heliographic_stonyhurst.lon == hole_coordinates.heliographic_stonyhurst.lon.min())[0]
+
+    test_coords = [hole_coordinates[hole_lat_max][0], hole_coordinates[hole_lat_min][0],
+                   hole_coordinates[hole_lon_max][0], hole_coordinates[hole_lon_min][0]]
+
+    for ii, point1 in enumerate(test_coords):
+        for jj, point2 in enumerate(test_coords):
+            if ii >= jj:
+                inner_angles[ii,jj] = GreatArc(point1,point2).inner_angle.value
+
+    return [test_coords[np.where(inner_angles == inner_angles.max())[0][0]], test_coords[np.where(inner_angles == inner_angles.max())[1][0]]]
+
+
 def pch_mark(self, masked_map):
     # Marks the edge of a polar hole on a map and returns the stonyhurst heliographic coordinates
     # Returns an astropy table of the ['StartLat','StartLon','EndLat','EndLon','Quality']
@@ -162,21 +181,21 @@ def pch_mark(self, masked_map):
 
     edge_points = Table(names=('StartLat','StartLon','EndLat','EndLon','Quality'))
 
-    for r_number in range(1, np.max(holes), 1):
+    for r_number in range(1, np.max(holes)+1, 1):
 
         hole_coords = masked_map.pixel_to_world(np.where(holes == r_number)[1]*u.pixel, np.where(holes == r_number)[0]*u.pixel,0)
 
-        hole_max = np.where(hole_coords.heliographic_stonyhurst.lat == hole_coords.heliographic_stonyhurst.lat.max())[0]
-        hole_min = np.where(hole_coords.heliographic_stonyhurst.lat == hole_coords.heliographic_stonyhurst.lat.min())[0]
+        # filtering points below 50 deg lat, i.e. not polar any more
+        hole_coords = hole_coords[np.where(np.abs(hole_coords.heliographic_stonyhurst.lat) >= 50 * u.deg)]
 
-        edge_points.add_row((hole_coords.heliographic_stonyhurst.lat.min(),
-                             hole_coords.heliographic_stonyhurst.lon[hole_min][0],
-                             hole_coords.heliographic_stonyhurst.lat.max(),
-                             hole_coords.heliographic_stonyhurst.lon[hole_max][0],
-                             pch_quality(masked_map, hole_coords[hole_min][0], hole_coords[hole_max][0],
-                                         np.where(holes == r_number)[0].size * u.pix)))
+        if hole_coords.shape[0] > 0:
+            pts = pick_hole_extremes(hole_coords)
+            edge_points.add_row((pts[0].heliographic_stonyhurst.lat, pts[0].heliographic_stonyhurst.lon,
+                                 pts[1].heliographic_stonyhurst.lat, pts[1].heliographic_stonyhurst.lon,
+                                 pch_quality(masked_map, pts[0], pts[1], np.where(holes == r_number)[0].size * u.pix)))
 
     return edge_points
+
 
 class PCH_Detection:
 
