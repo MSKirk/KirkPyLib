@@ -163,7 +163,7 @@ def pick_hole_extremes(hole_coordinates):
     return [test_coords[np.where(inner_angles == inner_angles.max())[0][0]], test_coords[np.where(inner_angles == inner_angles.max())[1][0]]]
 
 
-def pch_mark(self, masked_map):
+def pch_mark(masked_map):
     # Marks the edge of a polar hole on a map and returns the stonyhurst heliographic coordinates
     # Returns an astropy table of the ['StartLat','StartLon','EndLat','EndLon','Quality']
     # for the edge points of the holes detected
@@ -196,6 +196,40 @@ def pch_mark(self, masked_map):
 
     return edge_points
 
+
+def image_integrety_check(inmap):
+    # Runs through image checks to make sure the integrity of the full disk image
+    # Looks to make sure the input data is prepped for processing
+
+    if not isinstance(inmap, sunpy.map.GenericMap):
+        raise ValueError('Input needs to be an sunpy map object.')
+
+    # Size check
+    good_image = (inmap.data.shape >= (1024,1024))
+
+    if inmap.detector == 'AIA':
+        if 'QUALITYV0' in inmap.meta:
+            good_image = False
+
+        if 'MISSVALS' in inmap.data:
+            good_image = False
+
+        if inmap.meta['Quality'] not in [2097152, 1073741824, 1073741828, 1075838976]:
+            good_image = False
+
+    if inmap.detector == 'EIT':
+        if inmap.meta['OBJECT'] == 'partial FOV':
+            good_image = False
+
+    if inmap.detector == 'EUVI':
+        if (len(np.where(inmap.data < 0)[0])/len(inmap.data.nonzero()[0])) > 0.75:
+            good_image = False
+
+    if inmap.detector == 'SWAP':
+        if inmap.meta['LEVEL'] != 11:
+            good_image = False
+
+    return good_image
 
 class PCH_Detection:
 
