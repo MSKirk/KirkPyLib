@@ -6,7 +6,10 @@ from PolarCoronalHoles import PCH_Tools
 import astropy.units as u
 from skimage import exposure, morphology, measure
 from sunpy.coordinates.utils import GreatArc
-from astropy.table import Table
+from astropy.table import Table, join
+from astropy.time import Time
+from astropy.coordinates import Longitude
+import warnings
 
 '''
 Detection of polar coronal holes given a directory of images. 
@@ -135,7 +138,7 @@ def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
     # returns a fractional hole quality between 0 and 1
     # 1 is a very well defined hole, 0 is an undefined hole (not actually possible)
 
-    arc_width = self.rsun_pix(masked_map)[0] * (0.995 - 0.965)
+    arc_width = rsun_pix(masked_map)[0] * (0.995 - 0.965)
     degree_sep = GreatArc(hole_start, hole_end).inner_angle.to(u.deg)
     arc_length = 2 * np.pi * rsun_pix(masked_map)[0] * u.pix * (degree_sep[-1]/(360. * u.deg))
     quality_ratio = n_hole_pixels / (arc_length * arc_width)
@@ -179,7 +182,7 @@ def pch_mark(masked_map):
 
     holes = measure.label(np.logical_not(masked_map.mask).astype(int), connectivity=1, background=0)
 
-    edge_points = Table(names=('StartLat','StartLon','EndLat','EndLon','Quality'))
+    edge_points = Table(names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality'))
 
     for r_number in range(1, np.max(holes)+1, 1):
 
@@ -192,12 +195,16 @@ def pch_mark(masked_map):
             pts = pick_hole_extremes(hole_coords)
             edge_points.add_row((pts[0].heliographic_stonyhurst.lat, pts[0].heliographic_stonyhurst.lon,
                                  pts[1].heliographic_stonyhurst.lat, pts[1].heliographic_stonyhurst.lon,
+                                 GreatArc(pts, pts).inner_angle.value.to(u.deg),
                                  pch_quality(masked_map, pts[0], pts[1], np.where(holes == r_number)[0].size * u.pix)))
+
+    if not len(edge_points):
+        edge_points.add_row((np.nan, np.nan, np.nan, np.nan, np.nan, 0))
 
     return edge_points
 
 
-def image_integrety_check(inmap):
+def image_integrity_check(inmap):
     # Runs through image checks to make sure the integrity of the full disk image
     # Looks to make sure the input data is prepped for processing
 
@@ -231,14 +238,50 @@ def image_integrety_check(inmap):
 
     return good_image
 
+
 class PCH_Detection:
 
     def __init__(self, image_dir):
+
+        # Quiet things a bit
+        warnings.simplefilter('ignore', UserWarning)
+
         self.dir = os.path.abspath(image_dir)
 
-    def recenter_data(theta, rho):
-        # Recenter polar data for fitting.
-        return (theta,rho)
+        if 'efz' in os.listdir(self.dir)[-10]:
+            self.files = [file for file in os.listdir(self.dir) if file.startswith('efz')]
+
+        if '.fts' in os.listdir(self.dir)[-10]:
+            self.files = [file for file in os.listdir(self.dir) if file.endswith('.fts')]
+
+        if '.fits' in os.listdir(self.dir)[-10]:
+            self.files = [file for file in os.listdir(self.dir) if file.startswith('.fits')]
+
+        self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], Time('1900-01-04')],
+                                     names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'))
+
+        for image_file in self.files:
+            solar_image = sunpy.map.Map(image_file)
+
+            if image_integrity_check(solar_image):
+                pch_mask(solar_image)
+                pts = pch_mark(solar_image)
+
+                pts['FileName'] = [self.dir+'/'+image_file] * len(pts)
+                pts['Date'] = [Time(solar_image.date)] * len(pts)
+
+                self.point_detection = join(pts, self.point_detection, join_type='outer')
+
+        self.point_detection.remove_row(0)
+
+
+    def add_harvey_coordinates(self):
+        # Modifies the point detection to add in harvey lon.
+
+        self.point_detection['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in self.point_detection['Date']]
+        harvey_lon = np.array([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]) * u.deg
+        self.point_detection["H_StartLon"] = Longitude(harvey_lon - np.array(self.point_detection['StartLon']) * u.deg)
+        self.point_detection["H_EndLon"] = Longitude(harvey_lon - np.array(self.point_detection['EndLon']) * u.deg)
 
 
 

@@ -3,6 +3,8 @@ from scipy import optimize
 from astropy.time import Time
 import math
 import astropy
+import astropy.units as u
+from astropy.coordinates import Longitude
 
 '''
 A collection of tools used in PCH detection. This replicates the following IDL routines:
@@ -243,9 +245,9 @@ def get_harvey_lon(date, radians=False):
         raise ValueError('Input needs to be an astropy time object.')
 
     if radians:
-        return math.radians(((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.))
+        return Longitude([math.radians(((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.))] * u.rad)
     else:
-        return ((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.)
+        return Longitude([((360. / 33.) * (date.jd - 2415023.5)) - (np.floor(((360. / 33.) * (date.jd - 2415023.5)) / 360.) * 360.)] * u.deg)
 
 
 def hist_percent(array, fraction, number_of_bins=200):
