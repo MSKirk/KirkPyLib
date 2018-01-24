@@ -2,6 +2,7 @@ import sunpy
 from sunpy import map
 import numpy as np
 import os
+from pathlib import Path
 from PolarCoronalHoles import PCH_Tools
 import astropy.units as u
 from skimage import exposure, morphology, measure
@@ -9,7 +10,7 @@ from sunpy.coordinates.utils import GreatArc
 from astropy.table import Table, join
 from astropy.time import Time
 from astropy.coordinates import Longitude
-from astropy.io import ascii
+from astropy.io import ascii, fits
 import warnings
 
 '''
@@ -68,7 +69,7 @@ def pch_mask(map, factor=0.5):
         else:
             map.mask = exposure.equalize_hist(map.data)
     else:
-        map.mask = np.copy(map.data)
+        map.mask = np.copy(map.data).astype('float')
 
     # Found through experiment...
     if map.detector == 'AIA':
@@ -229,6 +230,9 @@ def image_integrity_check(inmap):
         if inmap.meta['OBJECT'] == 'partial FOV':
             good_image = False
 
+        if inmap.meta['OBJECT'] == 'Dark':
+            good_image = False
+
     if inmap.detector == 'EUVI':
         if (len(np.where(inmap.data < 0)[0])/len(inmap.data.nonzero()[0])) > 0.75:
             good_image = False
@@ -238,6 +242,28 @@ def image_integrity_check(inmap):
             good_image = False
 
     return good_image
+
+
+def file_integrity_check(infile):
+    # Makes sure it can be fed to the Map
+
+    file_path = Path(infile)
+
+    if file_path.is_file():
+        hdu1 = fits.open(file_path)
+        hdu1[0].verify('fix')
+
+        if 'NAXIS3' in hdu1[0].header:
+            return False
+        if type(hdu1[0].header['CDELT1']) != float:
+            return False
+        if type(hdu1[0].header['CDELT2']) != float:
+            return False
+        else:
+            return True
+    else:
+        return False
+
 
 
 class PCH_Detection:
@@ -258,29 +284,31 @@ class PCH_Detection:
         if '.fits' in os.listdir(self.dir)[-10]:
             self.files = [file for file in os.listdir(self.dir) if file.startswith('.fits')]
 
-        self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], Time('1900-01-04')],
+        self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
                                      names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
                                      meta={'name': 'Coordinate_Detections'})
 
         for ii, image_file in enumerate(self.files):
-            solar_image = sunpy.map.Map(image_file)
 
-            self.detector = solar_image.detector
+            if file_integrity_check(self.dir+'/'+image_file):
+                solar_image = sunpy.map.Map(self.dir+'/'+image_file)
 
-            if ii == 0:
-                self.begin_date = solar_image.date.year
+                self.detector = solar_image.detector
 
-            if ii == len(self.files)-1:
-                self.end_date = solar_image.date.year
+                if ii == 0:
+                    self.begin_date = solar_image.date.year
 
-            if image_integrity_check(solar_image):
-                pch_mask(solar_image)
-                pts = pch_mark(solar_image)
+                if ii == len(self.files)-1:
+                    self.end_date = solar_image.date.year
 
-                pts['FileName'] = [self.dir+'/'+image_file] * len(pts)
-                pts['Date'] = [Time(solar_image.date)] * len(pts)
+                if image_integrity_check(solar_image):
+                    pch_mask(solar_image)
+                    pts = pch_mark(solar_image)
 
-                self.point_detection = join(pts, self.point_detection, join_type='outer')
+                    pts['FileName'] = [self.dir+'/'+image_file] * len(pts)
+                    pts['Date'] = [Time(solar_image.date)] * len(pts)
+
+                    self.point_detection = join(pts, self.point_detection, join_type='outer')
 
         self.point_detection.remove_row(0)
         self.add_harvey_coordinates()
