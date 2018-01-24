@@ -1,5 +1,5 @@
 import sunpy
-from sunpy import map
+from sunpy.map import Map 
 import numpy as np
 import os
 from pathlib import Path
@@ -11,6 +11,7 @@ from astropy.table import Table, join
 from astropy.time import Time
 from astropy.coordinates import Longitude
 from astropy.io import ascii, fits
+from astropy.utils.exceptions import AstropyWarning
 import warnings
 
 '''
@@ -39,100 +40,100 @@ def rsun_pix(inmap):
                      inmap.wcs.all_world2pix(rsun, rsun, 0)[1] - inmap.wcs.all_world2pix(0, 0, 0)[1]])
 
 
-def pch_mask(map, factor=0.5):
+def pch_mask(mask_map, factor=0.5):
     # To isolate the lim of the sun to study coronal holes
     # returns a binary array of the outer lim of the sun
 
     # Class check
-    if not isinstance(map, sunpy.map.GenericMap):
+    if not isinstance(map, sunpy.mask_map.GenericMap):
         raise ValueError('Input needs to be an sunpy map object.')
 
     # Bad image check
-    if np.max(map.data) < 1:
-        map.mask = np.ones_like(map.data)
+    if np.max(mask_map.data) < 1:
+        mask_map.mask = np.ones_like(mask_map.data)
+    else:
+        # EUVI Wavelet adjustment
+        if np.max(mask_map.data) < 100:
+            mask_map.data *= mask_map.data
 
-    # EUVI Wavelet adjustment
-    if np.max(map.data) < 100:
-        map.data *= map.data
+        # Range Clipping
+        mask_map.data[mask_map.data > 10000] = 10000
 
-    # Range Clipping
-    map.data[map.data > 10000] = 10000
+        mask_map.data[mask_map.data < 0] = 0
 
-    map.data[map.data < 0] = 0
+        rsun_in_pix = rsun_pix(map)
 
-    rsun_in_pix = rsun_pix(map)
-
-    # EUVI Wavelet adjustment
-    if map.detector == 'EUVI':
-        if map.wavelength > 211*u.AA:
-               map.mask = exposure.equalize_hist(map.data, mask=np.logical_not(PCH_Tools.annulus_mask(map.data.shape, (0,0), rsun_in_pix, center=map.wcs.wcs.crpix)))
+        # EUVI Wavelet adjustment
+        if mask_map.detector == 'EUVI':
+            if mask_map.wavelength > 211*u.AA:
+                   mask_map.mask = exposure.equalize_hist(mask_map.data, mask=np.logical_not(PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.wcs.wcs.crpix)))
+            else:
+                mask_map.mask = exposure.equalize_hist(mask_map.data)
         else:
-            map.mask = exposure.equalize_hist(map.data)
-    else:
-        map.mask = np.copy(map.data).astype('float')
+            mask_map.mask = np.copy(mask_map.data).astype('float')
 
-    # Found through experiment...
-    if map.detector == 'AIA':
-        if map.wavelength == 193 * u.AA:
-            factor = 0.30
-        if map.wavelength == 171 * u.AA:
-            factor = 0.62
-        if map.wavelength == 304 * u.AA:
-            factor = 0.15
-    if map.detector == 'EIT':
-        if map.wavelength == 195 * u.AA:
-            factor = 0.27
-        if map.wavelength == 171 * u.AA:
-            factor = 0.37
-        if map.wavelength == 304 * u.AA:
-            factor = 0.14
-        if map.wavelength == 284 * u.AA:
-            factor = 0.22
-    if map.detector == 'EUVI':
-        if map.wavelength == 195 * u.AA:
-            factor = 0.53
-        if map.wavelength == 171 * u.AA:
-            factor = 0.55
-        if map.wavelength == 304 * u.AA:
-            factor = 0.35
-        if map.wavelength == 284 * u.AA:
-            factor = 0.22
-    if map.detector == 'SWAP':
-        if map.wavelength == 174 * u.AA:
-            factor = 0.55
+        # Found through experiment...
+        if mask_map.detector == 'AIA':
+            if mask_map.wavelength == 193 * u.AA:
+                factor = 0.30
+            if mask_map.wavelength == 171 * u.AA:
+                factor = 0.62
+            if mask_map.wavelength == 304 * u.AA:
+                factor = 0.15
+        if mask_map.detector == 'EIT':
+            if mask_map.wavelength == 195 * u.AA:
+                factor = 0.27
+            if mask_map.wavelength == 171 * u.AA:
+                factor = 0.37
+            if mask_map.wavelength == 304 * u.AA:
+                factor = 0.14
+            if mask_map.wavelength == 284 * u.AA:
+                factor = 0.22
+        if mask_map.detector == 'EUVI':
+            if mask_map.wavelength == 195 * u.AA:
+                factor = 0.53
+            if mask_map.wavelength == 171 * u.AA:
+                factor = 0.55
+            if mask_map.wavelength == 304 * u.AA:
+                factor = 0.35
+            if mask_map.wavelength == 284 * u.AA:
+                factor = 0.22
+        if mask_map.detector == 'SWAP':
+            if mask_map.wavelength == 174 * u.AA:
+                factor = 0.55
 
-    # Creating a kernel for the morphological transforms
-    if map.wavelength == 304 * u.AA:
-        structelem = morphology.disk(np.round(np.average(rsun_in_pix) * 0.007))
-    else:
-        structelem = morphology.disk(np.round(np.average(rsun_in_pix) * 0.004))
+        # Creating a kernel for the morphological transforms
+        if mask_map.wavelength == 304 * u.AA:
+            structelem = morphology.disk(np.round(np.average(rsun_in_pix) * 0.007))
+        else:
+            structelem = morphology.disk(np.round(np.average(rsun_in_pix) * 0.004))
 
-    # First morphological pass...
-    if map.wavelength == 304 * u.AA:
-        map.mask = morphology.opening(morphology.closing(map.mask, selem=structelem))
-    else:
-        map.mask = morphology.closing(morphology.opening(map.mask, selem=structelem))
+        # First morphological pass...
+        if mask_map.wavelength == 304 * u.AA:
+            mask_map.mask = morphology.opening(morphology.closing(mask_map.mask, selem=structelem))
+        else:
+            mask_map.mask = morphology.closing(morphology.opening(mask_map.mask, selem=structelem))
 
-    # Masking off limb structures and Second morphological pass...
-    map.mask = morphology.opening(map.mask * PCH_Tools.annulus_mask(map.data.shape, (0,0), rsun_in_pix, center=map.wcs.wcs.crpix), selem=structelem)
+        # Masking off limb structures and Second morphological pass...
+        mask_map.mask = morphology.opening(mask_map.mask * PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.wcs.wcs.crpix), selem=structelem)
 
-    # Extracting holes...
-    thresh = PCH_Tools.hist_percent(map.mask[np.nonzero(map.mask)], factor, number_of_bins=1000)
-    map.mask = np.where(map.mask >= thresh, map.mask, 0)
+        # Extracting holes...
+        thresh = PCH_Tools.hist_percent(mask_map.mask[np.nonzero(mask_map.mask)], factor, number_of_bins=1000)
+        mask_map.mask = np.where(mask_map.mask >= thresh, mask_map.mask, 0)
 
-    # Extracting annulus
-    map.mask[PCH_Tools.annulus_mask(map.data.shape, rsun_in_pix*0.965, rsun_in_pix*0.995, center=map.wcs.wcs.crpix) == False] = np.nan
+        # Extracting annulus
+        mask_map.mask[PCH_Tools.annulus_mask(mask_map.data.shape, rsun_in_pix*0.965, rsun_in_pix*0.995, center=mask_map.wcs.wcs.crpix) == False] = np.nan
 
-    # Filter for hole size scaled to resolution of the image
+        # Filter for hole size scaled to resolution of the image
 
-    regions = measure.label(np.logical_not(map.mask).astype(int), connectivity=1, background=0)
+        regions = measure.label(np.logical_not(mask_map.mask).astype(int), connectivity=1, background=0)
 
-    if np.max(regions) > 0:
-        for r_number in range(1,np.max(regions),1):
-            if np.where(regions == r_number)[0].size < (0.4 * map.mask.shape[0]):
-                regions[np.where(regions == r_number)] = 0
-        regions[np.where(regions >= 1)] = 1
-    map.mask = np.logical_not(regions)
+        if np.max(regions) > 0:
+            for r_number in range(1,np.max(regions),1):
+                if np.where(regions == r_number)[0].size < (0.4 * mask_map.mask.shape[0]):
+                    regions[np.where(regions == r_number)] = 0
+            regions[np.where(regions >= 1)] = 1
+        mask_map.mask = np.logical_not(regions)
 
 
 def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
@@ -142,7 +143,7 @@ def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
 
     arc_width = rsun_pix(masked_map)[0] * (0.995 - 0.965)
     degree_sep = GreatArc(hole_start, hole_end).inner_angle.to(u.deg)
-    arc_length = 2 * np.pi * rsun_pix(masked_map)[0] * u.pix * (degree_sep[-1]/(360. * u.deg))
+    arc_length = 2 * np.pi * rsun_pix(masked_map)[0] * u.pix * (degree_sep/(360. * u.deg))
     quality_ratio = n_hole_pixels / (arc_length * arc_width)
 
     return quality_ratio
@@ -178,28 +179,36 @@ def pch_mark(masked_map):
     if not isinstance(masked_map, sunpy.map.GenericMap):
         raise ValueError('Input needs to be an sunpy map object.')
 
+    edge_points = Table(names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality'))
+
     # Check if mask assigned
-    if (np.nanmax(masked_map.mask) <= 0) or (np.nanmin(masked_map.mask) != 0):
-        return Table(names=('StartLat','StartLon','EndLat','EndLon','Quality'))
+    if masked_map.mask.all() or not masked_map.mask.any():
+        return edge_points
 
     holes = measure.label(np.logical_not(masked_map.mask).astype(int), connectivity=1, background=0)
 
-    edge_points = Table(names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality'))
+    for r_number in range(1, holes.max()+1, 1):
 
-    for r_number in range(1, np.max(holes)+1, 1):
+        hole_xx = np.where(holes == r_number)[0] * u.pixel
+        hole_yy = np.where(holes == r_number)[1] * u.pixel
 
-        hole_coords = masked_map.pixel_to_world(np.where(holes == r_number)[1]*u.pixel, np.where(holes == r_number)[0] * u.pixel,0)
+        # Double check Size Filter
+        if len(hole_xx) > 10:
 
-        # filtering points below 50 deg lat, i.e. not polar any more
-        hole_coords = hole_coords[np.where(np.abs(hole_coords.heliographic_stonyhurst.lat) >= 50 * u.deg)]
+            hole_coords = masked_map.pixel_to_world(hole_yy, hole_xx,0)
 
-        if hole_coords.shape[0] > 0:
-            pts = pick_hole_extremes(hole_coords)
-            edge_points.add_row((pts[0].heliographic_stonyhurst.lat, pts[0].heliographic_stonyhurst.lon,
-                                 pts[1].heliographic_stonyhurst.lat, pts[1].heliographic_stonyhurst.lon,
-                                 GreatArc(pts, pts).inner_angle.value.to(u.deg),
-                                 pch_quality(masked_map, pts[0], pts[1], np.where(holes == r_number)[0].size * u.pix)))
+            # filtering points below 50 deg lat, i.e. not polar any more
 
+            only_polar_holes = np.where(np.abs(hole_coords.heliographic_stonyhurst.lat) >= 50 * u.deg)
+
+            if only_polar_holes[0].size > 0:
+                hole_coords = hole_coords[only_polar_holes]
+                pts = pick_hole_extremes(hole_coords)
+                edge_points.add_row((pts[0].heliographic_stonyhurst.lat, pts[0].heliographic_stonyhurst.lon,
+                                    pts[1].heliographic_stonyhurst.lat, pts[1].heliographic_stonyhurst.lon,
+                                    GreatArc(pts[0], pts[1]).inner_angle.to(u.deg),
+                                    pch_quality(masked_map, pts[0], pts[1], np.where(holes == r_number)[0].size * u.pix)))
+                print(edge_points)
     if not len(edge_points):
         edge_points.add_row((np.nan, np.nan, np.nan, np.nan, np.nan, 0))
 
@@ -233,19 +242,22 @@ def image_integrity_check(inmap):
         if inmap.meta['OBJECT'] == 'Dark':
             good_image = False
 
-    if inmap.detector == 'EUVI':
-        if (len(np.where(inmap.data < 0)[0])/len(inmap.data.nonzero()[0])) > 0.75:
-            good_image = False
+    if (len(np.where(inmap.data <= 0)[0])/(float(len(np.where(inmap.data > 0)[0]))+0.1)) > 0.75:
+        good_image = False
 
     if inmap.detector == 'SWAP':
         if inmap.meta['LEVEL'] != 11:
             good_image = False
+
+    if inmap.data.max() < 1:
+        good_image = False
 
     return good_image
 
 
 def file_integrity_check(infile):
     # Makes sure it can be fed to the Map
+    warnings.simplefilter('ignore', AstropyWarning)
 
     file_path = Path(infile)
 
@@ -263,7 +275,6 @@ def file_integrity_check(infile):
             return True
     else:
         return False
-
 
 
 class PCH_Detection:
@@ -293,6 +304,8 @@ class PCH_Detection:
             if file_integrity_check(self.dir+'/'+image_file):
                 solar_image = sunpy.map.Map(self.dir+'/'+image_file)
 
+                print(image_file)
+
                 self.detector = solar_image.detector
 
                 if ii == 0:
@@ -305,10 +318,11 @@ class PCH_Detection:
                     pch_mask(solar_image)
                     pts = pch_mark(solar_image)
 
-                    pts['FileName'] = [self.dir+'/'+image_file] * len(pts)
-                    pts['Date'] = [Time(solar_image.date)] * len(pts)
+                    if len(pts) > 0:
+                        pts['FileName'] = [self.dir+'/'+image_file] * len(pts)
+                        pts['Date'] = [Time(solar_image.date)] * len(pts)
 
-                    self.point_detection = join(pts, self.point_detection, join_type='outer')
+                        self.point_detection = join(pts, self.point_detection, join_type='outer')
 
         self.point_detection.remove_row(0)
         self.add_harvey_coordinates()

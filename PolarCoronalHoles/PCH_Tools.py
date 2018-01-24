@@ -286,9 +286,9 @@ def annulus_mask(array_shape, inner_radius, outer_radius, center=(0,0)):
     # expects the inner_radius and outer_radius to be a tuple of (a,b)
 
     array_shape = np.array(array_shape)
-    inner_radius = np.array(inner_radius)
-    outer_radius = np.array(outer_radius)
-    center = np.array(center)
+    inner_radius = np.array(inner_radius).astype(float)
+    outer_radius = np.array(outer_radius).astype(float)
+    center = np.array(center).astype(float)
 
     yy = np.tile(np.arange(0, array_shape[1], 1), (array_shape[0], 1))-center[1]+1
     xx = np.rot90(np.tile(np.arange(0, array_shape[0], 1), (array_shape[1], 1))-center[0]+1)
