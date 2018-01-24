@@ -9,6 +9,7 @@ from sunpy.coordinates.utils import GreatArc
 from astropy.table import Table, join
 from astropy.time import Time
 from astropy.coordinates import Longitude
+from astropy.io import ascii
 import warnings
 
 '''
@@ -258,10 +259,19 @@ class PCH_Detection:
             self.files = [file for file in os.listdir(self.dir) if file.startswith('.fits')]
 
         self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], Time('1900-01-04')],
-                                     names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'))
+                                     names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
+                                     meta={'name': 'Coordinate_Detections'})
 
-        for image_file in self.files:
+        for ii, image_file in enumerate(self.files):
             solar_image = sunpy.map.Map(image_file)
+
+            self.detector = solar_image.detector
+
+            if ii == 0:
+                self.begin_date = solar_image.date.year
+
+            if ii == len(self.files)-1:
+                self.end_date = solar_image.date.year
 
             if image_integrity_check(solar_image):
                 pch_mask(solar_image)
@@ -273,15 +283,27 @@ class PCH_Detection:
                 self.point_detection = join(pts, self.point_detection, join_type='outer')
 
         self.point_detection.remove_row(0)
-
+        self.add_harvey_coordinates()
 
     def add_harvey_coordinates(self):
         # Modifies the point detection to add in harvey lon.
 
         self.point_detection['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in self.point_detection['Date']]
         harvey_lon = np.array([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]) * u.deg
-        self.point_detection["H_StartLon"] = Longitude(harvey_lon - np.array(self.point_detection['StartLon']) * u.deg)
-        self.point_detection["H_EndLon"] = Longitude(harvey_lon - np.array(self.point_detection['EndLon']) * u.deg)
+        self.point_detection["H_StartLon"] = Longitude(harvey_lon + np.array(self.point_detection['StartLon']) * u.deg)
+        self.point_detection["H_EndLon"] = Longitude(harvey_lon + np.array(self.point_detection['EndLon']) * u.deg)
 
+    def write_table(self, table, write_dir=''):
 
+        if self.begin_date == self.end_date:
+            date_string = str(self.begin_date)
+        else:
+            date_string = str(self.begin_date)+'-'+str(self.end_date)
+
+        if write_dir == '':
+            write_dir = self.dir
+
+        write_file = write_dir+'/'+self.detector+'_'+table.meta['name']+date_string+'.csv'
+
+        ascii.write(table, format='ecsv', filename=write_file)
 
