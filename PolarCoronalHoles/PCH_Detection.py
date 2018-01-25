@@ -45,7 +45,7 @@ def pch_mask(mask_map, factor=0.5):
     # returns a binary array of the outer lim of the sun
 
     # Class check
-    if not isinstance(map, sunpy.mask_map.GenericMap):
+    if not isinstance(mask_map, sunpy.map.GenericMap):
         raise ValueError('Input needs to be an sunpy map object.')
 
     # Bad image check
@@ -61,7 +61,7 @@ def pch_mask(mask_map, factor=0.5):
 
         mask_map.data[mask_map.data < 0] = 0
 
-        rsun_in_pix = rsun_pix(map)
+        rsun_in_pix = rsun_pix(mask_map)
 
         # EUVI Wavelet adjustment
         if mask_map.detector == 'EUVI':
