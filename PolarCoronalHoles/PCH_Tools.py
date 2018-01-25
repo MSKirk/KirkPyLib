@@ -303,7 +303,8 @@ def annulus_mask(array_shape, inner_radius, outer_radius, center=(0,0)):
 
 
 def coord_rec2spher(xx, yy, zz):
-    #
+    # http://sce.uhcl.edu/helm/SpaceNavHandbook/Chapter5.pdf
+
     rr = np.sqrt(xx ** 2 + yy ** 2 + zz ** 2)
     beta = np.arctan(zz / np.sqrt(xx ** 2 + yy ** 2)) * u.deg
     lamb = np.arctan(yy / xx) * u.deg
@@ -313,6 +314,7 @@ def coord_rec2spher(xx, yy, zz):
 
 
 def coord_spher2rec(rr, beta, lamb):
+    # http://sce.uhcl.edu/helm/SpaceNavHandbook/Chapter5.pdf
 
     xx = rr * np.cos(beta) * np.cos(lamb)
     yy = rr * np.cos(beta) * np.sin(lamb)
