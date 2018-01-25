@@ -302,10 +302,20 @@ def annulus_mask(array_shape, inner_radius, outer_radius, center=(0,0)):
     return rr_in * rr_out
 
 
-def rec2spher(xx, yy, zz):
-    rr = np.sqrt(xx ** 2 + yy ** 2 + zz ** 2) * xx.unit
+def coord_rec2spher(xx, yy, zz):
+    #
+    rr = np.sqrt(xx ** 2 + yy ** 2 + zz ** 2)
     beta = np.arctan(zz / np.sqrt(xx ** 2 + yy ** 2)) * u.deg
     lamb = np.arctan(yy / xx) * u.deg
 
     # Dist from Sun, Latitude, Longitude
     return [rr, beta, lamb]
+
+
+def coord_spher2rec(rr, beta, lamb):
+
+    xx = rr * np.cos(beta) * np.cos(lamb)
+    yy = rr * np.cos(beta) * np.sin(lamb)
+    zz = rr * np.sin(beta)
+
+    return [xx, yy, zz]
