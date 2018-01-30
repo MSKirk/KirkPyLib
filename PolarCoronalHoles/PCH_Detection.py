@@ -293,7 +293,7 @@ class PCH_Detection:
             self.files = [file for file in os.listdir(self.dir) if file.endswith('.fts')]
 
         if '.fits' in os.listdir(self.dir)[-10]:
-            self.files = [file for file in os.listdir(self.dir) if file.startswith('.fits')]
+            self.files = [file for file in os.listdir(self.dir) if file.endswith('.fits')]
 
         self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
                                      names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
