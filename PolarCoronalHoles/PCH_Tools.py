@@ -31,6 +31,10 @@ def trigfit(theta, rho, sigma=None, degree=1):
     guess_amp = np.std(yy) * 2. ** 0.5
     guess_offset = np.mean(yy)
 
+    if degree > 10:
+        print('Too many terms requested. Resetting to 10-term cosine series')
+        degree = 10
+
     # Guesses only first order cosine fit
     guess = np.append(np.array([guess_offset, guess_amp, 2. * np.pi * guess_freq]), np.zeros((degree-1)*2))
 
