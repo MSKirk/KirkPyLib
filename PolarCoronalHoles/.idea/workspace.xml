@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/FileMangementForBigSolar.py" afterPath="$PROJECT_DIR$/../AIA_Spikes/FileMangementForBigSolar.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/PCH_Tools.py" afterPath="$PROJECT_DIR$/PCH_Tools.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -51,8 +52,8 @@
       <file leaf-file-name="PCH_Tools.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="29" column="48" lean-forward="true" selection-start-line="29" selection-start-column="48" selection-end-line="29" selection-end-column="48" />
+            <state relative-caret-position="555">
+              <caret line="37" column="41" lean-forward="false" selection-start-line="37" selection-start-column="41" selection-end-line="37" selection-end-column="41" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -436,7 +437,14 @@
       <option name="project" value="LOCAL" />
       <updated>1517348665423</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="Plot PCH data">
+      <created>1517425974835</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1517425974835</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -712,8 +720,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="29" column="48" lean-forward="true" selection-start-line="29" selection-start-column="48" selection-end-line="29" selection-end-column="48" />
+        <state relative-caret-position="555">
+          <caret line="37" column="41" lean-forward="false" selection-start-line="37" selection-start-column="41" selection-end-line="37" selection-end-column="41" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

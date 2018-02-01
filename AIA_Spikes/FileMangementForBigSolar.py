@@ -23,14 +23,18 @@ def directory_setup():
             CleanDirs.write("%s\n" % dd)
 
 
-def spikes_unzip():
+def spikes_unzip(year=2010):
+    year = str(year)
+
     for file in listdir('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'):
         if fnmatch.fnmatch(file, '*.tar'):
-            save_dir = '/Volumes/BigSolar/AIA_Spikes/'+'/'.join(file.split('_')[1].split('.')[0].split('-'))
-            tar_ref = tarfile.open('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'+file, 'r')
-            tar_ref.extractall(save_dir)
-            tar_ref.close()
-
+            if fnmatch.fnmatch(file, '*'+year+'*'):
+                save_dir = '/Volumes/BigSolar/AIA_Spikes/'+'/'.join(file.split('_')[1].split('.')[0].split('-'))
+                tar_ref = tarfile.open('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'+file, 'r')
+                tar_ref.extractall(save_dir)
+                tar_ref.close()
+                print('/'.join(file.split('_')[1].split('.')[0].split('-')))
+                os.remove('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'+file)
 
 def reg_spikes_move():
     rootdir='/Volumes/BigSolar/AIA_Spikes/'
