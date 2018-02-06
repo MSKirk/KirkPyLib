@@ -265,6 +265,13 @@ def file_integrity_check(infile):
         hdu1 = fits.open(file_path)
         hdu1[0].verify('fix')
 
+        # SWAP Stacked image fix
+        if 'CTYPE1' not in hdu1[0].header:
+            hdu1[0].header['CTYPE1'] = 'HPLN-TAN'
+
+        if 'CTYPE2' not in hdu1[0].header:
+            hdu1[0].header['CTYPE2'] = 'HPLT-TAN'
+
         if 'NAXIS3' in hdu1[0].header:
             return False
         if type(hdu1[0].header['CDELT1']) != float:

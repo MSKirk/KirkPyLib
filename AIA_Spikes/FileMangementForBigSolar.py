@@ -36,8 +36,10 @@ def spikes_unzip(year=2010):
                 print('/'.join(file.split('_')[1].split('.')[0].split('-')))
                 os.remove('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'+file)
 
-def reg_spikes_move():
-    rootdir='/Volumes/BigSolar/AIA_Spikes/'
+def reg_spikes_move(year=2010):
+    year = str(year)
+
+    rootdir='/Volumes/BigSolar/AIA_Spikes/'+year+'/'
     for subdir, dirs, files in os.walk(rootdir):
         for file in files:
             if 'H' in subdir:
