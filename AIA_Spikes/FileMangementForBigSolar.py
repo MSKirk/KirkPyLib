@@ -12,6 +12,7 @@ cd /Volumes/BigSolar/Filtered_Spikes
 xargs mkdir -p </Volumes/BigSolar/AIA_Spikes/CleanDirs.txt
 '''
 
+
 def directory_setup():
     fdirs = open('/Volumes/BigSolar/AIA_Spikes/dirs.txt', 'r').readlines()
     dirlist = [ss.split('/H')[0] for ss in fdirs]
@@ -35,6 +36,7 @@ def spikes_unzip(year=2010):
                 tar_ref.close()
                 print('/'.join(file.split('_')[1].split('.')[0].split('-')))
                 os.remove('/Volumes/BigSolar/AIA_Spikes/spikes-tars/'+file)
+
 
 def reg_spikes_move(year=2010):
     year = str(year)

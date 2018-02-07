@@ -271,6 +271,7 @@ def file_integrity_check(infile):
 
         if 'CTYPE2' not in hdu1[0].header:
             hdu1[0].header['CTYPE2'] = 'HPLT-TAN'
+            hdu1.writeto(file_path, overwrite=True)
 
         if 'NAXIS3' in hdu1[0].header:
             return False
