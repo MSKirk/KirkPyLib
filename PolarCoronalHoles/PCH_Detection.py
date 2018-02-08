@@ -54,7 +54,7 @@ def pch_mask(mask_map, factor=0.5):
     else:
         # EUVI Wavelet adjustment
         if np.max(mask_map.data) < 100:
-            mask_map.data *= mask_map.data
+            mask_map.data[:, :] *= mask_map.data
 
         # Range Clipping
         mask_map.data[mask_map.data > 10000] = 10000
