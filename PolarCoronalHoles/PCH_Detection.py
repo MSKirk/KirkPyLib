@@ -332,18 +332,18 @@ class PCH_Detection:
 
                         self.point_detection = join(pts, self.point_detection, join_type='outer')
 
-        self.point_detection.remove_row(0)
+        self.point_detection.remove_row(np.where(self.point_detection['ArcLength'] == 0)[0][0])
         self.add_harvey_coordinates()
 
     def add_harvey_coordinates(self):
         # Modifies the point detection to add in harvey lon.
 
         self.point_detection['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in self.point_detection['Date']]
-        harvey_lon = np.array([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]) * u.deg
-        self.point_detection["H_StartLon"] = Longitude(harvey_lon + np.array(self.point_detection['StartLon']) * u.deg)
-        self.point_detection["H_EndLon"] = Longitude(harvey_lon + np.array(self.point_detection['EndLon']) * u.deg)
+        harvey_lon = np.array([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]).reshape(self.point_detection['Date'].size) * u.deg
+        self.point_detection['H_StartLon'] = Longitude(harvey_lon + np.array(self.point_detection['StartLon']) * u.deg)
+        self.point_detection['H_EndLon'] = Longitude(harvey_lon + np.array(self.point_detection['EndLon']) * u.deg)
 
-    def write_table(self, table, write_dir=''):
+    def write_table(self, write_dir=''):
 
         if self.begin_date == self.end_date:
             date_string = str(self.begin_date)
@@ -353,7 +353,7 @@ class PCH_Detection:
         if write_dir == '':
             write_dir = self.dir
 
-        write_file = write_dir+'/'+self.detector+'_'+table.meta['name']+date_string+'.csv'
+        write_file = write_dir+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string+'.csv'
 
-        ascii.write(table, format='ecsv', filename=write_file)
+        ascii.write(self.point_detection, write_file, format='ecsv')
 

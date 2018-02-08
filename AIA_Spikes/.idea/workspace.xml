@@ -2,6 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7317b70c-e847-4124-9b85-686203542308" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/AIA_Spikes.iml" afterPath="$PROJECT_DIR$/.idea/AIA_Spikes.iml" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/PolarCoronalHoles.iml" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/PolarCoronalHoles.iml" />
+      <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/misc.xml" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/misc.xml" />
       <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/PCH_Detection.py" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/PCH_Detection.py" />
     </list>
@@ -17,11 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="228">
-              <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="60" selection-end-column="52" />
+            <state relative-caret-position="603">
+              <caret line="76" column="0" lean-forward="true" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -29,11 +34,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SpikesDB.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="93">
-              <caret line="10" column="47" lean-forward="false" selection-start-line="10" selection-start-column="8" selection-end-line="10" selection-end-column="47" />
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="10" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -56,8 +61,8 @@
       <file leaf-file-name="Spikes_Stats.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Spikes_Stats.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+            <state relative-caret-position="-1071">
+              <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding>
                 <element signature="e#143#152#0" expanded="true" />
               </folding>
@@ -107,8 +112,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="311" />
-    <option name="y" value="166" />
+    <option name="x" value="2" />
+    <option name="y" value="23" />
     <option name="width" value="1464" />
     <option name="height" value="1112" />
   </component>
@@ -145,6 +150,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -316,7 +322,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="311" y="166" width="1464" height="1112" extended-state="0" />
+    <frame x="2" y="23" width="1464" height="1112" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -789,12 +795,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Spikes_Stats.py">
+    <entry file="file://$PROJECT_DIR$/SpikesDB.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="10" />
           <folding>
-            <element signature="e#143#152#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -809,22 +815,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
+    <entry file="file://$PROJECT_DIR$/Spikes_Stats.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="60" selection-end-column="52" />
+        <state relative-caret-position="-1071">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#143#152#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikesDB.py">
+    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="93">
-          <caret line="10" column="47" lean-forward="false" selection-start-line="10" selection-start-column="8" selection-end-line="10" selection-end-column="47" />
+        <state relative-caret-position="603">
+          <caret line="76" column="0" lean-forward="true" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
