@@ -2,13 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/.idea/AIA_Spikes.iml" afterPath="$PROJECT_DIR$/../AIA_Spikes/.idea/AIA_Spikes.iml" />
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/.idea/misc.xml" afterPath="$PROJECT_DIR$/../AIA_Spikes/.idea/misc.xml" />
       <change beforePath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/PolarCoronalHoles.iml" afterPath="$PROJECT_DIR$/.idea/PolarCoronalHoles.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/SpikeVectors.py" afterPath="$PROJECT_DIR$/../AIA_Spikes/SpikeVectors.py" />
+      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/SpikesDB.py" afterPath="$PROJECT_DIR$/../AIA_Spikes/SpikesDB.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/PCH_Detection.py" afterPath="$PROJECT_DIR$/PCH_Detection.py" />
+      <change beforePath="$PROJECT_DIR$/PCH_Tools.py" afterPath="$PROJECT_DIR$/PCH_Tools.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,11 +18,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PCH_Detection.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PCH_Detection.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="506">
-              <caret line="330" column="73" lean-forward="true" selection-start-line="330" selection-start-column="73" selection-end-line="330" selection-end-column="73" />
+            <state relative-caret-position="408">
+              <caret line="328" column="47" lean-forward="true" selection-start-line="328" selection-start-column="47" selection-end-line="328" selection-end-column="47" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -55,12 +54,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PCH_Tools.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="PCH_Tools.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="25" lean-forward="false" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
-              <folding />
+            <state relative-caret-position="663">
+              <caret line="324" column="0" lean-forward="true" selection-start-line="324" selection-start-column="0" selection-end-line="324" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -90,8 +91,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/PCH_tests.py" />
-        <option value="$PROJECT_DIR$/PCH_Tools.py" />
         <option value="$PROJECT_DIR$/PCH_Detection.py" />
+        <option value="$PROJECT_DIR$/PCH_Tools.py" />
       </list>
     </option>
   </component>
@@ -102,8 +103,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="90" />
-    <option name="y" value="151" />
+    <option name="x" value="364" />
+    <option name="y" value="142" />
     <option name="width" value="1464" />
     <option name="height" value="1112" />
   </component>
@@ -478,11 +479,18 @@
       <option name="project" value="LOCAL" />
       <updated>1518120324657</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="Fixed Table errors&#10;Fixed writing errors">
+      <created>1518131075791</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1518131075791</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="90" y="151" width="1464" height="1112" extended-state="0" />
+    <frame x="364" y="142" width="1464" height="1112" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -518,7 +526,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Plot PCH data" />
     <MESSAGE value="Range expansion for enhanced data." />
-    <option name="LAST_COMMIT_MESSAGE" value="Range expansion for enhanced data." />
+    <MESSAGE value="Fixed Table errors&#10;Fixed writing errors" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Table errors&#10;Fixed writing errors" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -561,7 +570,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
           <caret line="37" column="41" lean-forward="false" selection-start-line="37" selection-start-column="41" selection-end-line="37" selection-end-column="41" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -599,7 +610,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4500">
           <caret line="306" column="59" lean-forward="true" selection-start-line="306" selection-start-column="59" selection-end-line="306" selection-end-column="59" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -627,7 +640,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3855">
           <caret line="261" column="11" lean-forward="false" selection-start-line="261" selection-start-column="11" selection-end-line="261" selection-end-column="11" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -655,7 +670,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3855">
           <caret line="261" column="11" lean-forward="true" selection-start-line="261" selection-start-column="11" selection-end-line="261" selection-end-column="11" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -693,7 +710,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4425">
           <caret line="298" column="21" lean-forward="true" selection-start-line="298" selection-start-column="21" selection-end-line="298" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -731,7 +750,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="675">
           <caret line="47" column="53" lean-forward="true" selection-start-line="47" selection-start-column="53" selection-end-line="47" selection-end-column="53" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -749,7 +770,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="12" column="3" lean-forward="true" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -770,14 +793,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="25" lean-forward="false" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_series.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="313">
@@ -790,10 +805,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="330" column="73" lean-forward="true" selection-start-line="330" selection-start-column="73" selection-end-line="330" selection-end-column="73" />
+        <state relative-caret-position="408">
+          <caret line="328" column="47" lean-forward="true" selection-start-line="328" selection-start-column="47" selection-end-line="328" selection-end-column="47" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="324" column="0" lean-forward="true" selection-start-line="324" selection-start-column="0" selection-end-line="324" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -5,13 +5,27 @@ import numpy as np
 import glob
 import sys
 
+
+def query(question):
+    yes = {'yes', 'y', 'ye', ''}
+    no = {'no', 'n'}
+
+    choice = input(question).lower()
+    if choice in yes:
+        return True
+    elif choice in no:
+        return False
+    else:
+        sys.stdout.write("Please respond with 'yes' or 'no'")
+
+
 class SpikesDB:
 
     def __init__(self, db_location):
         self.dir = os.path.abspath(db_location)
         self.n_files = sum([len(files) for r, d, files in os.walk(self.dir)])
 
-        if self.query('Build database for '+str(self.n_files)+' files?'):
+        if query('Build database for '+str(self.n_files)+' files?'):
             self.file_list_gen()
             self.time_gen()
             self.wave_gen()
@@ -50,15 +64,3 @@ class SpikesDB:
     def wave_gen(self):
         self.wave = np.asarray([ii.split(':')[-1].split('_')[1].split('.')[0] for ii in self.fullfilelist], dtype='uint16')
 
-    def query(self, question):
-
-        yes = {'yes', 'y', 'ye', ''}
-        no = {'no', 'n'}
-
-        choice = input(question).lower()
-        if choice in yes:
-            return True
-        elif choice in no:
-            return False
-        else:
-            sys.stdout.write("Please respond with 'yes' or 'no'")

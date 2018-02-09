@@ -141,6 +141,8 @@ def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
     # returns a fractional hole quality between 0 and 1
     # 1 is a very well defined hole, 0 is an undefined hole (not actually possible)
 
+    # something is not working here - continually returns values over 1
+
     arc_width = rsun_pix(masked_map)[0] * (0.995 - 0.965)
     degree_sep = GreatArc(hole_start, hole_end).inner_angle.to(u.deg)
     arc_length = 2 * np.pi * rsun_pix(masked_map)[0] * u.pix * (degree_sep/(360. * u.deg))

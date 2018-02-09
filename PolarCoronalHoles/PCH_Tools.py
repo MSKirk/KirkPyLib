@@ -306,6 +306,19 @@ def annulus_mask(array_shape, inner_radius, outer_radius, center=(0,0)):
     return rr_in * rr_out
 
 
+def query(question):
+    yes = {'yes', 'y', 'ye', ''}
+    no = {'no', 'n'}
+
+    choice = input(question).lower()
+    if choice in yes:
+        return True
+    elif choice in no:
+        return False
+    else:
+        sys.stdout.write("Please respond with 'yes' or 'no'")
+
+
 def coord_rec2spher(xx, yy, zz):
     # http://sce.uhcl.edu/helm/SpaceNavHandbook/Chapter5.pdf
     # SPACE NAVIGATION HANDBOOK  NAVPERS 92988 July 1, 1961

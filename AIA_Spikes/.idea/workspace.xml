@@ -2,13 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7317b70c-e847-4124-9b85-686203542308" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/AIA_Spikes.iml" afterPath="$PROJECT_DIR$/.idea/AIA_Spikes.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/PolarCoronalHoles.iml" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/PolarCoronalHoles.iml" />
-      <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/misc.xml" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/misc.xml" />
+      <change beforePath="$PROJECT_DIR$/SpikeVectors.py" afterPath="$PROJECT_DIR$/SpikeVectors.py" />
+      <change beforePath="$PROJECT_DIR$/SpikesDB.py" afterPath="$PROJECT_DIR$/SpikesDB.py" />
       <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/PCH_Detection.py" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/PCH_Detection.py" />
+      <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/PCH_Tools.py" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/PCH_Tools.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,11 +20,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="603">
-              <caret line="76" column="0" lean-forward="true" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+            <state relative-caret-position="90">
+              <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -34,11 +32,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SpikesDB.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="10" />
+            <state relative-caret-position="120">
+              <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -97,11 +95,11 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/download_spikes_files.py" />
-        <option value="$PROJECT_DIR$/SpikesDB.py" />
         <option value="$PROJECT_DIR$/Spikes_Stats.py" />
-        <option value="$PROJECT_DIR$/SpikeVectors.py" />
         <option value="/Volumes/BigSolar/AIA_Spikes/dirs.txt" />
         <option value="$PROJECT_DIR$/FileMangementForBigSolar.py" />
+        <option value="$PROJECT_DIR$/SpikeVectors.py" />
+        <option value="$PROJECT_DIR$/SpikesDB.py" />
       </list>
     </option>
   </component>
@@ -795,16 +793,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikesDB.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="10" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FileMangementForBigSolar.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="450">
@@ -827,10 +815,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="603">
-          <caret line="76" column="0" lean-forward="true" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+        <state relative-caret-position="90">
+          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SpikesDB.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
