@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/SpikeVectors.py" afterPath="$PROJECT_DIR$/../AIA_Spikes/SpikeVectors.py" />
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/SpikesDB.py" afterPath="$PROJECT_DIR$/../AIA_Spikes/SpikesDB.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/PCH_Detection.py" afterPath="$PROJECT_DIR$/PCH_Detection.py" />
-      <change beforePath="$PROJECT_DIR$/PCH_Tools.py" afterPath="$PROJECT_DIR$/PCH_Tools.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -486,7 +481,14 @@
       <option name="project" value="LOCAL" />
       <updated>1518131075791</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Fixed Table errors&#10;Fixed writing errors">
+      <created>1518190440536</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1518190440536</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="ToolWindowManager">
