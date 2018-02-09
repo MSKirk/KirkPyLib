@@ -488,7 +488,14 @@
       <option name="project" value="LOCAL" />
       <updated>1518190440536</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="Query Addition&#10;Comments">
+      <created>1518190464166</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1518190464166</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -529,7 +536,8 @@
     <MESSAGE value="Plot PCH data" />
     <MESSAGE value="Range expansion for enhanced data." />
     <MESSAGE value="Fixed Table errors&#10;Fixed writing errors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed Table errors&#10;Fixed writing errors" />
+    <MESSAGE value="Query Addition&#10;Comments" />
+    <option name="LAST_COMMIT_MESSAGE" value="Query Addition&#10;Comments" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
