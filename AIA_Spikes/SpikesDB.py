@@ -30,18 +30,22 @@ class SpikesDB:
             self.time_gen()
             self.wave_gen()
             self.db_gen()
-            self.db_save()
 
         print('Spikes database file stored in: '+self.dir+'/Table_SpikesDB.h5')
 
     def db_gen(self):
 
-        # Time in JD | Wavelength | full file path | file size
-        df = {'MJDTime': self.time_object.mjd, 'YMDTime': self.time_object.datetime, 'Wavelength': self.wave, 'Path': self.fullfilelist, 'Size': self.filesize}
-        self.spikes_df=pd.DataFrame(data=df)
+        # Time in JD | Time in YMD | Wavelength | file path | file size
 
-    def db_save(self):
-        self.spikes_df.to_hdf(self.dir+'/Table_SpikesDB.h5', 'table', mode='w')
+        store = pd.HDFStore(self.dir+'/Table_SpikesDB.h5')
+    
+        store.put('Path', pd.DataFrame(data={'Path': self.fullfilelist}).astype('|S60'))
+        store.put('MJDTime', pd.DataFrame(data={'MJDTime': self.time_object.mjd}))
+        store.put('YMDTime', pd.DataFrame(data={'YMDTime': self.time_object.datetime}))
+        store.put('Wavelength', pd.DataFrame(data={'Wavelength': self.wave}))
+        store.put('Size', pd.DataFrame(data={'Size': self.filesize}))
+        
+        store.close()
 
     def file_list_gen(self):
         self.filesize = np.zeros(self.n_files, dtype='uint32')
@@ -50,7 +54,7 @@ class SpikesDB:
         # search for a file list and extract the file size
         for ii, filename in enumerate(glob.iglob(self.dir + '/**/20*.*.fits', recursive=True)):
             self.filesize[ii] = os.path.getsize(filename)
-            self.fullfilelist[ii] = filename
+            self.fullfilelist[ii] = filename[28:]
 
         # set up a filter for null results
         self.filesize = self.filesize[[jj for jj,kk in enumerate(self.fullfilelist) if kk != '']]
