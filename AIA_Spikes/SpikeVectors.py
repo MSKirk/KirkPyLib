@@ -87,12 +87,12 @@ class Sort_Spikes:
 
                 for ind_num in subset.index:
                     good_spikes_vector = (spikes_to_image(self.dir+subset.Path[ind_num].decode('UTF-8'))[0,:,:]*spike_filter).flatten()
-                    good_spikes_lev1 = (spikes_to_image(self.dir+subset.Path[ind_num].decode('UTF-8')[1,:,:]*spike_filter).flatten()
+                    good_spikes_lev1 = (spikes_to_image(self.dir+subset.Path[ind_num].decode('UTF-8'))[1,:,:]*spike_filter).flatten()
                     good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
                     # Need to compress the output CompImageHDU maybe?
                     hdu = fits.PrimaryHDU(np.stack((good_spikes_index,good_spikes_vector[good_spikes_index],good_spikes_lev1[good_spikes_index])))
-                    hdu.writeto(self.filter_spike_file_rename(subset.Path[ind_num]), overwrite=True)
+                    hdu.writeto(self.filter_spike_file_rename(self.dir+subset.Path[ind_num].decode('UTF-8')), overwrite=True)
 
                 print('Group number '+str(group_number)+' is complete.')
 
