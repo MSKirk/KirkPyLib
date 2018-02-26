@@ -38,7 +38,7 @@ class Sort_Spikes:
         self.n_co_spikes = 2.
 
         # Read in the expected DB file
-        self.spikes_db = pd.HDFStore(self.dir+'/Table_SpikesDB.h5', 'table')
+        self.spikes_db = pd.HDFStore(self.dir+'/Table_SpikesDB.h5')
 
         # Segment the DB into 12s groups (a full cycle of wavelengths)
         self.db_groups()
