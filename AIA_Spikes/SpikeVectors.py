@@ -23,6 +23,7 @@ def spikes_to_image(spike_file):
 
     return np.stack((spike_vector.reshape((4096, 4096)), lev1_vector.reshape((4096, 4096))))
 
+
 class Sort_Spikes:
     def __init__(self, directory, count_index=0):
         # This isn't fast enough yet....
@@ -37,7 +38,7 @@ class Sort_Spikes:
         self.n_co_spikes = 2.
 
         # Read in the expected DB file
-        self.spikes_db = pd.read_hdf(self.dir+'/Table_SpikesDB.h5', 'table')
+        self.spikes_db = pd.HDFStore(self.dir+'/Table_SpikesDB.h5', 'table')
 
         # Segment the DB into 12s groups (a full cycle of wavelengths)
         self.db_groups()
@@ -47,7 +48,9 @@ class Sort_Spikes:
 
     def db_groups(self):
         # group the spikes into 12 second intervals
-        self.spikes_db['GroupNumber'] = self.spikes_db.groupby(pd.Grouper(key='YMDTime', freq='12s')).ngroup()
+
+        if '/GroupNumber' not in self.spikes_db.keys():
+            self.spikes_db.put('GroupNumber', self.spikes_db.get('YMDTime').groupby(pd.Grouper(key='YMDTime', freq='12s')).ngroup())
 
     def good_spike_filter(self, subset):
         # 3x3 structuring element with connectivity 2
@@ -56,7 +59,7 @@ class Sort_Spikes:
         spike_filter = np.zeros((4096, 4096))
 
         for spike_path in subset.Path:
-            spike_filter += ndimage.binary_dilation((spikes_to_image(spike_path)[0,:,:] > 0), structure=struct).astype(spike_filter.dtype)
+            spike_filter += ndimage.binary_dilation((spikes_to_image(self.dir+spike_path.decode('UTF-8'))[0, :, :] > 0), structure=struct).astype(spike_filter.dtype)
 
         return spike_filter > (self.n_co_spikes - 1)
 
@@ -69,11 +72,14 @@ class Sort_Spikes:
         # Create a new file database with only good spikes.
         # The file name is identical to the generating file except it is .filtered.fits
 
-        for count, group_number in enumerate(self.spikes_db.GroupNumber.unique()):
+        group_numbers = self.spikes_db.get('GroupNumber')
+        paths = self.spikes_db.get('Path')
+
+        for count, group_number in enumerate(group_numbers.unique()):
 
             # Selecting every 8th file for crappy multi threading
             if count % 8 == self.count_index:
-                subset = self.spikes_db.loc[self.spikes_db['GroupNumber'] == group_number]
+                subset = paths.loc[group_numbers == group_number]
 
                 # should create a file checking to see if it already exists.
 
@@ -92,7 +98,7 @@ class Sort_Spikes:
 
     def plot_example(self):
         # Plotting an example of a spikes image
-        sp_im = spikes_to_image('/Volumes/BigSolar/AIA_Spikes/2010/06/04/H1600/2010-06-04T16:00:23.07Z_0131.spikes.fits')
+        sp_im = spikes_to_image('/Volumes/BigSolar/AIA_Spikes/2010/06/04/2010-06-04T16:00:23.07Z_0131.spikes.fits')
         plt.imshow(sp_im[0, :, :] > 1, cmap='binary_r')
         plt.axis('off')
         plt.title('All Spikes Removed from an AIA 131 Image')
