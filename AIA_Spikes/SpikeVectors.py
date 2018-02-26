@@ -86,8 +86,8 @@ class Sort_Spikes:
                 spike_filter = self.good_spike_filter(subset)
 
                 for ind_num in subset.index:
-                    good_spikes_vector = (spikes_to_image(subset.Path[ind_num])[0,:,:]*spike_filter).flatten()
-                    good_spikes_lev1 = (spikes_to_image(subset.Path[ind_num])[1,:,:]*spike_filter).flatten()
+                    good_spikes_vector = (spikes_to_image(self.dir+subset.Path[ind_num].decode('UTF-8'))[0,:,:]*spike_filter).flatten()
+                    good_spikes_lev1 = (spikes_to_image(self.dir+subset.Path[ind_num].decode('UTF-8')[1,:,:]*spike_filter).flatten()
                     good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
                     # Need to compress the output CompImageHDU maybe?
