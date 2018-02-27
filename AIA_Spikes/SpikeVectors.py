@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from astropy.io import fits
 from scipy import ndimage
+import matplotlib.pyplot as plt
 
 
 def spikes_to_image(spike_file):
@@ -22,6 +23,14 @@ def spikes_to_image(spike_file):
     lev1_vector[raw_spikes[0, :]] = raw_spikes[2, :]
 
     return np.stack((spike_vector.reshape((4096, 4096)), lev1_vector.reshape((4096, 4096))))
+
+
+def plot_example():
+    # Plotting an example of a spikes image
+    sp_im = spikes_to_image('/Volumes/BigSolar/AIA_Spikes/2010/06/04/2010-06-04T16:00:23.07Z_0131.spikes.fits')
+    plt.imshow(sp_im[0, :, :] > 1, cmap='binary_r')
+    plt.axis('off')
+    plt.title('All Spikes Removed from an AIA 131 Image')
 
 
 class Sort_Spikes:
@@ -58,8 +67,11 @@ class Sort_Spikes:
 
         spike_filter = np.zeros((4096, 4096))
 
+        self.sp_im = []
+
         for spike_path in subset.Path:
-            spike_filter += ndimage.binary_dilation((spikes_to_image(self.dir+spike_path.decode('UTF-8'))[0, :, :] > 0), structure=struct).astype(spike_filter.dtype)
+            self.sp_im += [spikes_to_image(self.dir+spike_path.decode('UTF-8'))]
+            spike_filter += ndimage.binary_dilation((self.sp_im[-1][0, :, :] > 0), structure=struct).astype(spike_filter.dtype)
 
         return spike_filter > (self.n_co_spikes - 1)
 
@@ -86,19 +98,13 @@ class Sort_Spikes:
                 spike_filter = self.good_spike_filter(subset)
 
                 for ind_num in subset.index:
-                    good_spikes_vector = (spikes_to_image(self.dir+subset.Path[ind_num].decode('UTF-8'))[0,:,:]*spike_filter).flatten()
-                    good_spikes_lev1 = (spikes_to_image(self.dir+subset.Path[ind_num].decode('UTF-8'))[1,:,:]*spike_filter).flatten()
+                    good_spikes_vector = (self.sp_im[ind_num-subset.index.min()][0,:,:]*spike_filter).flatten()
+                    good_spikes_lev1 = (self.sp_im[ind_num-subset.index.min()][1,:,:]*spike_filter).flatten()
                     good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
-                    # Need to compress the output CompImageHDU maybe?
-                    hdu = fits.PrimaryHDU(np.stack((good_spikes_index,good_spikes_vector[good_spikes_index],good_spikes_lev1[good_spikes_index])))
+                    hdu = fits.PrimaryHDU(np.stack((good_spikes_index, good_spikes_vector[good_spikes_index], good_spikes_lev1[good_spikes_index])).astype('int32'))
                     hdu.writeto(self.filter_spike_file_rename(self.dir+subset.Path[ind_num].decode('UTF-8')), overwrite=True)
 
                 print('Group number '+str(group_number)+' is complete.')
 
-    def plot_example(self):
-        # Plotting an example of a spikes image
-        sp_im = spikes_to_image('/Volumes/BigSolar/AIA_Spikes/2010/06/04/2010-06-04T16:00:23.07Z_0131.spikes.fits')
-        plt.imshow(sp_im[0, :, :] > 1, cmap='binary_r')
-        plt.axis('off')
-        plt.title('All Spikes Removed from an AIA 131 Image')
+        self.spikes_db.close()
