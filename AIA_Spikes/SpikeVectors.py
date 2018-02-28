@@ -25,6 +25,17 @@ def spikes_to_image(spike_file):
     return np.stack((spike_vector.reshape((4096, 4096)), lev1_vector.reshape((4096, 4096))))
 
 
+def image_to_spikes(images):
+    # Take an [2, :, :] image numpy array and write it like a spike file
+    # returs an astropy fits hdu object
+
+    spikes_index = np.where((images[0, :, :].flatten() > 0))[0]
+
+    hdu = fits.PrimaryHDU(np.stack((spikes_index, images[0, :, :].flatten()[spikes_index], images[1, :, :].flatten()[spikes_index])).astype('int32'))
+
+    return hdu
+
+
 def plot_example():
     # Plotting an example of a spikes image
     sp_im = spikes_to_image('/Volumes/BigSolar/AIA_Spikes/2010/06/04/2010-06-04T16:00:23.07Z_0131.spikes.fits')
