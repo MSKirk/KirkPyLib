@@ -40,9 +40,9 @@ def filesize_benchmark():
 
 def sort_spikes_benchmark():
     startTime = datetime.now()
-    sv.Sort_Spikes('/Volumes/BigSolar/AIA_Spikes', end_group=24)
+    sv.Sort_Spikes('/Volumes/BigSolar/AIA_Spikes', end_group=48)
     timedif = datetime.now()-startTime
-    ngroups = (24/8)+1
+    ngroups = (48/8)+1
 
     print('Processing over %0.0f groups:' %ngroups)
     print('Total processing time %0.1f seconds;' %timedif.total_seconds())
