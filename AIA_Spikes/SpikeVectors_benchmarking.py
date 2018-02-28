@@ -1,7 +1,7 @@
 from datetime import datetime
 from AIA_Spikes import SpikeVectors as sv
 import os
-from astropy.io import fits
+import pandas as pd
 import numpy as np
 
 def io_benchmark(directory):
@@ -17,8 +17,8 @@ def io_benchmark(directory):
             hdu.writeto(direc+'/'+f, overwrite=True)
             times = times + [datetime.now() - startTime]
 
-    print('Over', len(ffiles)-1, 'files,')
-    print('It takes an average of', np.mean(times).total_seconds(), ' seconds for file I/O.')
+    print('Over %0.0f files.' %(len(ffiles)-1))
+    print('It takes an average of %0.1f seconds for file I/O.' %np.mean(times).total_seconds())
 
 
 def filesize_benchmark():
@@ -34,15 +34,32 @@ def filesize_benchmark():
 
     redux_ratio = np.sum(ff_size[1:])/np.sum(uf_size[1:len(ff_size)])
 
-    print('Over', len(ff_size)-1, 'files,')
-    print('filtered files are', redux_ratio,'% the size of the original.')
+    print('Over %0.0f files' %(len(ff_size)-1))
+    print('filtered files are %0.3f times the size of the original.' %float(redux_ratio))
 
 
 def sort_spikes_benchmark():
     startTime = datetime.now()
     sv.Sort_Spikes('/Volumes/BigSolar/AIA_Spikes', end_group=24)
     timedif = datetime.now()-startTime
+    ngroups = (24/8)+1
 
-    print('Processing over', 24 % 8, 'groups:')
-    print('Total processing time', timedif.total_seconds(), ' seconds;')
-    print('Averaging', timedif.total_seconds()/((24 % 8) * 7), ' seconds per spike file.')
+    print('Processing over %0.0f groups:' %ngroups)
+    print('Total processing time %0.1f seconds;' %timedif.total_seconds())
+    print('Averaging %0.1f seconds per spike file (not counting initialization).' %((timedif.total_seconds()-61.3)/(ngroups * 7)))
+
+
+def initialization_benchmark():
+    startTime = datetime.now()
+    spikes_db = pd.HDFStore('/Volumes/BigSolar/AIA_Spikes/Table_SpikesDB.h5')
+    group_numbers = spikes_db.get('GroupNumber')
+    paths = spikes_db.get('Path')
+    spikes_db.close()
+
+    group_numbers = None
+    paths = None
+    timedif = datetime.now() - startTime
+
+    print('Total initialization time: %0.1f seconds;' %timedif.total_seconds())
+
+

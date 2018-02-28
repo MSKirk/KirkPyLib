@@ -102,6 +102,8 @@ class Sort_Spikes:
             # Exit the loop early.
             if group_number > terminus:
                 self.spikes_db.close()
+                group_numbers = None
+                paths = None
                 break
 
             # Selecting every 8th file for crappy multi threading
@@ -123,3 +125,5 @@ class Sort_Spikes:
                 print('Group number '+str(group_number)+' is complete.')
 
         self.spikes_db.close()
+        group_numbers = None
+        paths = None
