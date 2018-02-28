@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 
+
 def io_benchmark(directory):
     direc = os.path.abspath(directory)
     ffiles = [f for f in os.listdir(direc) if os.path.isfile(os.path.join(direc, f))]
@@ -18,7 +19,7 @@ def io_benchmark(directory):
             times = times + [datetime.now() - startTime]
 
     print('Over %0.0f files.' %(len(ffiles)-1))
-    print('It takes an average of %0.1f seconds for file I/O.' %np.mean(times).total_seconds())
+    print('It takes an average of %0.3f seconds for file I/O.' %np.mean(times).total_seconds())
 
 
 def filesize_benchmark():
@@ -60,6 +61,6 @@ def initialization_benchmark():
     paths = None
     timedif = datetime.now() - startTime
 
-    print('Total initialization time: %0.1f seconds;' %timedif.total_seconds())
+    print('Total initialization time: %0.2f seconds;' %timedif.total_seconds())
 
 
