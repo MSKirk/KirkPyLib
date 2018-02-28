@@ -45,7 +45,7 @@ def plot_example():
 
 
 class Sort_Spikes:
-    def __init__(self, directory, count_index=0):
+    def __init__(self, directory, count_index=0, end_group=None):
         # This isn't fast enough yet....
         # Bench marking is putting the processing rate at about 1 file per sec. (
         #
@@ -64,7 +64,7 @@ class Sort_Spikes:
         self.db_groups()
 
         # Generate filtered spike files
-        self.good_spike_db_gen()
+        self.good_spike_db_gen(terminus=end_group)
 
     def db_groups(self):
         # group the spikes into 12 second intervals
@@ -91,7 +91,7 @@ class Sort_Spikes:
         new_name = 'filtered'+str(int(self.n_co_spikes))
         return old_filename.replace('spikes', new_name).replace('AIA_Spikes', 'Filtered_Spikes')
 
-    def good_spike_db_gen(self):
+    def good_spike_db_gen(self, terminus=float('inf')):
         # Create a new file database with only good spikes.
         # The file name is identical to the generating file except it is .filtered.fits
 
@@ -99,6 +99,10 @@ class Sort_Spikes:
         paths = self.spikes_db.get('Path')
 
         for count, group_number in enumerate(group_numbers.unique()):
+            # Exit the loop early.
+            if group_number > terminus:
+                self.spikes_db.close()
+                break
 
             # Selecting every 8th file for crappy multi threading
             if count % 8 == self.count_index:

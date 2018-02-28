@@ -17,8 +17,8 @@ def io_benchmark(directory):
             hdu.writeto(direc+'/'+f, overwrite=True)
             times = times + [datetime.now() - startTime]
 
-    print('Over ', len(ffiles), 'files,')
-    print('It takes an average of ', np.mean(times).total_seconds(), ' seconds to read and write each file.')
+    print('Over', len(ffiles)-1, 'files,')
+    print('It takes an average of', np.mean(times).total_seconds(), ' seconds for file I/O.')
 
 
 def filesize_benchmark():
@@ -32,7 +32,17 @@ def filesize_benchmark():
     ufiles = [f for f in os.listdir(unfiltered_dir) if os.path.isfile(os.path.join(unfiltered_dir, f))]
     uf_size = [os.path.getsize(unfiltered_dir + '/' + f) for f in ufiles]
 
-    redux_ratio = ff_size[1:]/uf_size[1:len(ff_size)]
+    redux_ratio = np.sum(ff_size[1:])/np.sum(uf_size[1:len(ff_size)])
 
-    print('Over ', len(ff_size), 'files,')
-    print('filtered files are ', redux_ratio,'% the size of the original.')
+    print('Over', len(ff_size)-1, 'files,')
+    print('filtered files are', redux_ratio,'% the size of the original.')
+
+
+def sort_spikes_benchmark():
+    startTime = datetime.now()
+    sv.Sort_Spikes('/Volumes/BigSolar/AIA_Spikes', end_group=24)
+    timedif = datetime.now()-startTime
+
+    print('Processing over', 24 % 8, 'groups:')
+    print('Total processing time', timedif.total_seconds(), ' seconds;')
+    print('Averaging', timedif.total_seconds()/((24 % 8) * 7), ' seconds per spike file.')
