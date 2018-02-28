@@ -15,7 +15,7 @@ def spikes_to_image(spike_file):
     #
     # Returns a [2,4096,4096] array with [0,:,:] with the spike value, and [1,:,:] with the level 1 value
 
-    raw_spikes = fits.open(spike_file)[1].data
+    raw_spikes = fits.open(spike_file)[-1].data
     spike_vector = np.zeros((4096, 4096), dtype='int32').flatten()
     lev1_vector = np.zeros_like(spike_vector)
 
@@ -27,7 +27,7 @@ def spikes_to_image(spike_file):
 
 def image_to_spikes(images):
     # Take an [2, :, :] image numpy array and write it like a spike file
-    # returs an astropy fits hdu object
+    # returns an astropy fits hdu object
 
     spikes_index = np.where((images[0, :, :].flatten() > 0))[0]
 
