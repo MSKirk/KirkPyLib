@@ -3,7 +3,6 @@ from AIA_Spikes import SpikeVectors as sv
 import os
 import pandas as pd
 import numpy as np
-import astropy.units as u
 
 
 def io_benchmark(directory):
@@ -58,7 +57,7 @@ def sort_spikes_benchmark():
     print('Total processing time %0.1f seconds;' %timedif.total_seconds())
     print('Averaging %0.3f seconds per spike file (not counting initialization);' %time_per_file)
     print('Averaging %0.3f seconds of processing per spike file;' %(time_per_file-io_time))
-    print('And a projected processing time of %0.0f days to process all spikes' %((time_per_file*131198781*u.s).to('d')))
+    print('And a projected processing time of %0.0f days to process all spikes' %(time_per_file*131198781/86400))
 
 
 def initialization_benchmark():
