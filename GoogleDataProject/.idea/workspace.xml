@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f90e356f-7d85-441b-80d3-3c5d720d2ee0" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/../SolarWindCluster/.idea/vcs.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/../SolarWindCluster/CCMC_Data.py" />
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/SpikeVectors.py" afterPath="$PROJECT_DIR$/../AIA_Spikes/SpikeVectors.py" />
+      <change beforePath="$PROJECT_DIR$/../SolarWindCluster/CCMC_Data.py" afterPath="$PROJECT_DIR$/../SolarWindCluster/CCMC_Data.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
