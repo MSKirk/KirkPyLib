@@ -73,7 +73,9 @@ class Sort_Spikes:
             self.spikes_db.put('GroupNumber', self.spikes_db.get('YMDTime').groupby(pd.Grouper(key='YMDTime', freq='12s')).ngroup())
 
     def good_spike_filter(self, subset):
-        # 3x3 structuring element with connectivity 2
+        # Returns a masked array for coincident spikes; 3x3 structuring element with connectivity 2
+        # Also creates a list of spike_images for each wavelength
+
         struct = ndimage.generate_binary_structure(2, 2)
 
         spike_filter = np.zeros((4096, 4096))
@@ -92,7 +94,7 @@ class Sort_Spikes:
         return old_filename.replace('spikes', new_name).replace('AIA_Spikes', 'Filtered_Spikes')
 
     def good_spike_db_gen(self, terminus=float('inf')):
-        # Create a new file database with only good spikes.
+        # Create a new files with only good spikes.
         # The file name is identical to the generating file except it is .filtered.fits
 
         group_numbers = self.spikes_db.get('GroupNumber')
@@ -114,6 +116,7 @@ class Sort_Spikes:
 
                 spike_filter = self.good_spike_filter(subset)
 
+                # filtering spikes and saving files.
                 for ind_num in subset.index:
                     good_spikes_vector = (self.sp_im[ind_num-subset.index.min()][0,:,:]*spike_filter).flatten()
                     good_spikes_lev1 = (self.sp_im[ind_num-subset.index.min()][1,:,:]*spike_filter).flatten()

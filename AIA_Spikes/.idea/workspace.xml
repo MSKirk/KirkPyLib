@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7317b70c-e847-4124-9b85-686203542308" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/SpikeVectors_benchmarking.py" afterPath="$PROJECT_DIR$/SpikeVectors_benchmarking.py" />
+      <change beforePath="$PROJECT_DIR$/SpikeVectors.py" afterPath="$PROJECT_DIR$/SpikeVectors.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,11 +17,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="783">
-              <caret line="120" column="0" lean-forward="true" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
+            <state relative-caret-position="483">
+              <caret line="102" column="60" lean-forward="true" selection-start-line="102" selection-start-column="60" selection-end-line="102" selection-end-column="60" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -29,11 +29,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpikeVectors_benchmarking.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SpikeVectors_benchmarking.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SpikeVectors_benchmarking.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+            <state relative-caret-position="618">
+              <caret line="59" column="102" lean-forward="true" selection-start-line="59" selection-start-column="102" selection-end-line="59" selection-end-column="102" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -108,8 +108,8 @@
         <option value="/Volumes/BigSolar/AIA_Spikes/dirs.txt" />
         <option value="$PROJECT_DIR$/FileMangementForBigSolar.py" />
         <option value="$PROJECT_DIR$/SpikesDB.py" />
-        <option value="$PROJECT_DIR$/SpikeVectors.py" />
         <option value="$PROJECT_DIR$/SpikeVectors_benchmarking.py" />
+        <option value="$PROJECT_DIR$/SpikeVectors.py" />
       </list>
     </option>
   </component>
@@ -424,7 +424,14 @@
       <option name="project" value="LOCAL" />
       <updated>1519849656416</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Creating timing benchmarks for optimization.">
+      <created>1519849826818</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1519849826818</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -943,22 +950,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
+    <entry file="file://$PROJECT_DIR$/SpikeVectors_benchmarking.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="783">
-          <caret line="120" column="0" lean-forward="true" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
+        <state relative-caret-position="618">
+          <caret line="59" column="102" lean-forward="true" selection-start-line="59" selection-start-column="102" selection-end-line="59" selection-end-column="102" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#29#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikeVectors_benchmarking.py">
+    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        <state relative-caret-position="483">
+          <caret line="102" column="60" lean-forward="true" selection-start-line="102" selection-start-column="60" selection-end-line="102" selection-end-column="60" />
           <folding>
-            <element signature="e#0#29#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
