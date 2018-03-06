@@ -1,5 +1,6 @@
 import pandas as pd
 from astropy.time import Time
+import astropy.units as u
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
