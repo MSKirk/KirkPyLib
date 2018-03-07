@@ -5,6 +5,7 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
 import numpy as np
+import datetime
 
 def read_ccmc_model(filename):
     col_names = [['Time', 'R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat', 'N', 'T', 'E_r', 'E_lon',
@@ -59,3 +60,52 @@ def elbow_plot_kmeans(dataframe):
     plt.title('Elbow Curve')
     plt.show()
 
+
+def read_omni_data(filename):
+    # to read a omni asc text file from the archive
+
+    # See ftp://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/hroformat.txt for more information
+
+    col_names = [['Year', 'Day', 'Hour', 'Minute', 'ID_IMF', 'ID_SWPlasma', 'N_points_IMF', 'N_points_Plasma',
+                 'Percent_interp', 'Timeshift', 'RMS_Timeshift', 'RMS_Phase', 'Delta_Time', 'B_magnitude', 'Bx_GSE_GSM',
+                 'By_GSE', 'Bz_GSE', 'By_GSM', 'Bz_GSM', 'RMS_SD_B', 'RMS_SD_field', 'Flow_speed', 'Vx_GSE', 'Vy_GSE',
+                 'Vz_GSE', 'Proton_Density', 'Temp', 'Flow_pressure', 'E_field', 'Plasma_beta', 'Alfven_mach_num',
+                 'X_GSE', 'Y_GSE', 'Z_GSE', 'BSN_Xgse', 'BSN_Ygse', 'BSN_Zgse', 'AE_index', 'AL_index', 'AU_index',
+                 'SYM/D_index', 'SYM/H_index', 'ASY/D_index', 'ASY/H_index', 'PC_N_index', 'Mag_mach_num'],
+
+                 ['u.yr', 'u.d', 'u.h', 'u.min', '', '', '', '', 'u.percent', 'u.s', 'u.s', '', 'u.s', 'u.nT', 'u.nT',
+                  'u.nT', 'u.nT', 'u.nT', 'u.nT', 'u.nT', 'u.nT', 'u.km/u.s', 'u.km/u.s', 'u.km/u.s', 'u.km/u.s',
+                  'u.cm**-3', 'u.K', 'u.nPa', 'u.mV/u.m', '', '', '', '', '', '', '', '', 'u.nT', 'u.nT', 'u.nT','u.nT',
+                  'u.nT', 'u.nT', 'u.nT', '', '']]
+
+    tuples = list(zip(*col_names))
+    col_index = pd.MultiIndex.from_tuples(tuples, names=['measurement', 'units'])
+
+    df = pd.read_csv(filename, names=col_index, delimiter='\s+')
+
+    # Cleaning up NaN values for each measurement
+
+    nan_values = [['Year', 'Day', 'Hour', 'Minute', 'ID_IMF', 'ID_SWPlasma', 'N_points_IMF', 'N_points_Plasma',
+                 'Percent_interp', 'Timeshift', 'RMS_Timeshift', 'RMS_Phase', 'Delta_Time', 'B_magnitude', 'Bx_GSE_GSM',
+                 'By_GSE', 'Bz_GSE', 'By_GSM', 'Bz_GSM', 'RMS_SD_B', 'RMS_SD_field', 'Flow_speed', 'Vx_GSE', 'Vy_GSE',
+                 'Vz_GSE', 'Proton_Density', 'Temp', 'Flow_pressure', 'E_field', 'Plasma_beta', 'Alfven_mach_num',
+                 'X_GSE', 'Y_GSE', 'Z_GSE', 'BSN_Xgse', 'BSN_Ygse', 'BSN_Zgse', 'AE_index', 'AL_index', 'AU_index',
+                 'SYM/D_index', 'SYM/H_index', 'ASY/D_index', 'ASY/H_index', 'PC_N_index', 'Mag_mach_num'],
+
+                  [9999, 999, 99, 99, 99, 99, 999, 999, 999, 999999, 999999, 99.99, 999999, 9999.99, 9999.99, 9999.99,
+                   9999.99, 9999.99, 9999.99, 9999.99, 9999.99, 99999.9, 99999.9, 99999.9, 99999.9, 999.99, 9999999.,
+                   99.99, 999.99, 999.99, 999.9, 9999.99, 9999.99, 9999.99, 9999.99, 9999.99, 9999.99, 99, 99, 99, 99,
+                   99, 99, 99, 9.99, 99.9]]
+
+    nan_dic = dict(zip(*nan_values))
+
+    for key in df.keys():
+        df[key[0]] = df[key[0]].replace(nan_dic[key[0]], np.nan)
+
+    time_stamp = pd.Series([datetime.datetime(int(df['Year']['u.yr'][ii]), 1, 1) +
+                            datetime.timedelta(int(df['Day']['u.d'][ii]) - 1, hours=int(df['Hour']['u.h'][ii]),
+                                               minutes=int(df['Minute']['u.min'][ii])) for ii in df.index])
+
+    df.set_index(time_stamp)
+
+    return df
