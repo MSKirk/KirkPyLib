@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
 import numpy as np
 import datetime
+import matplotlib.ticker as ticker
+
 
 def read_ccmc_model(filename):
     col_names = [['Time', 'R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat', 'N', 'T', 'E_r', 'E_lon',
@@ -39,9 +41,17 @@ def read_ccmc_model(filename):
     return df
 
 
+def ccmc_kmeans_df(dataframe, number_of_clusters=5):
+    array_data = dataframe.drop(['Time', 'R', 'Lat', 'Lon'], axis=1).as_matrix()
+    km = KMeans(init='k-means++', n_clusters=number_of_clusters, n_init=150)
+    kmmodel = km.fit(array_data)
+
+    return kmmodel
+
+
 def elbow_plot_kmeans(dataframe):
     # dropping Time from clustering
-    array_data = dataframe.drop('Time', axis=1).as_matrix()
+    array_data = dataframe.drop(['Time', 'R', 'Lat', 'Lon'], axis=1).as_matrix()
     Nc = range(1, 20)
     distortions = []
     score = []
@@ -109,3 +119,73 @@ def read_omni_data(filename):
     df.set_index(time_stamp)
 
     return df
+
+
+def parallel_coordinates_plot(data_sets, style=None, xticknames=None):
+
+    dims = len(data_sets[0])
+    x = range(dims)
+    fig, axes = plt.subplots(1, dims-1, sharey=False)
+
+    if style is None:
+        style = ['r-']*len(data_sets)
+
+    # Calculate the limits on the data
+    min_max_range = list()
+    for m in zip(*data_sets):
+        mn = min(m)
+        mx = max(m)
+        if mn == mx:
+            mn -= 0.5
+            mx = mn + 1.
+        r = float(mx - mn)
+        min_max_range.append((mn, mx, r))
+
+    # Normalize the data sets
+    norm_data_sets = list()
+    for ds in data_sets:
+        nds = [(value - min_max_range[dimension][0]) /
+                min_max_range[dimension][2]
+                for dimension,value in enumerate(ds)]
+        norm_data_sets.append(nds)
+    data_sets = norm_data_sets
+
+    # Plot the datasets on all the subplots
+    for i, ax in enumerate(axes):
+        for dsi, d in enumerate(data_sets):
+            ax.plot(x, d, style[dsi])
+        ax.set_xlim([x[i], x[i+1]])
+
+    # Set the x axis ticks
+    for dimension, (axx,xx) in enumerate(zip(axes, x[:-1])):
+        axx.xaxis.set_major_locator(ticker.FixedLocator([xx]))
+        ticks = len(axx.get_yticklabels())
+        labels = list()
+        step = min_max_range[dimension][2] / (ticks - 1)
+        mn  = min_max_range[dimension][0]
+        for i in range(ticks):
+            v = mn + i*step
+            labels.append('%4.2f' % v)
+        axx.set_yticklabels(labels)
+        if xticknames:
+            axx.set_xticklabels(xticknames[dimension:dimension+1])
+
+
+    # Move the final axis' ticks to the right-hand side
+    axx = plt.twinx(axes[-1])
+    dimension += 1
+    axx.xaxis.set_major_locator(ticker.FixedLocator([x[-2], x[-1]]))
+    ticks = len(axx.get_yticklabels())
+    step = min_max_range[dimension][2] / (ticks - 1)
+    mn = min_max_range[dimension][0]
+    labels = ['%4.2f' % (mn + i*step) for i in range(ticks)]
+    axx.set_yticklabels(labels)
+    if xticknames:
+        axx.set_xticklabels([xticknames[-2],xticknames[-1]])
+
+
+    # Stack the subplots
+    plt.subplots_adjust(wspace=0)
+
+    return plt
+
