@@ -51,7 +51,7 @@ def ccmc_kmeans_df(dataframe, number_of_clusters=5):
 
 def elbow_plot_kmeans(dataframe):
     # dropping Time from clustering
-    array_data = dataframe.drop(['Time', 'R', 'Lat', 'Lon'], axis=1).as_matrix()
+    array_data = dataframe.as_matrix()
     Nc = range(1, 20)
     distortions = []
     score = []
@@ -193,8 +193,13 @@ def parallel_coordinates_plot(data_sets, style=None, xticknames=None):
 
 
 def ccmc_clusering(filename):
-    # DF {t, V, Np, B, Tp}
+    # included in the DF {Time, N, T, V, B, P_ram, E_mag}
 
-    dataframe = read_ccmc_model(filename)
+    df = read_ccmc_model(filename)
 
-    dataframe.drop(['R', 'Lat', 'Lon', 'BP'], axis=1)
+    df['E_mag'] = np.sqrt(df['E_r']['u.mV / u.m']**2+df['E_lon']['u.mV / u.m']**2+df['E_lat']['u.mV / u.m']**2)
+
+    df_array = df.drop(['R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat','E_r', 'E_lon',
+                        'E_lat', 'BP'], axis=1).as_matrix()
+
+    km = ccmc_kmeans_df(df_array)
