@@ -31,7 +31,7 @@ class SpikesDB:
             self.wave_gen()
             self.db_gen()
 
-        print('Spikes database file stored in: '+self.dir+'/Table_SpikesDB.h5')
+        print('Spikes database file stored in: '+os.path.join(self.dir, 'Table_SpikesDB.h5'))
 
     def db_gen(self):
 
@@ -52,7 +52,7 @@ class SpikesDB:
         self.fullfilelist = ['' for xx in range(self.n_files)]
 
         # search for a file list and extract the file size
-        for ii, filename in enumerate(glob.iglob(self.dir + '/**/20*.*.fits', recursive=True)):
+        for ii, filename in enumerate(glob.iglob(os.path.join(self.dir, '**/20*.*.fits'), recursive=True)):
             self.filesize[ii] = os.path.getsize(filename)
             self.fullfilelist[ii] = filename[28:]
 

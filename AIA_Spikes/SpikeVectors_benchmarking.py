@@ -13,9 +13,9 @@ def io_benchmark(directory):
     for f in ffiles:
         if f.endswith('.fits'):
             startTime = datetime.now()
-            sp_image = sv.spikes_to_image(direc+'/'+f)
+            sp_image = sv.spikes_to_image(os.path.join(direc, f))
             hdu = sv.image_to_spikes(sp_image)
-            hdu.writeto(direc+'/'+f, overwrite=True)
+            hdu.writeto(os.path.join(direc, f), overwrite=True)
             times = times + [datetime.now() - startTime]
 
     print('Over %0.0f files.' %(len(ffiles)-1))
@@ -29,10 +29,10 @@ def filesize_benchmark():
     unfiltered_dir = '/Volumes/BigSolar/AIA_Spikes/2010/05/13'
 
     ffiles = [f for f in os.listdir(filtered_dir) if os.path.isfile(os.path.join(filtered_dir, f))]
-    ff_size = [os.path.getsize(filtered_dir + '/' + f) for f in ffiles]
+    ff_size = [os.path.getsize(os.path.join(filtered_dir, f)) for f in ffiles]
 
     ufiles = [f for f in os.listdir(unfiltered_dir) if os.path.isfile(os.path.join(unfiltered_dir, f))]
-    uf_size = [os.path.getsize(unfiltered_dir + '/' + f) for f in ufiles]
+    uf_size = [os.path.getsize(os.path.join(unfiltered_dir, f)) for f in ufiles]
 
     redux_ratio = np.sum(ff_size[1:])/np.sum(uf_size[1:len(ff_size)])
 

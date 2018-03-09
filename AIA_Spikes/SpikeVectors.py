@@ -58,7 +58,7 @@ class Sort_Spikes:
         self.n_co_spikes = 2.
 
         # Read in the expected DB file
-        self.spikes_db = pd.HDFStore(self.dir+'/Table_SpikesDB.h5')
+        self.spikes_db = pd.HDFStore(os.path.join(self.dir,'Table_SpikesDB.h5'))
 
         # Segment the DB into 12s groups (a full cycle of wavelengths)
         self.db_groups()
@@ -123,7 +123,7 @@ class Sort_Spikes:
                     good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
                     hdu = fits.PrimaryHDU(np.stack((good_spikes_index, good_spikes_vector[good_spikes_index], good_spikes_lev1[good_spikes_index])).astype('int32'))
-                    hdu.writeto(self.filter_spike_file_rename(self.dir+subset.Path[ind_num].decode('UTF-8')), overwrite=True)
+                    hdu.writeto(self.filter_spike_file_rename(os.path.join(self.dir, subset.Path[ind_num].decode('UTF-8'))), overwrite=True)
 
                 print('Group number '+str(group_number)+' is complete.')
 

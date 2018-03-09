@@ -42,7 +42,7 @@ def read_ccmc_model(filename):
 
 
 def ccmc_kmeans_df(dataframe, number_of_clusters=5):
-    array_data = dataframe.drop(['Time', 'R', 'Lat', 'Lon'], axis=1).as_matrix()
+    array_data = dataframe.as_matrix()
     km = KMeans(init='k-means++', n_clusters=number_of_clusters, n_init=150)
     kmmodel = km.fit(array_data)
 
@@ -69,6 +69,8 @@ def elbow_plot_kmeans(dataframe):
     plt.ylabel('Group Distortion Score')
     plt.title('Elbow Curve')
     plt.show()
+
+    return plt
 
 
 def read_omni_data(filename):
@@ -189,3 +191,8 @@ def parallel_coordinates_plot(data_sets, style=None, xticknames=None):
 
     return plt
 
+
+def ccmc_clusering(filename):
+    dataframe = read_ccmc_model(filename)
+
+    dataframe.drop(['Time', 'R', 'Lat', 'Lon'], axis=1)
