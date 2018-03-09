@@ -83,7 +83,7 @@ class Sort_Spikes:
         self.sp_im = []
 
         for spike_path in subset.Path:
-            self.sp_im += [spikes_to_image(self.direc+spike_path.decode('UTF-8'))]
+            self.sp_im += [spikes_to_image( os.path.join(self.direc, spike_path.decode('UTF-8')))]
             spike_filter += ndimage.binary_dilation((self.sp_im[-1][0, :, :] > 0), structure=struct).astype(spike_filter.dtype)
 
         return spike_filter > (self.n_co_spikes - 1)

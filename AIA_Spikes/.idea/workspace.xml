@@ -4,7 +4,6 @@
     <list default="true" id="7317b70c-e847-4124-9b85-686203542308" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/SpikeVectors.py" afterPath="$PROJECT_DIR$/SpikeVectors.py" />
-      <change beforePath="$PROJECT_DIR$/SpikesDB.py" afterPath="$PROJECT_DIR$/SpikesDB.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,11 +17,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="74">
-              <caret line="66" column="50" lean-forward="true" selection-start-line="66" selection-start-column="50" selection-end-line="66" selection-end-column="50" />
+            <state relative-caret-position="482">
+              <caret line="85" column="25" lean-forward="true" selection-start-line="85" selection-start-column="25" selection-end-line="85" selection-end-column="25" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -42,7 +41,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SpikesDB.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="693">
@@ -112,8 +111,8 @@
         <option value="/Volumes/BigSolar/AIA_Spikes/dirs.txt" />
         <option value="$PROJECT_DIR$/SpikeVectors_benchmarking.py" />
         <option value="$PROJECT_DIR$/FileMangementForBigSolar.py" />
-        <option value="$PROJECT_DIR$/SpikeVectors.py" />
         <option value="$PROJECT_DIR$/SpikesDB.py" />
+        <option value="$PROJECT_DIR$/SpikeVectors.py" />
       </list>
     </option>
   </component>
@@ -442,7 +441,14 @@
       <option name="project" value="LOCAL" />
       <updated>1520618782736</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="Clean up file path calls.">
+      <created>1520623380150</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1520623380150</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -962,22 +968,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="74">
-          <caret line="66" column="50" lean-forward="true" selection-start-line="66" selection-start-column="50" selection-end-line="66" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SpikesDB.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="693">
           <caret line="56" column="62" lean-forward="false" selection-start-line="56" selection-start-column="62" selection-end-line="56" selection-end-column="62" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="482">
+          <caret line="85" column="25" lean-forward="true" selection-start-line="85" selection-start-column="25" selection-end-line="85" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
