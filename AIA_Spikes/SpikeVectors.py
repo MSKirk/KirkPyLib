@@ -50,7 +50,7 @@ class Sort_Spikes:
         # Bench marking is putting the processing rate at about 1 file per sec. (
         #
         # Root directory of the Database: e.g. '/Volumes/BigSolar/AIA_Spikes'
-        self.dir = os.path.abspath(directory)
+        self.direc = os.path.abspath(directory)
         self.count_index = int(count_index)
 
         # Number of Coincident spikes needed for a positive detection.
@@ -58,7 +58,7 @@ class Sort_Spikes:
         self.n_co_spikes = 2.
 
         # Read in the expected DB file
-        self.spikes_db = pd.HDFStore(os.path.join(self.dir,'Table_SpikesDB.h5'))
+        self.spikes_db = pd.HDFStore(os.path.join(self.direc,'Table_SpikesDB.h5'))
 
         # Segment the DB into 12s groups (a full cycle of wavelengths)
         self.db_groups()
@@ -83,7 +83,7 @@ class Sort_Spikes:
         self.sp_im = []
 
         for spike_path in subset.Path:
-            self.sp_im += [spikes_to_image(self.dir+spike_path.decode('UTF-8'))]
+            self.sp_im += [spikes_to_image(self.direc+spike_path.decode('UTF-8'))]
             spike_filter += ndimage.binary_dilation((self.sp_im[-1][0, :, :] > 0), structure=struct).astype(spike_filter.dtype)
 
         return spike_filter > (self.n_co_spikes - 1)
@@ -123,7 +123,7 @@ class Sort_Spikes:
                     good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
                     hdu = fits.PrimaryHDU(np.stack((good_spikes_index, good_spikes_vector[good_spikes_index], good_spikes_lev1[good_spikes_index])).astype('int32'))
-                    hdu.writeto(self.filter_spike_file_rename(os.path.join(self.dir, subset.Path[ind_num].decode('UTF-8'))), overwrite=True)
+                    hdu.writeto(self.filter_spike_file_rename(os.path.join(self.direc, subset.Path[ind_num].decode('UTF-8'))), overwrite=True)
 
                 print('Group number '+str(group_number)+' is complete.')
 

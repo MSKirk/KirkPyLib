@@ -54,7 +54,7 @@ class SpikesDB:
         # search for a file list and extract the file size
         for ii, filename in enumerate(glob.iglob(os.path.join(self.dir, '**/20*.*.fits'), recursive=True)):
             self.filesize[ii] = os.path.getsize(filename)
-            self.fullfilelist[ii] = filename[28:]
+            self.fullfilelist[ii] = os.path.basename(filename)
 
         # set up a filter for null results
         self.filesize = self.filesize[[jj for jj,kk in enumerate(self.fullfilelist) if kk != '']]
