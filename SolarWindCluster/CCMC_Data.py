@@ -193,6 +193,8 @@ def parallel_coordinates_plot(data_sets, style=None, xticknames=None):
 
 
 def ccmc_clusering(filename):
+    # DF {t, V, Np, B, Tp}
+
     dataframe = read_ccmc_model(filename)
 
-    dataframe.drop(['Time', 'R', 'Lat', 'Lon'], axis=1)
+    dataframe.drop(['R', 'Lat', 'Lon', 'BP'], axis=1)

@@ -51,6 +51,9 @@ class Sort_Spikes:
         #
         # Root directory of the Database: e.g. '/Volumes/BigSolar/AIA_Spikes'
         self.direc = os.path.abspath(directory)
+        self.out_dir = os.path.join(self.direc, 'filtered')
+        if not os.path.exists(self.out_dir):
+            os.makedirs(self.out_dir)
         self.count_index = int(count_index)
 
         # Number of Coincident spikes needed for a positive detection.
@@ -83,7 +86,7 @@ class Sort_Spikes:
         self.sp_im = []
 
         for spike_path in subset.Path:
-            self.sp_im += [spikes_to_image( os.path.join(self.direc, spike_path.decode('UTF-8')))]
+            self.sp_im += [spikes_to_image(os.path.join(self.direc, spike_path.decode('UTF-8')))]
             spike_filter += ndimage.binary_dilation((self.sp_im[-1][0, :, :] > 0), structure=struct).astype(spike_filter.dtype)
 
         return spike_filter > (self.n_co_spikes - 1)
@@ -122,9 +125,11 @@ class Sort_Spikes:
                     good_spikes_lev1 = (self.sp_im[ind_num-subset.index.min()][1,:,:]*spike_filter).flatten()
                     good_spikes_index = np.where((good_spikes_vector > 0))[0]
 
-                    hdu = fits.PrimaryHDU(np.stack((good_spikes_index, good_spikes_vector[good_spikes_index], good_spikes_lev1[good_spikes_index])).astype('int32'))
-                    hdu.writeto(self.filter_spike_file_rename(os.path.join(self.direc, subset.Path[ind_num].decode('UTF-8'))), overwrite=True)
-
+                    hdu = fits.PrimaryHDU(np.stack((good_spikes_index, good_spikes_vector[good_spikes_index],
+                                                    good_spikes_lev1[good_spikes_index])).astype('int32'))
+                    hdu.writeto(
+                        self.filter_spike_file_rename(os.path.join(self.out_dir, subset.Path[ind_num].decode('UTF-8'))),
+                        overwrite=True)
                 print('Group number '+str(group_number)+' is complete.')
 
         self.spikes_db.close()
