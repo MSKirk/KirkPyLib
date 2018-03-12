@@ -23,6 +23,7 @@ def io_benchmark(directory):
 
     return np.mean(times).total_seconds()
 
+
 def filesize_benchmark():
 
     filtered_dir = '/Volumes/BigSolar/Filtered_Spikes/2010/05/13'
@@ -67,8 +68,8 @@ def initialization_benchmark():
     paths = spikes_db.get('Path')
     spikes_db.close()
 
-    group_numbers = None
-    paths = None
+    del group_numbers
+    del paths
     timedif = datetime.now() - startTime
 
     print('Total initialization time: %0.2f seconds;' %timedif.total_seconds())
