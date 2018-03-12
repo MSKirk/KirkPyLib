@@ -49,9 +49,7 @@ def ccmc_kmeans_df(dataframe, number_of_clusters=5):
     return kmmodel
 
 
-def elbow_plot_kmeans(dataframe):
-    # dropping Time from clustering
-    array_data = dataframe.as_matrix()
+def elbow_plot_kmeans(array_data):
     Nc = range(1, 20)
     distortions = []
     score = []
@@ -203,3 +201,4 @@ def ccmc_clusering(filename):
                         'E_lat', 'BP'], axis=1).as_matrix()
 
     km = ccmc_kmeans_df(df_array)
+    el = elbow_plot_kmeans(df_array)
