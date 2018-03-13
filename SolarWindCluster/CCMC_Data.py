@@ -187,7 +187,7 @@ def parallel_coordinates_plot(data_sets, style=None, xticknames=None):
     # Stack the subplots
     plt.subplots_adjust(wspace=0)
 
-    return plt
+    return fig
 
 
 def ccmc_clusering(filename):
