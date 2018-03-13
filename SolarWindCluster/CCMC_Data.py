@@ -23,7 +23,7 @@ def read_ccmc_model(filename):
     file = open(filename, 'r')
     for line in file:
         if 'Start Date' in line:
-            st_dt=line
+            st_dt = line
 
     start_date = Time(st_dt[st_dt.find(':')+2:-1].replace('/', '-').replace('  ', ' '))
 
@@ -202,3 +202,13 @@ def ccmc_clusering(filename):
 
     km = ccmc_kmeans_df(df_array)
     el = elbow_plot_kmeans(df_array)
+
+
+def omni_clustering(filename)
+
+    ['Year', 'Day', 'Hour', 'Minute', 'ID_IMF', 'ID_SWPlasma', 'N_points_IMF', 'N_points_Plasma',
+     'Percent_interp', 'Timeshift', 'RMS_Timeshift', 'RMS_Phase', 'Delta_Time', 'B_magnitude', 'Bx_GSE_GSM',
+     'By_GSE', 'Bz_GSE', 'By_GSM', 'Bz_GSM', 'RMS_SD_B', 'RMS_SD_field', 'Flow_speed', 'Vx_GSE', 'Vy_GSE',
+     'Vz_GSE', 'Proton_Density', 'Temp', 'Flow_pressure', 'E_field', 'Plasma_beta', 'Alfven_mach_num',
+     'X_GSE', 'Y_GSE', 'Z_GSE', 'BSN_Xgse', 'BSN_Ygse', 'BSN_Zgse', 'AE_index', 'AL_index', 'AU_index',
+     'SYM/D_index', 'SYM/H_index', 'ASY/D_index', 'ASY/H_index', 'PC_N_index', 'Mag_mach_num']
