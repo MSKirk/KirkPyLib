@@ -31,7 +31,7 @@ def read_ccmc_model(filename):
 
     time_stamp = pd.Series([(start_date + (t * eval(df.Time.keys()[0]))).datetime for t in df.Time[df.Time.keys()[0]]])
 
-    df.set_index(time_stamp)
+    df = df.set_index(time_stamp)
 
     # to access the unit information for, e.g., Time:
     # import astropy.units as u
@@ -118,7 +118,7 @@ def read_omni_data(filename):
                             datetime.timedelta(int(df['Day']['u.d'][ii]) - 1, hours=int(df['Hour']['u.h'][ii]),
                                                minutes=int(df['Minute']['u.min'][ii])) for ii in df.index])
 
-    df.set_index(time_stamp)
+    df = df.set_index(time_stamp)
 
     return df
 
@@ -230,6 +230,9 @@ def omni_clustering(filename, n_clusters=5):
                         'BSN_Zgse', 'AE_index', 'AL_index', 'AU_index', 'SYM/D_index', 'SYM/H_index', 'ASY/D_index',
                         'ASY/H_index', 'PC_N_index', 'Mag_mach_num'], axis=1).dropna()
 
+    # Model sensitive to the abs value only
+    df['E_field'] = np.abs(df['E_field'])
+
     # same order as ccmc model data
     df = df[list(zip(*[['time_stamp', 'Proton_Density', 'Temp', 'Flow_speed', 'B_magnitude', 'Flow_pressure', 'E_field'],
                            ['', 'u.cm**-3', 'u.K', 'u.km/u.s', 'u.nT', 'u.nPa', 'u.mV/u.m']]))]
@@ -247,11 +250,10 @@ def ccmc_omni_parallel_coordinates(n_clusters=5):
     mwowsaenlil = ccmc_clustering('/Users/mskirk/Desktop/CCMC_Runs_CR2062/MWO-WSA-Enlilv2.8f-CR2062.txt', n_clusters=n_clusters)
     nsowsaenlil = ccmc_clustering('/Users/mskirk/Desktop/CCMC_Runs_CR2062/NSO-WSA-Enlilv2.8f-CR2062.txt', n_clusters=n_clusters)
 
-    omni07 = omni_clustering(['/Users/mskirk/Desktop/CCMC_Runs_CR2062/OMNI1minData/omni_min200710.asc',
-                              '/Users/mskirk/Desktop/CCMC_Runs_CR2062/OMNI1minData/omni_min200711.asc'], n_clusters=n_clusters)
+    omni07 = omni_clustering(['/Users/mskirk/Desktop/CCMC_Runs_CR2062/OMNI1minData/omni_min200710.asc'], n_clusters=n_clusters)
 
     models = np.concatenate([gongwsa22enlil.cluster_centers_, gongwsaenlil.cluster_centers_,
-                             mwowsaenlil.cluster_centers_, nsowsaenlil.cluster_centers_, omni07.cluster_centers],
+                             mwowsaenlil.cluster_centers_, nsowsaenlil.cluster_centers_, omni07.cluster_centers_],
                             axis=0)
 
     lstyle = ['c'] * n_clusters
@@ -265,3 +267,29 @@ def ccmc_omni_parallel_coordinates(n_clusters=5):
     axis = parallel_coordinates_plot(models, style=lstyle, xticknames=names)
 
     return axis
+
+
+def ccmc_omni_subtract(ccmc_df, omni_df):
+
+    # Clip the omni_df at the beginning and end time of ccmc_df
+
+
+    
+    omni_df['time_stamp'] = pd.Series([int(omni_df['Day']['u.d'][ii]) - 1 + int(omni_df['Hour']['u.h'][ii])/24. +
+                                  int(omni_df['Minute']['u.min'][ii])/(24*60.) for ii in omni_df.index])
+
+    omni_df['time_stamp'] = omni_df['time_stamp'] - np.min(omni_df['time_stamp'])
+
+    # same order and names as ccmc model data
+
+    col_rename = list(zip(*[['Time', 'N', 'T', 'V', 'B', 'P_ram', 'E'],
+                            ['', 'u.cm**-3', 'u.K', 'u.km/u.s', 'u.nT', 'u.nPa', 'u.mV/u.m']]))
+
+    col_index = pd.MultiIndex.from_tuples(col_rename, names=['measurement', 'units'])
+
+    omni_df_clean = pd.DataFrame(omni_df[list(zip(*[['time_stamp', 'Proton_Density', 'Temp', 'Flow_speed', 'B_magnitude', 'Flow_pressure', 'E_field'],
+                           ['', 'u.cm**-3', 'u.K', 'u.km/u.s', 'u.nT', 'u.nPa', 'u.mV/u.m']]))].dropna().values, columns=col_index, index=omni_df.index)
+
+
+    diff_df = ccmc_df.resample("5T").mean().subtract(omni_df.resample("5T").mean())
+
