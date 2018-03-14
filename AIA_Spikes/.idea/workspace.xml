@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7317b70c-e847-4124-9b85-686203542308" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/../SolarWindCluster/CCMC_Data.py" afterPath="$PROJECT_DIR$/../SolarWindCluster/CCMC_Data.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,11 +16,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SpikeVectors.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1665">
-              <caret line="111" column="0" lean-forward="false" selection-start-line="109" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
+            <state relative-caret-position="483">
+              <caret line="89" column="23" lean-forward="false" selection-start-line="89" selection-start-column="23" selection-end-line="89" selection-end-column="23" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -31,7 +31,7 @@
       <file leaf-file-name="SpikeVectors_benchmarking.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SpikeVectors_benchmarking.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="735">
+            <state relative-caret-position="675">
               <caret line="49" column="38" lean-forward="false" selection-start-line="49" selection-start-column="38" selection-end-line="49" selection-end-column="38" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
@@ -40,11 +40,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SpikesDB.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SpikesDB.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="525">
-              <caret line="35" column="21" lean-forward="true" selection-start-line="35" selection-start-column="21" selection-end-line="35" selection-end-column="21" />
+              <caret line="35" column="21" lean-forward="false" selection-start-line="35" selection-start-column="21" selection-end-line="35" selection-end-column="21" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -55,7 +55,7 @@
       <file leaf-file-name="FileMangementForBigSolar.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/FileMangementForBigSolar.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
+            <state relative-caret-position="435">
               <caret line="32" column="27" lean-forward="false" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
@@ -67,7 +67,7 @@
       <file leaf-file-name="Spikes_Stats.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Spikes_Stats.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
+            <state relative-caret-position="390">
               <caret line="33" column="42" lean-forward="false" selection-start-line="33" selection-start-column="42" selection-end-line="33" selection-end-column="42" />
               <folding>
                 <element signature="e#143#152#0" expanded="true" />
@@ -124,7 +124,7 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="376" />
-    <option name="y" value="28" />
+    <option name="y" value="24" />
     <option name="width" value="1791" />
     <option name="height" value="1412" />
   </component>
@@ -144,7 +144,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -157,6 +156,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -494,7 +494,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="376" y="28" width="1791" height="1412" extended-state="0" />
+    <frame x="376" y="24" width="1791" height="1412" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -978,7 +978,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Spikes_Stats.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
+        <state relative-caret-position="390">
           <caret line="33" column="42" lean-forward="false" selection-start-line="33" selection-start-column="42" selection-end-line="33" selection-end-column="42" />
           <folding>
             <element signature="e#143#152#0" expanded="true" />
@@ -988,7 +988,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/FileMangementForBigSolar.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
+        <state relative-caret-position="435">
           <caret line="32" column="27" lean-forward="false" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
@@ -998,7 +998,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SpikeVectors_benchmarking.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
+        <state relative-caret-position="675">
           <caret line="49" column="38" lean-forward="false" selection-start-line="49" selection-start-column="38" selection-end-line="49" selection-end-column="38" />
           <folding>
             <element signature="e#0#29#0" expanded="true" />
@@ -1006,22 +1006,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
+    <entry file="file://$PROJECT_DIR$/SpikesDB.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1665">
-          <caret line="111" column="0" lean-forward="false" selection-start-line="109" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
+        <state relative-caret-position="525">
+          <caret line="35" column="21" lean-forward="false" selection-start-line="35" selection-start-column="21" selection-end-line="35" selection-end-column="21" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SpikesDB.py">
+    <entry file="file://$PROJECT_DIR$/SpikeVectors.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="35" column="21" lean-forward="true" selection-start-line="35" selection-start-column="21" selection-end-line="35" selection-end-column="21" />
+        <state relative-caret-position="483">
+          <caret line="89" column="23" lean-forward="false" selection-start-line="89" selection-start-column="23" selection-end-line="89" selection-end-column="23" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
