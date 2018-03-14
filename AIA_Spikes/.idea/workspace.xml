@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7317b70c-e847-4124-9b85-686203542308" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/SpikesDB.py" afterPath="$PROJECT_DIR$/SpikesDB.py" />
-      <change beforePath="$PROJECT_DIR$/../SolarWindCluster/CCMC_Data.py" afterPath="$PROJECT_DIR$/../SolarWindCluster/CCMC_Data.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -485,7 +483,14 @@
       <option name="project" value="LOCAL" />
       <updated>1520957150296</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Clarify path commands.">
+      <created>1520958585196</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1520958585196</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -530,7 +535,8 @@
     <MESSAGE value="Creating timing benchmarks for optimization." />
     <MESSAGE value="Clean up file path calls." />
     <MESSAGE value="Clean up memory release on exit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Clean up memory release on exit" />
+    <MESSAGE value="Clarify path commands." />
+    <option name="LAST_COMMIT_MESSAGE" value="Clarify path commands." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />

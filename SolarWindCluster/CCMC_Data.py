@@ -61,14 +61,16 @@ def elbow_plot_kmeans(array_data):
         score.append(kmmodel.score(array_data))
         distortions.append(sum(np.min(cdist(array_data, kmmodel.cluster_centers_, 'euclidean'), axis=1)) / array_data.shape[0])
 
-    plt.plot(Nc, np.gradient(score) / np.gradient(score).max())
-    plt.plot(Nc, np.array(distortions) / np.array(distortions).max())
-    plt.xlabel('Number of Clusters')
-    plt.ylabel('Group Distortion Score')
-    plt.title('Elbow Curve')
+
+    fig, ax = plt.subplots()
+    ax.plot(Nc, np.gradient(score) / np.gradient(score).max())
+    ax.plot(Nc, np.array(distortions) / np.array(distortions).max())
+    ax.set_xlabel('Number of Clusters')
+    ax.set_ylabel('Group Distortion Score')
+    ax.set_title('Elbow Curve')
     plt.show()
 
-    return plt
+    return fig
 
 
 def read_omni_data(filename):
@@ -170,7 +172,6 @@ def parallel_coordinates_plot(data_sets, style=None, xticknames=None):
         if xticknames:
             axx.set_xticklabels(xticknames[dimension:dimension+1])
 
-
     # Move the final axis' ticks to the right-hand side
     axx = plt.twinx(axes[-1])
     dimension += 1
@@ -183,32 +184,61 @@ def parallel_coordinates_plot(data_sets, style=None, xticknames=None):
     if xticknames:
         axx.set_xticklabels([xticknames[-2],xticknames[-1]])
 
-
     # Stack the subplots
     plt.subplots_adjust(wspace=0)
 
     return fig
 
 
-def ccmc_clusering(filename):
+def ccmc_clustering(filename):
     # included in the DF {Time, N, T, V, B, P_ram, E_mag}
 
-    df = read_ccmc_model(filename)
+    if type(filename) == str:
+        filename = [filename]
+
+    df = pd.concat([read_ccmc_model(fname) for fname in filename])
 
     df['E_mag'] = np.sqrt(df['E_r']['u.mV / u.m']**2+df['E_lon']['u.mV / u.m']**2+df['E_lat']['u.mV / u.m']**2)
 
-    df_array = df.drop(['R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat','E_r', 'E_lon',
-                        'E_lat', 'BP'], axis=1).as_matrix()
+    df = df.drop(['R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat','E_r', 'E_lon',
+                        'E_lat', 'BP'], axis=1)
 
-    km = ccmc_kmeans_df(df_array)
-    el = elbow_plot_kmeans(df_array)
+    km = ccmc_kmeans_df(df)
+    el = elbow_plot_kmeans(df.as_matrix())
+
+    return km
 
 
-def omni_clustering(filename)
+def omni_clustering(filename):
 
-    ['Year', 'Day', 'Hour', 'Minute', 'ID_IMF', 'ID_SWPlasma', 'N_points_IMF', 'N_points_Plasma',
-     'Percent_interp', 'Timeshift', 'RMS_Timeshift', 'RMS_Phase', 'Delta_Time', 'B_magnitude', 'Bx_GSE_GSM',
-     'By_GSE', 'Bz_GSE', 'By_GSM', 'Bz_GSM', 'RMS_SD_B', 'RMS_SD_field', 'Flow_speed', 'Vx_GSE', 'Vy_GSE',
-     'Vz_GSE', 'Proton_Density', 'Temp', 'Flow_pressure', 'E_field', 'Plasma_beta', 'Alfven_mach_num',
-     'X_GSE', 'Y_GSE', 'Z_GSE', 'BSN_Xgse', 'BSN_Ygse', 'BSN_Zgse', 'AE_index', 'AL_index', 'AU_index',
-     'SYM/D_index', 'SYM/H_index', 'ASY/D_index', 'ASY/H_index', 'PC_N_index', 'Mag_mach_num']
+    if type(filename) == str:
+        filename = [filename]
+
+    df = pd.concat([read_omni_data(fname) for fname in filename])
+
+    df['time_stamp'] = pd.Series([int(df['Day']['u.d'][ii]) - 1 + int(df['Hour']['u.h'][ii])/24. +
+                                  int(df['Minute']['u.min'][ii])/(24*60.) for ii in df.index])
+
+    df = df.drop(['Year', 'Day', 'Hour', 'Minute','ID_IMF', 'ID_SWPlasma', 'N_points_IMF', 'N_points_Plasma',
+                        'Percent_interp', 'Timeshift', 'RMS_Timeshift', 'RMS_Phase', 'Delta_Time', 'Bx_GSE_GSM',
+                        'By_GSE', 'Bz_GSE', 'By_GSM', 'Bz_GSM', 'RMS_SD_B', 'RMS_SD_field', 'Vx_GSE', 'Vy_GSE',
+                        'Vz_GSE', 'Plasma_beta', 'Alfven_mach_num', 'X_GSE', 'Y_GSE', 'Z_GSE', 'BSN_Xgse', 'BSN_Ygse',
+                        'BSN_Zgse', 'AE_index', 'AL_index', 'AU_index', 'SYM/D_index', 'SYM/H_index', 'ASY/D_index',
+                        'ASY/H_index', 'PC_N_index', 'Mag_mach_num'], axis=1).dropna()
+
+    km = ccmc_kmeans_df(df)
+    el = elbow_plot_kmeans(df.as_matrix())
+
+    return km
+
+
+def ccmc_omni_parallel_coordinates():
+
+    gongwsa22enlil = ccmc_clustering('/Users/mskirk/Desktop/CCMC_Runs_CR2062/GONG-WSA2.2-Enlil-CR2062.txt')
+    gongwsaenlil = ccmc_clustering('/Users/mskirk/Desktop/CCMC_Runs_CR2062/GONG-WSA-Enlil-CR2062.txt')
+    mwowsaenlil = ccmc_clustering('/Users/mskirk/Desktop/CCMC_Runs_CR2062/MWO-WSA-Enlilv2.8f-CR2062.txt')
+    nsowsaenlil = ccmc_clustering('/Users/mskirk/Desktop/CCMC_Runs_CR2062/NSO-WSA-Enlilv2.8f-CR2062.txt')
+
+    omni07 = omni_clustering(['/Users/mskirk/Desktop/CCMC_Runs_CR2062/OMNI1minData/omni_min200710.asc',
+                              '/Users/mskirk/Desktop/CCMC_Runs_CR2062/OMNI1minData/omni_min200711.asc'])
+
