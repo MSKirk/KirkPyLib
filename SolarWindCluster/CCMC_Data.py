@@ -273,23 +273,32 @@ def ccmc_omni_subtract(ccmc_df, omni_df):
 
     # Clip the omni_df at the beginning and end time of ccmc_df
 
-
+    omni_df = omni_df[omni_df.index >= ccmc_df.index[0]]
+    omni_df = omni_df[omni_df.index <= ccmc_df.index[-1]]
     
     omni_df['time_stamp'] = pd.Series([int(omni_df['Day']['u.d'][ii]) - 1 + int(omni_df['Hour']['u.h'][ii])/24. +
-                                  int(omni_df['Minute']['u.min'][ii])/(24*60.) for ii in omni_df.index])
+                                  int(omni_df['Minute']['u.min'][ii])/(24*60.) for ii in omni_df.index], index=omni_df.index)
 
-    omni_df['time_stamp'] = omni_df['time_stamp'] - np.min(omni_df['time_stamp'])
+    omni_df['time_stamp'] = omni_df['time_stamp'] - np.nanmin(omni_df['time_stamp'])
+
+    omni_df['E_field'] = np.abs(omni_df['E_field'])
 
     # same order and names as ccmc model data
 
     col_rename = list(zip(*[['Time', 'N', 'T', 'V', 'B', 'P_ram', 'E'],
-                            ['', 'u.cm**-3', 'u.K', 'u.km/u.s', 'u.nT', 'u.nPa', 'u.mV/u.m']]))
+                            ['u.d', 'u.cm ** -3', 'u.K', 'u.km / u.s', 'u.nT', 'u.nPa', 'u.mV / u.m']]))
 
     col_index = pd.MultiIndex.from_tuples(col_rename, names=['measurement', 'units'])
 
-    omni_df_clean = pd.DataFrame(omni_df[list(zip(*[['time_stamp', 'Proton_Density', 'Temp', 'Flow_speed', 'B_magnitude', 'Flow_pressure', 'E_field'],
-                           ['', 'u.cm**-3', 'u.K', 'u.km/u.s', 'u.nT', 'u.nPa', 'u.mV/u.m']]))].dropna().values, columns=col_index, index=omni_df.index)
+    omni_df = omni_df[list(zip(*[['time_stamp', 'Proton_Density', 'Temp', 'Flow_speed', 'B_magnitude', 'Flow_pressure', 'E_field'],
+                           ['', 'u.cm**-3', 'u.K', 'u.km/u.s', 'u.nT', 'u.nPa', 'u.mV/u.m']]))]
 
+    omni_df_clean = pd.DataFrame(omni_df.dropna().values, columns=col_index, index=omni_df.dropna().index)
 
-    diff_df = ccmc_df.resample("5T").mean().subtract(omni_df.resample("5T").mean())
+    ccmc_df[('E', 'u.mV / u.m')] = np.sqrt(ccmc_df['E_r']['u.mV / u.m'] ** 2 + ccmc_df['E_lon']['u.mV / u.m'] ** 2 + ccmc_df['E_lat']['u.mV / u.m'] ** 2)
+
+    ccmc_df = ccmc_df.drop(['R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat','E_r', 'E_lon',
+                        'E_lat', 'BP'], axis=1)
+
+    diff_df = ccmc_df.resample("5T").mean().subtract(omni_df_clean.resample("5T").mean())
 
