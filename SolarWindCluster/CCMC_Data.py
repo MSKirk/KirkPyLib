@@ -302,3 +302,4 @@ def ccmc_omni_subtract(ccmc_df, omni_df):
 
     diff_df = ccmc_df.resample("5T").mean().subtract(omni_df_clean.resample("5T").mean())
 
+    return diff_df
