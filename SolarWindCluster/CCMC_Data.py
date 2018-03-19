@@ -269,7 +269,7 @@ def ccmc_omni_parallel_coordinates(n_clusters=5):
     return axis
 
 
-def ccmc_omni_subtract(ccmc_df, omni_df):
+def ccmc_omni_subtract(ccmc_df, omni_df, average_time_in_minutes=5):
 
     # Clip the omni_df at the beginning and end time of ccmc_df
 
@@ -300,7 +300,8 @@ def ccmc_omni_subtract(ccmc_df, omni_df):
     ccmc_df = ccmc_df.drop(['R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat','E_r', 'E_lon',
                         'E_lat', 'BP'], axis=1)
 
-    diff_df = omni_df_clean.resample("5T").mean().subtract(ccmc_df.resample("5T").mean())
+    average_time_str = str(average_time_in_minutes)+'T'
+    diff_df = omni_df_clean.resample(average_time_str).mean().subtract(ccmc_df.resample(average_time_str).mean())
 
     return diff_df
 
@@ -333,14 +334,24 @@ def diff_parallel_coordinates(n_clusters=8, relative=False):
 
         models = np.concatenate([gong22_km.cluster_centers_/omni_mean_values, gong_km.cluster_centers_/omni_mean_values, mwo_km.cluster_centers_/omni_mean_values,
                              nso_km.cluster_centers_/omni_mean_values],axis=0)
+
+        bounds = np.stack([np.array([models.max()] * 6), np.array([models.min()] * 6)])
+        models = np.concatenate([bounds, models])
+
+        lstyle = ['w'] * 2
+        lstyle.extend(['c'] * n_clusters)
+        lstyle.extend(['b'] * n_clusters)
+        lstyle.extend(['r'] * n_clusters)
+        lstyle.extend(['m'] * n_clusters)
+
     else:
         models = np.concatenate([gong22_km.cluster_centers_, gong_km.cluster_centers_, mwo_km.cluster_centers_,
                              nso_km.cluster_centers_],axis=0)
 
-    lstyle = ['c'] * n_clusters
-    lstyle.extend(['b'] * n_clusters)
-    lstyle.extend(['r'] * n_clusters)
-    lstyle.extend(['m'] * n_clusters)
+        lstyle = ['c'] * n_clusters
+        lstyle.extend(['b'] * n_clusters)
+        lstyle.extend(['r'] * n_clusters)
+        lstyle.extend(['m'] * n_clusters)
 
     names = ['Density', 'Temp', 'Vel', 'B_mag', 'P_ram', 'E_mag']
 
