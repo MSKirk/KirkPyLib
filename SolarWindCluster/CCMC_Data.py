@@ -336,22 +336,25 @@ def diff_parallel_coordinates(n_clusters=8, relative=False):
                              nso_km.cluster_centers_/omni_mean_values],axis=0)
 
         bounds = np.stack([np.array([models.max()] * 6), np.array([models.min()] * 6)])
-        models = np.concatenate([bounds, models])
+        models = np.concatenate([bounds, models, np.array([0] * 6)])
 
         lstyle = ['w'] * 2
         lstyle.extend(['c'] * n_clusters)
         lstyle.extend(['b'] * n_clusters)
         lstyle.extend(['r'] * n_clusters)
         lstyle.extend(['m'] * n_clusters)
+        lstyle.extend(['k'])
 
     else:
         models = np.concatenate([gong22_km.cluster_centers_, gong_km.cluster_centers_, mwo_km.cluster_centers_,
                              nso_km.cluster_centers_],axis=0)
+        models = np.concatenate([models, np.array([0] * 6)])
 
         lstyle = ['c'] * n_clusters
         lstyle.extend(['b'] * n_clusters)
         lstyle.extend(['r'] * n_clusters)
         lstyle.extend(['m'] * n_clusters)
+        lstyle.extend(['k'])
 
     names = ['Density', 'Temp', 'Vel', 'B_mag', 'P_ram', 'E_mag']
 
