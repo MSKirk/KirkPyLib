@@ -300,6 +300,50 @@ def ccmc_omni_subtract(ccmc_df, omni_df):
     ccmc_df = ccmc_df.drop(['R', 'Lat', 'Lon', 'V_r', 'V_lon', 'V_lat', 'B_r', 'B_lon', 'B_lat','E_r', 'E_lon',
                         'E_lat', 'BP'], axis=1)
 
-    diff_df = ccmc_df.resample("5T").mean().subtract(omni_df_clean.resample("5T").mean())
+    diff_df = omni_df_clean.resample("5T").mean().subtract(ccmc_df.resample("5T").mean())
 
     return diff_df
+
+
+def diff_parallel_coordinates(n_clusters=8, relative=False):
+
+    gongwsa22enlil = read_ccmc_model('/Users/mskirk/Desktop/CCMC_Runs_CR2062/GONG-WSA2.2-Enlil-CR2062.txt')
+    gongwsaenlil = read_ccmc_model('/Users/mskirk/Desktop/CCMC_Runs_CR2062/GONG-WSA-Enlil-CR2062.txt')
+    mwowsaenlil = read_ccmc_model('/Users/mskirk/Desktop/CCMC_Runs_CR2062/MWO-WSA-Enlilv2.8f-CR2062.txt')
+    nsowsaenlil = read_ccmc_model('/Users/mskirk/Desktop/CCMC_Runs_CR2062/NSO-WSA-Enlilv2.8f-CR2062.txt')
+
+    filename = ['/Users/mskirk/Desktop/CCMC_Runs_CR2062/OMNI1minData/omni_min200710.asc',
+                '/Users/mskirk/Desktop/CCMC_Runs_CR2062/OMNI1minData/omni_min200711.asc']
+    omni = pd.concat([read_omni_data(fname) for fname in filename])
+
+    gong22 = ccmc_omni_subtract(gongwsa22enlil, omni).drop(['Time'], axis=1)
+    gong = ccmc_omni_subtract(gongwsaenlil, omni).drop(['Time'], axis=1)
+    mwo = ccmc_omni_subtract(mwowsaenlil, omni).drop(['Time'], axis=1)
+    nso = ccmc_omni_subtract(nsowsaenlil, omni).drop(['Time'], axis=1)
+
+    gong22_km = ccmc_kmeans_df(gong22.dropna(), number_of_clusters=n_clusters)
+    gong_km = ccmc_kmeans_df(gong.dropna(), number_of_clusters=n_clusters)
+    mwo_km = ccmc_kmeans_df(mwo.dropna(), number_of_clusters=n_clusters)
+    nso_km = ccmc_kmeans_df(nso.dropna(), number_of_clusters=n_clusters)
+
+    if relative:
+        omni_mean_values = np.array([omni['Proton_Density'].mean()[0], omni['Temp'].mean()[0],
+                                     omni['Flow_speed'].mean()[0], omni['B_magnitude'].mean()[0],
+                                     omni['Flow_pressure'].mean()[0], np.abs(omni['E_field']).mean()[0]])
+
+        models = np.concatenate([gong22_km.cluster_centers_/omni_mean_values, gong_km.cluster_centers_/omni_mean_values, mwo_km.cluster_centers_/omni_mean_values,
+                             nso_km.cluster_centers_/omni_mean_values],axis=0)
+    else:
+        models = np.concatenate([gong22_km.cluster_centers_, gong_km.cluster_centers_, mwo_km.cluster_centers_,
+                             nso_km.cluster_centers_],axis=0)
+
+    lstyle = ['c'] * n_clusters
+    lstyle.extend(['b'] * n_clusters)
+    lstyle.extend(['r'] * n_clusters)
+    lstyle.extend(['m'] * n_clusters)
+
+    names = ['Density', 'Temp', 'Vel', 'B_mag', 'P_ram', 'E_mag']
+
+    axis = parallel_coordinates_plot(models, style=lstyle, xticknames=names)
+
+    return axis
