@@ -338,11 +338,17 @@ def diff_parallel_coordinates(n_clusters=8, relative=False):
         bounds = np.stack([np.array([models.max()] * 6), np.array([models.min()] * 6)])
         models = np.concatenate([bounds, models, np.array([0] * 6)])
 
+        # Bounds
         lstyle = ['w'] * 2
+        # Gong WSA2.2 Enlil
         lstyle.extend(['c'] * n_clusters)
+        # GONG WSA Enlil
         lstyle.extend(['b'] * n_clusters)
+        # MWO WSA Enlil
         lstyle.extend(['r'] * n_clusters)
+        # NSO WSA Enlil
         lstyle.extend(['m'] * n_clusters)
+        # Zero line
         lstyle.extend(['k'])
 
     else:
@@ -350,10 +356,15 @@ def diff_parallel_coordinates(n_clusters=8, relative=False):
                              nso_km.cluster_centers_],axis=0)
         models = np.concatenate([models, np.array([0] * 6)])
 
+        # Gong WSA2.2 Enlil
         lstyle = ['c'] * n_clusters
+        # GONG WSA Enlil
         lstyle.extend(['b'] * n_clusters)
+        # MWO WSA Enlil
         lstyle.extend(['r'] * n_clusters)
+        # NSO WSA Enlil
         lstyle.extend(['m'] * n_clusters)
+        # Zero line
         lstyle.extend(['k'])
 
     names = ['Density', 'Temp', 'Vel', 'B_mag', 'P_ram', 'E_mag']
