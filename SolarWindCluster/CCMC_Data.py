@@ -332,11 +332,12 @@ def diff_parallel_coordinates(n_clusters=8, relative=False):
                                      omni['Flow_speed'].mean()[0], omni['B_magnitude'].mean()[0],
                                      omni['Flow_pressure'].mean()[0], np.abs(omni['E_field']).mean()[0]])
 
-        models = np.concatenate([gong22_km.cluster_centers_/omni_mean_values, gong_km.cluster_centers_/omni_mean_values, mwo_km.cluster_centers_/omni_mean_values,
-                             nso_km.cluster_centers_/omni_mean_values],axis=0)
+        models = np.concatenate([gong22_km.cluster_centers_/omni_mean_values, gong_km.cluster_centers_/omni_mean_values,
+                                 mwo_km.cluster_centers_/omni_mean_values, nso_km.cluster_centers_/omni_mean_values],
+                                axis=0)
 
         bounds = np.stack([np.array([models.max()] * 6), np.array([models.min()] * 6)])
-        models = np.concatenate([bounds, models, np.array([0.0] * 6).reshape((1,6))])
+        models = np.concatenate([bounds, models, np.array([0.0] * 6).reshape((1, 6))])
 
         # Bounds
         lstyle = ['w'] * 2
@@ -353,8 +354,8 @@ def diff_parallel_coordinates(n_clusters=8, relative=False):
 
     else:
         models = np.concatenate([gong22_km.cluster_centers_, gong_km.cluster_centers_, mwo_km.cluster_centers_,
-                             nso_km.cluster_centers_],axis=0)
-        models = np.concatenate([models, np.array([0] *6).reshape((1,6))])
+                             nso_km.cluster_centers_], axis=0)
+        models = np.concatenate([models, np.array([0.0] * 6).reshape((1, 6))])
 
         # Gong WSA2.2 Enlil
         lstyle = ['c'] * n_clusters
