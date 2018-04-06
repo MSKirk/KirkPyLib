@@ -334,6 +334,38 @@ class PCH_Detection:
 
         self.point_detection.remove_row(np.where(self.point_detection['ArcLength'] == 0)[0][0])
         self.add_harvey_coordinates()
+        self.point_detection.sort(['Harvey_Rotation'])
+
+        # Adding in Area Calculation each point with one HR previous measurements
+        self.point_detection['Area'] = [hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
+
+    def hole_area(self, h_rotation_number):
+        begin = np.min(np.where(self.point_detection['Harvey_Rotation'] > (h_rotation_number - 1)))
+        end = np.max(np.where(self.point_detection['Harvey_Rotation'] == h_rotation_number))
+
+        if self.point_detection[h_rotation_number]['StartLat'] > 0:
+            # A northern hole
+            index_measurements = np.where(self.point_detection[begin:end]['StartLat'] > 0)
+        else:
+            # A southern hole
+            index_measurements = np.where(self.point_detection[begin:end]['StartLat'] < 0)
+
+        if len(index_measurements[0]) < 10:
+            return np.nan
+        else:
+            lons = np.concatenate([self.point_detection[index_measurements]['H_StartLon'].data.data,
+                                   self.point_detection[index_measurements]['H_EndLon'].data.data])
+            lats = np.concatenate([self.point_detection[index_measurements]['StartLat'].data.data,
+                                   self.point_detection[index_measurements]['EndLat'].data.data])
+
+
+            hole_fit = PCH_Tools.trigfit(lons, lats, degree=6)
+
+            # Need fit with several degrees
+            # Need to define error in trigfit
+            # Need to off set center of mass
+            # Need to Find area within curve
+
 
     def add_harvey_coordinates(self):
         # Modifies the point detection to add in harvey lon.
