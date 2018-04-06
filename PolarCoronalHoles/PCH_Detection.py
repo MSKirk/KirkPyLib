@@ -296,14 +296,12 @@ class PCH_Detection:
 
         self.dir = os.path.abspath(image_dir)
 
-        if 'efz' in os.listdir(self.dir)[-10]:
-            self.files = [file for file in os.listdir(self.dir) if file.startswith('efz')]
+        self.files = []
 
-        if '.fts' in os.listdir(self.dir)[-10]:
-            self.files = [file for file in os.listdir(self.dir) if file.endswith('.fts')]
-
-        if '.fits' in os.listdir(self.dir)[-10]:
-            self.files = [file for file in os.listdir(self.dir) if file.endswith('.fits')]
+        for root, dirnames, filenames in os.walk(image_dir):
+            for filename in filenames:
+                if filename.endswith(('.fts', '.fits') or filename.startswith('efz')):
+                    self.files.append(os.path.join(root, filename))
 
         self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
                                      names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
@@ -311,8 +309,8 @@ class PCH_Detection:
 
         for ii, image_file in enumerate(self.files):
 
-            if file_integrity_check(self.dir+'/'+image_file):
-                solar_image = sunpy.map.Map(self.dir+'/'+image_file)
+            if file_integrity_check(image_file):
+                solar_image = sunpy.map.Map(image_file)
 
                 print(image_file)
 
@@ -329,7 +327,7 @@ class PCH_Detection:
                     pts = pch_mark(solar_image)
 
                     if len(pts) > 0:
-                        pts['FileName'] = [self.dir+'/'+image_file] * len(pts)
+                        pts['FileName'] = [image_file] * len(pts)
                         pts['Date'] = [Time(solar_image.date)] * len(pts)
 
                         self.point_detection = join(pts, self.point_detection, join_type='outer')
