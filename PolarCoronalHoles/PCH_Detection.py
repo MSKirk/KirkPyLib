@@ -337,7 +337,7 @@ class PCH_Detection:
         self.point_detection.sort(['Harvey_Rotation'])
 
         # Adding in Area Calculation each point with one HR previous measurements
-        self.point_detection['Area'] = [hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
+        self.point_detection['Area'] = [self.hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
 
     def hole_area(self, h_rotation_number):
         begin = np.min(np.where(self.point_detection['Harvey_Rotation'] > (h_rotation_number - 1)))
