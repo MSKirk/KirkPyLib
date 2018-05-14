@@ -337,15 +337,18 @@ class PCH_Detection:
         self.point_detection.sort(['Harvey_Rotation'])
 
         # Adding in Area Calculation each point with one HR previous measurements
-        self.point_detection['Area'] = [self.hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
+        # self.point_detection['Area'] = [self.hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
 
     def hole_area(self, h_rotation_number):
+        # Reurns the area as a fraction of the total solar surface area
+
         begin = np.min(np.where(self.point_detection['Harvey_Rotation'] > (h_rotation_number - 1)))
         end = np.max(np.where(self.point_detection['Harvey_Rotation'] == h_rotation_number))
 
-        if self.point_detection[h_rotation_number]['StartLat'] > 0:
+        if self.point_detection[end]['StartLat'] > 0:
             # A northern hole
             index_measurements = np.where(self.point_detection[begin:end]['StartLat'] > 0)
+            northern = True
         else:
             # A southern hole
             index_measurements = np.where(self.point_detection[begin:end]['StartLat'] < 0)
@@ -358,14 +361,24 @@ class PCH_Detection:
             lats = np.concatenate([self.point_detection[index_measurements]['StartLat'].data.data,
                                    self.point_detection[index_measurements]['EndLat'].data.data])
 
-
-            hole_fit = PCH_Tools.trigfit(lons, lats, degree=6)
+            hole_fit = PCH_Tools.trigfit((lons * u.rad), (lats * u.rad), degree=6)
 
             # Need fit with several degrees
             # Need to define error in trigfit
             # Need to off set center of mass
-            # Need to Find area within curve
 
+            # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
+            # A sphere is 4π steradians in surface area
+
+            lamb_x = np.radians(np.arange(0,360,0.01)) * u.rad
+            lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value)) * u.rad
+
+            if northern:
+                hole_area = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
+            else:
+                hole_area = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
+
+            return hole_area / (4 * np.pi)
 
     def add_harvey_coordinates(self):
         # Modifies the point detection to add in harvey lon.

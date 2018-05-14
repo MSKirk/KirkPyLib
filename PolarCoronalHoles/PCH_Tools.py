@@ -17,8 +17,19 @@ A collection of tools used in PCH detection. This replicates the following IDL r
 '''
 
 
-def trigfit(theta, rho, sigma=None, degree=1):
+def trigfit(theta_in, rho_in, sigma=None, degree=1):
     # A cosine series fit for data
+    # Expects a astropy quantity in rad or deg
+    # Returns a fitfunc which expects radians
+
+    if not isinstance(theta_in, u.Quantity):
+        raise TypeError('Theta coordinates should be an AstroPy quantity')
+
+    if not isinstance(rho_in, u.Quantity):
+        raise TypeError('Theta coordinates should be an AstroPy quantity')
+
+    theta = theta_in.to(u.rad).value
+    rho = rho_in.to(u.rad).value
 
     tt = np.array(theta)
     yy = np.array(rho)
