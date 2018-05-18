@@ -25,21 +25,24 @@ def TESS_2018_plot():
     hole_fit7 = PCH_Tools.trigfit((lons[test7] * u.rad), (lats[test7] * u.rad), degree=7)
     hole_fit8 = PCH_Tools.trigfit((lons[test8] * u.rad), (lats[test8] * u.rad), degree=7)
 
-    plt.plot(np.degrees(test_lons), np.sin(hole_fit3['fitfunc'](test_lons)))
-    plt.plot(np.degrees(test_lons), np.sin(hole_fit4['fitfunc'](test_lons)))
-    plt.plot(np.degrees(test_lons), np.sin(hole_fit5['fitfunc'](test_lons)))
-    plt.plot(np.degrees(test_lons), np.sin(hole_fit6['fitfunc'](test_lons)))
-    plt.plot(np.degrees(test_lons), np.sin(hole_fit7['fitfunc'](test_lons)))
-    plt.plot(np.degrees(test_lons), np.sin(hole_fit8['fitfunc'](test_lons)))
+    plt.plot(np.degrees(test_lons), np.sin(hole_fit3['fitfunc'](test_lons)), color='r', linewidth=8)
+    plt.plot(np.degrees(test_lons), np.sin(hole_fit4['fitfunc'](test_lons)), color='m', linewidth=8)
+    plt.plot(np.degrees(test_lons), np.sin(hole_fit5['fitfunc'](test_lons)), color='orange', linewidth=8)
+    plt.plot(np.degrees(test_lons), np.sin(hole_fit6['fitfunc'](test_lons)), color='g', linewidth=8)
+    plt.plot(np.degrees(test_lons), np.sin(hole_fit7['fitfunc'](test_lons)), color='b', linewidth=8)
+    plt.plot(np.degrees(test_lons), np.sin(hole_fit8['fitfunc'](test_lons)), color='c', linewidth=8)
 
-    plt.plot(np.degrees(lons[test3]), np.sin(lats[test3]), '.')
-    plt.plot(np.degrees(lons[test4]), np.sin(lats[test4]), '.')
-    plt.plot(np.degrees(lons[test5]), np.sin(lats[test5]), '.')
-    plt.plot(np.degrees(lons[test6]), np.sin(lats[test6]), '.')
-    plt.plot(np.degrees(lons[test7]), np.sin(lats[test7]), '.')
-    plt.plot(np.degrees(lons[test8]), np.sin(lats[test8]), '.')
+    plt.plot(np.degrees(lons[test3]), np.sin(lats[test3]), '.', markersize=12, color='r')
+    plt.plot(np.degrees(lons[test4]), np.sin(lats[test4]), '.', markersize=12, color='m')
+    plt.plot(np.degrees(lons[test5]), np.sin(lats[test5]), '.', markersize=12, color='orange')
+    plt.plot(np.degrees(lons[test6]), np.sin(lats[test6]), '.', markersize=12, color='g')
+    plt.plot(np.degrees(lons[test7]), np.sin(lats[test7]), '.', markersize=12, color='b')
+    plt.plot(np.degrees(lons[test8]), np.sin(lats[test8]), '.', markersize=12, color='c')
 
-    plt.ylim([0.5,1])
+    plt.ylim([0.7,1])
+    plt.xlim([0,360])
+    plt.ylabel('Sine Latitude', fontweight='bold')
+    plt.xlabel('Degrees Longitude', fontweight='bold')
 
     fittest = np.concatenate([[np.sin(hole_fit3['fitfunc'](test_lons))],
                               [np.sin(hole_fit4['fitfunc'](test_lons))],
@@ -48,7 +51,9 @@ def TESS_2018_plot():
                               [np.sin(hole_fit7['fitfunc'](test_lons))],
                               [np.sin(hole_fit8['fitfunc'](test_lons))]])
 
-    ax = sns.tsplot(data=fittest, time=np.degrees(test_lons), ci=[90])
+    ax = sns.tsplot(data=fittest, time=np.degrees(test_lons), ci=[90,95,99], linewidth=8)
+
+    plt.gcf().clear()
 
     # ---------------------
     testbed = np.concatenate([test3,test4,test5,test6,test7,test8])
@@ -58,7 +63,7 @@ def TESS_2018_plot():
     test_lats2 = np.sin(lats[ind])
     test_lons2 = lons[ind]
 
-    number_of_bins = 60
+    number_of_bins = 50
 
     bin_median, bin_edges, binnumber = stats.binned_statistic(test_lons2, test_lats2, statistic='median', bins=number_of_bins)
 
@@ -70,5 +75,5 @@ def TESS_2018_plot():
         binned_lats[:,jj] = np.nanmean(test_lats2[ar])
         binned_lats[0:lens[jj], jj] = test_lats2[ar]
 
-    ax = sns.tsplot(data=binned_lats, time=np.degrees(bin_edges[0:number_of_bins]), err_style='boot_traces', n_boot=800)
+    ax = sns.tsplot(data=binned_lats, time=np.degrees(bin_edges[0:number_of_bins]), err_style='boot_traces', n_boot=800, color='m')
 

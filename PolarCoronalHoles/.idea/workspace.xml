@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/pch_plots.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/PCH_Tools.py" afterPath="$PROJECT_DIR$/PCH_Tools.py" />
+      <change beforePath="$PROJECT_DIR$/pch_plots.py" afterPath="$PROJECT_DIR$/pch_plots.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -66,8 +65,8 @@
       <file leaf-file-name="pch_plots.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pch_plots.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="36" column="63" lean-forward="true" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
+            <state relative-caret-position="907">
+              <caret line="79" column="0" lean-forward="true" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -205,13 +204,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Plot PCH data">
-      <created>1515179409184</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1515179409184</updated>
     </task>
     <task id="LOCAL-00002" summary="Plot PCH data">
       <created>1515179418635</created>
@@ -549,7 +541,14 @@
       <option name="project" value="LOCAL" />
       <updated>1526330104106</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Implementing the hole area calculation.">
+      <created>1526663633086</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1526663633086</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -1052,8 +1051,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pch_plots.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="36" column="63" lean-forward="true" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
+        <state relative-caret-position="907">
+          <caret line="79" column="0" lean-forward="true" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
