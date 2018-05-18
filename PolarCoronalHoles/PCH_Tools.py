@@ -225,7 +225,7 @@ def center_of_mass(coords, mass=1, distance=False):
 
     mm = np.transpose(np.tile(mass, (coords.shape[1],1)))
 
-    return np.sum(coords*mm,axis=0)/np.sum(mass)
+    return np.sum(coords * mm, axis=0) / np.sum(mass)
 
 
 def hrot2date(hrot):

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/pch_plots.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/PCH_Detection.py" afterPath="$PROJECT_DIR$/PCH_Detection.py" />
       <change beforePath="$PROJECT_DIR$/PCH_Tools.py" afterPath="$PROJECT_DIR$/PCH_Tools.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,11 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PCH_Detection.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PCH_Detection.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="661">
-              <caret line="374" column="0" lean-forward="true" selection-start-line="374" selection-start-column="0" selection-end-line="374" selection-end-column="0" />
+            <state relative-caret-position="282">
+              <caret line="157" column="111" lean-forward="false" selection-start-line="157" selection-start-column="111" selection-end-line="157" selection-end-column="111" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -54,8 +54,20 @@
       <file leaf-file-name="PCH_Tools.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="34" column="22" lean-forward="true" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
+            <state relative-caret-position="473">
+              <caret line="200" column="0" lean-forward="true" selection-start-line="200" selection-start-column="0" selection-end-line="200" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pch_plots.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pch_plots.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="540">
+              <caret line="36" column="63" lean-forward="true" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -76,9 +88,13 @@
     <findStrings>
       <find>map.</find>
       <find>periodic</find>
+      <find>1</find>
     </findStrings>
     <replaceStrings>
       <replace>mask_map.</replace>
+      <replace>7</replace>
+      <replace>8</replace>
+      <replace>5</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -88,8 +104,9 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/PCH_tests.py" />
-        <option value="$PROJECT_DIR$/PCH_Tools.py" />
         <option value="$PROJECT_DIR$/PCH_Detection.py" />
+        <option value="$PROJECT_DIR$/PCH_Tools.py" />
+        <option value="$PROJECT_DIR$/pch_plots.py" />
       </list>
     </option>
   </component>
@@ -525,7 +542,14 @@
       <option name="project" value="LOCAL" />
       <updated>1525359952603</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Implementing the hole area calculation.">
+      <created>1526330104106</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1526330104106</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -569,11 +593,12 @@
     <MESSAGE value="Query Addition&#10;Comments" />
     <MESSAGE value="flienames fix" />
     <MESSAGE value="Progress toward hole area" />
-    <option name="LAST_COMMIT_MESSAGE" value="Progress toward hole area" />
+    <MESSAGE value="Implementing the hole area calculation." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implementing the hole area calculation." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1007,8 +1032,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="34" column="22" lean-forward="true" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
+        <state relative-caret-position="473">
+          <caret line="200" column="0" lean-forward="true" selection-start-line="200" selection-start-column="0" selection-end-line="200" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -1017,10 +1042,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="661">
-          <caret line="374" column="0" lean-forward="true" selection-start-line="374" selection-start-column="0" selection-end-line="374" selection-end-column="0" />
+        <state relative-caret-position="282">
+          <caret line="157" column="111" lean-forward="false" selection-start-line="157" selection-start-column="111" selection-end-line="157" selection-end-column="111" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pch_plots.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="36" column="63" lean-forward="true" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
