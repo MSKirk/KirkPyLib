@@ -18,7 +18,7 @@ from scipy.stats import invgamma
 from skimage.util import view_as_windows
 
 class NoiseLevelEstimation:
-    def __init__(self):
+    def __init__(self, img, patchsize=7):
         """
         NoiseLevel estimates noise level of input single noisy image.
 
@@ -135,3 +135,35 @@ class NoiseLevelEstimation:
         
         return T
 
+    def  weaktexturemask(self, img, th, patchsize=7):
+
+        kh = np.array([-1 / 2, 0, 1 / 2])
+        imgh = scipy.ndimage.correlate(img, kh, mode='nearest').transpose()
+        imgh = imgh[:, 1: imgh.shape[1] - 1, :]
+        imgh = imgh * imgh
+
+        kv = np.matrix(kh).getH()
+        imgv = scipy.ndimage.correlate(img, kv, mode='nearest').transpose()
+        imgv = imgv[1: imgv.shape[0] - 1, :, :]
+        imgv = imgv * imgv
+
+        s = img.shape
+        msk = np.zeros_like(img)
+
+        for cha in range(s[2]):
+            m = np.zeros_like(view_as_windows(img[:,:,cha], (patchsize, patchsize)))
+            Xh = view_as_windows(imgh[:,:, cha], (patchsize, patchsize - 2))
+            Xv = view_as_windows(imgv[:,:, cha], (patchsize - 2, patchsize))
+
+            Xtr = np.sum(np.concatenate((Xh, Xv)), axis=0)
+
+            p = Xtr < th[cha]
+            ind = 1
+
+            for col in range(0,s[1]-patchsize+1):
+                for row in range(0,s[0]-patchsize+1):
+                    if p[ind] > 0:
+                        msk[row: row + patchsize - 1, col: col + patchsize - 1, cha] = 1
+                    ind = ind + 1
+
+        return msk

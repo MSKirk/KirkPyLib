@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6696b96-717c-4e67-a2c6-3f67dc0759bb" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/NoiseLevel.py" />
-      <change beforePath="$PROJECT_DIR$/.idea/DeNoising.iml" afterPath="$PROJECT_DIR$/.idea/DeNoising.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../PolarCoronalHoles/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/NoiseLevel.py" afterPath="$PROJECT_DIR$/NoiseLevel.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -35,8 +32,8 @@
       <file leaf-file-name="NoiseLevel.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/NoiseLevel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="645">
-              <caret line="43" column="28" lean-forward="false" selection-start-line="43" selection-start-column="28" selection-end-line="43" selection-end-column="28" />
+            <state relative-caret-position="-1425">
+              <caret line="20" column="39" lean-forward="false" selection-start-line="20" selection-start-column="39" selection-end-line="20" selection-end-column="39" />
               <folding>
                 <element signature="e#225#245#0" expanded="true" />
               </folding>
@@ -286,6 +283,14 @@
       <option name="presentableId" value="Default" />
       <updated>1500486042969</updated>
     </task>
+    <task id="LOCAL-00001" summary="Noise Level estimation using weakly textured patches. Direct translation from the original matlab code. Untested.">
+      <created>1532032645004</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1532032645004</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -320,6 +325,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Noise Level estimation using weakly textured patches. Direct translation from the original matlab code. Untested." />
+    <option name="LAST_COMMIT_MESSAGE" value="Noise Level estimation using weakly textured patches. Direct translation from the original matlab code. Untested." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -425,8 +434,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/NoiseLevel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="43" column="28" lean-forward="false" selection-start-line="43" selection-start-column="28" selection-end-line="43" selection-end-column="28" />
+        <state relative-caret-position="-1425">
+          <caret line="20" column="39" lean-forward="false" selection-start-line="20" selection-start-column="39" selection-end-line="20" selection-end-column="39" />
           <folding>
             <element signature="e#225#245#0" expanded="true" />
           </folding>
