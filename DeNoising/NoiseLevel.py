@@ -11,7 +11,7 @@ class NoiseLevelEstimation:
         NoiseLevel estimates noise level of input single noisy image.
 
         Input parameters:
-            img: input single image array
+            img: input single numpy image array
             patchsize (optional): patch size (default: 7)
             decim (optional): decimation factor. If you put large number, the calculation will be accelerated. (default: 0)
             conf (optional): confidence interval to determin the threshold for the weak texture. In this algorithm, this value is usually set the value very close to one. (default: 0.99)
@@ -24,7 +24,7 @@ class NoiseLevelEstimation:
             mask: weak-texture mask. 0 and 1 represent non-weak-texture and weak-texture regions, respectively
 
         Example:
-            estimate = NoiseLevelEstimation(image_array, patchsize=11, itr=20)
+            estimate = NoiseLevelEstimation(image_array, patchsize=11, itr=10)
 
         Python Version: 20180718
 
@@ -54,17 +54,23 @@ class NoiseLevelEstimation:
 
     def noiselevel(self):
 
-        nlevel = np.ndarray(self.img.shape[2])
-        th = np.ndarray(self.img.shape[2])
-        num = np.ndarray(self.img.shape[2])
+        try:
+            third_dim_size = self.img.shape[2]
+        except IndexError:
+            self.img = np.expand_dims(self.img, 2)
+            third_dim_size = self.img.shape[2]
 
-        kh = np.array([-1 / 2, 0, 1 / 2])
-        imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest').transpose()
+        nlevel = np.ndarray(third_dim_size)
+        th = np.ndarray(third_dim_size)
+        num = np.ndarray(third_dim_size)
+
+        kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 1), 2)
+        imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest')
         imgh = imgh[:, 1: imgh.shape[1] - 1, :]
         imgh = imgh * imgh
 
-        kv = np.matrix(kh).getH()
-        imgv = scipy.ndimage.correlate(self.img, kv, mode='nearest').transpose()
+        kv = np.expand_dims(np.matrix(kh).getH(), 2)
+        imgv = scipy.ndimage.correlate(self.img, kv, mode='nearest')
         imgv = imgv[1: imgv.shape[0] - 1, :, :]
         imgv = imgv * imgv
 
@@ -78,15 +84,21 @@ class NoiseLevelEstimation:
 
         tau0 = invgamma.cdf(self.conf,r/2, scale=2*Dtr/r)
 
-        for cha in range(self.img.shape[2]):
+        for cha in range(third_dim_size):
             X = view_as_windows(self.img[:,:,cha], (self.patchsize, self.patchsize))
-            Xh = view_as_windows(imgh[:,:, cha], (self.patchsize, self.patchsize - 2))
-            Xv = view_as_windows(imgv[:,:, cha], (self.patchsize - 2, self.patchsize))
+            X = X.reshape(np.int(X.size/self.patchsize**2), self.patchsize**2, order='F')
 
-            Xtr = np.sum(np.concatenate((Xh, Xv)), axis=0)
+            Xh = view_as_windows(imgh[:,:, cha], (self.patchsize, self.patchsize - 2))
+            Xh = Xh.reshape(np.int(Xh.size/((self.patchsize - 2) * self.patchsize)), ((self.patchsize - 2) * self.patchsize), order='F')
+
+            Xv = view_as_windows(imgv[:,:, cha], (self.patchsize - 2, self.patchsize))
+            Xv = Xv.reshape(np.int(Xv.size / ((self.patchsize - 2) * self.patchsize)), ((self.patchsize - 2) * self.patchsize), order='F')
+
+            Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=1), axis=1), 1)
 
             if self.decim > 0:
-                XtrX = np.concatenate((Xtr, X), axis=0)
+                XtrX = np.concatenate((Xtr, X), axis=1)
+                # here
                 XtrX = np.asmatrix(XtrX).getH().sort(axis=1).getH()
                 p = np.floor(XtrX.shape[1]/(self.decim+1))
                 p = np.arange(0, p) * (self.decim+1)
@@ -125,14 +137,25 @@ class NoiseLevelEstimation:
         return nlevel, th, num
 
     def convmtx2(self, H, m, n):
+        # Specialized 2D convolution matrix generation
+        # H — Input matrix
+        # m — Rows in convolution matrix
+        # n — Columns in convolution matrix
+
         s = np.shape(H)
         T = np.zeros([(m - s[0] + 1) * (n - s[1] + 1), m * n])
 
         k = 0
         for i in range((m - s[0] + 1)):
-            for j in range(1, (m - s[1] + 1)):
+            for j in range((n - s[1] + 1)):
                 for p in range(s[0]):
-                    T[k, (i - 1 + p - 1) * n + (j - 1) + 1:(i - 1 + p - 1) * n + (j - 1) + 1 + s[2] - 1] = H[p,:]
+                    index_a = (i - 1 + p - 1) * n + (j - 1)
+                    index_b = (i - 1 + p - 1) * n + (j - 1) + s[1] - 1
+
+                    if index_a == index_b:
+                        T[k, index_a] = H[p, :]
+                    else:
+                        T[k, index_a: index_b] = H[p, :]
                 k = k + 1
         
         return T
