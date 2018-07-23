@@ -98,10 +98,10 @@ class NoiseLevelEstimation:
 
             if self.decim > 0:
                 XtrX = np.sort(np.concatenate((Xtr, X), axis=1), axis=1)
-                p = np.floor(XtrX.shape[1]/(self.decim+1))
-                p = np.arange(0, p) * (self.decim+1)
-                Xtr = XtrX[0, p.astype('int')]
-                X = XtrX[1:XtrX.shape[0], p.astype('int')]
+                p = np.floor(XtrX.shape[0] / (self.decim + 1))
+                p = np.arange(0, p) * (self.decim + 1)
+                Xtr = XtrX[p.astype('int'), 0]
+                X = XtrX[p.astype('int'), 1:XtrX.shape[1]]
 
             # noise level estimation
             tau = np.inf
@@ -109,8 +109,8 @@ class NoiseLevelEstimation:
             if X.shape[1] > X.shape[0]:
                 sig2 = 0
             else:
-                cov = (X * np.asmatrix(X).getH())/(X.shape[1] -1)
-                d = np.linalg.eig(cov)
+                cov = (np.asmatrix(X).getH() @ np.asmatrix(X)) / (X.shape[0] - 1)
+                d = np.linalg.eig(cov)[0]
                 sig2 = d[0]
 
             for i in range(1,self.itr):
@@ -121,11 +121,11 @@ class NoiseLevelEstimation:
                 X = X[:, p]
 
                 # noise level estimation
-                if X.shape[1] < X.shape[0]:
+                if X.shape[1] > X.shape[0]:
                     break
 
-                cov = (X * np.asmatrix(X).getH()) / (X.shape[1] - 1)
-                d = np.linalg.eig(cov)
+                cov = (np.asmatrix(X).getH() @ np.asmatrix(X)) / (X.shape[0] - 1)
+                d = np.linalg.eig(cov)[0]
                 sig2 = d[0]
 
             nlevel[cha] = np.sqrt(sig2)
