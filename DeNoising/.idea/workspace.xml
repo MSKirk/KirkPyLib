@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6696b96-717c-4e67-a2c6-3f67dc0759bb" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/NoiseLevel_test.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/NoiseLevel.py" afterPath="$PROJECT_DIR$/NoiseLevel.py" />
     </list>
@@ -29,11 +30,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NoiseLevel.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NoiseLevel.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NoiseLevel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="113" column="49" lean-forward="false" selection-start-line="113" selection-start-column="49" selection-end-line="113" selection-end-column="49" />
+            <state relative-caret-position="778">
+              <caret line="134" column="8" lean-forward="true" selection-start-line="134" selection-start-column="8" selection-end-line="134" selection-end-column="30" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NoiseLevel_test.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/NoiseLevel_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="380">
+              <caret line="64" column="37" lean-forward="true" selection-start-line="64" selection-start-column="37" selection-end-line="64" selection-end-column="37" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -67,6 +80,7 @@
       <find>img[</find>
       <find>th</find>
       <find>self.img.shape[2]</find>
+      <find>self.</find>
     </findStrings>
     <replaceStrings>
       <replace>PSF</replace>
@@ -86,6 +100,7 @@
         <option value="$PROJECT_DIR$/DeconvolutionCompare.ipynb" />
         <option value="$PROJECT_DIR$/AIA_pipeline.py" />
         <option value="$PROJECT_DIR$/NoiseLevel.py" />
+        <option value="$PROJECT_DIR$/NoiseLevel_test.py" />
       </list>
     </option>
   </component>
@@ -310,7 +325,14 @@
       <option name="project" value="LOCAL" />
       <updated>1532095828093</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Validating python code.">
+      <created>1532121769199</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1532121769199</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -350,7 +372,8 @@
     <MESSAGE value="Noise Level estimation using weakly textured patches. Direct translation from the original matlab code. Untested." />
     <MESSAGE value="Added in WeakTesturedMask" />
     <MESSAGE value="Reconfigured work flow." />
-    <option name="LAST_COMMIT_MESSAGE" value="Reconfigured work flow." />
+    <MESSAGE value="Validating python code." />
+    <option name="LAST_COMMIT_MESSAGE" value="Validating python code." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -503,8 +526,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/NoiseLevel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="113" column="49" lean-forward="false" selection-start-line="113" selection-start-column="49" selection-end-line="113" selection-end-column="49" />
+        <state relative-caret-position="778">
+          <caret line="134" column="8" lean-forward="true" selection-start-line="134" selection-start-column="8" selection-end-line="134" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NoiseLevel_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="64" column="37" lean-forward="true" selection-start-line="64" selection-start-column="37" selection-end-line="64" selection-end-column="37" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>

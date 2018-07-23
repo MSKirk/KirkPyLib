@@ -97,13 +97,11 @@ class NoiseLevelEstimation:
             Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=1), axis=1), 1)
 
             if self.decim > 0:
-                XtrX = np.concatenate((Xtr, X), axis=1)
-                # here
-                XtrX = np.asmatrix(XtrX).getH().sort(axis=1).getH()
+                XtrX = np.sort(np.concatenate((Xtr, X), axis=1), axis=1)
                 p = np.floor(XtrX.shape[1]/(self.decim+1))
                 p = np.arange(0, p) * (self.decim+1)
-                Xtr = XtrX[0,p]
-                X = XtrX[1:XtrX.shape[0],p]
+                Xtr = XtrX[0, p.astype('int')]
+                X = XtrX[1:XtrX.shape[0], p.astype('int')]
 
             # noise level estimation
             tau = np.inf
