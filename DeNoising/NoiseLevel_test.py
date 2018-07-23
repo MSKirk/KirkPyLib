@@ -30,7 +30,7 @@ def convmtx2(H, m, n):
     return T
 
 
-def NoiseLevel_test(img = data.camera(), patchsize = 7, ecim=1, conf=1-1E-6, itr=3):
+def NoiseLevel_test(img = data.camera(), patchsize = 7, decim=1, conf=1-1E-6, itr=3):
 
     try:
         third_dim_size = img.shape[2]
