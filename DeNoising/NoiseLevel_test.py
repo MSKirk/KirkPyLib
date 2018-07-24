@@ -2,7 +2,7 @@ import scipy.ndimage
 import numpy as np
 from numpy.linalg import matrix_rank
 from scipy.stats import gamma
-from skimage.util import view_as_windows
+from skimage.util import view_as_windows, random_noise
 from skimage import data
 
 
@@ -72,7 +72,8 @@ def NoiseLevel_test(img = data.camera(), patchsize = 7, decim=1, conf=1-1E-6, it
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
 
         if decim > 0:
-            XtrX = np.sort(np.concatenate((Xtr, X), axis=1), axis=1)
+            XtrX = np.transpose(np.concatenate((Xtr, X), axis=0))
+            XtrX = np.transpose(XtrX[XtrX[:,0].argsort(),])
             p = np.floor(XtrX.shape[1] / (decim + 1))
             p = np.expand_dims(np.arange(0, p) * (decim + 1), 0)
             Xtr = XtrX[0, p.astype('int')]
@@ -126,7 +127,8 @@ def  weaktexturemask(th, img = data.camera(), patchsize = 7):
         msk = np.zeros_like(img)
 
         for cha in range(s[2]):
-            m = np.zeros_like(view_as_windows(img[:,:,cha], (patchsize, patchsize)))
+            m = view_as_windows(img[:, :, cha], (patchsize, patchsize))
+            m = np.zeros_like(m.reshape(np.int(m.size / patchsize ** 2), patchsize ** 2, order='F').transpose())
 
             Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
             Xh = Xh.reshape(np.int(Xh.size / ((patchsize - 2) * patchsize)),
@@ -139,11 +141,11 @@ def  weaktexturemask(th, img = data.camera(), patchsize = 7):
             Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
 
             p = Xtr < th[cha]
-            ind = 1
+            ind = 0
 
             for col in range(0,s[1]-patchsize+1):
                 for row in range(0,s[0]-patchsize+1):
-                    if p[ind] > 0:
+                    if p[:,ind]:
                         msk[row: row + patchsize - 1, col: col + patchsize - 1, cha] = 1
                     ind = ind + 1
 

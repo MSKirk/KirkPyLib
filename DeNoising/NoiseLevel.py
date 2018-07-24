@@ -99,7 +99,8 @@ class NoiseLevelEstimation:
             Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
 
             if self.decim > 0:
-                XtrX = np.sort(np.concatenate((Xtr, X), axis=1), axis=1)
+                XtrX = np.transpose(np.concatenate((Xtr, X), axis=0))
+                XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(),])
                 p = np.floor(XtrX.shape[1] / (self.decim + 1))
                 p = np.expand_dims(np.arange(0, p) * (self.decim + 1), 0)
                 Xtr = XtrX[0, p.astype('int')]
@@ -170,7 +171,8 @@ class NoiseLevelEstimation:
         msk = np.zeros_like(self.img)
 
         for cha in range(s[2]):
-            m = np.zeros_like(view_as_windows(self.img[:,:,cha], (self.patchsize, self.patchsize)))
+            m = view_as_windows(self.img[:, :, cha], (self.patchsize, self.patchsize))
+            m = np.zeros_like(m.reshape(np.int(m.size / self.patchsize ** 2), self.patchsize ** 2, order='F').transpose())
 
             Xh = view_as_windows(imgh[:, :, cha], (self.patchsize, self.patchsize - 2))
             Xh = Xh.reshape(np.int(Xh.size / ((self.patchsize - 2) * self.patchsize)),
@@ -183,11 +185,11 @@ class NoiseLevelEstimation:
             Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
 
             p = Xtr < self.th[cha]
-            ind = 1
+            ind = 0
 
             for col in range(0,s[1]-self.patchsize+1):
                 for row in range(0,s[0]-self.patchsize+1):
-                    if p[ind] > 0:
+                    if p[:,ind]:
                         msk[row: row + self.patchsize - 1, col: col + self.patchsize - 1, cha] = 1
                     ind = ind + 1
 
