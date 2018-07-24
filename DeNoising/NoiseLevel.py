@@ -1,7 +1,7 @@
 import scipy.ndimage
 import numpy as np
 from numpy.linalg import matrix_rank
-from scipy.stats import invgamma
+from scipy.stats import gamma
 from skimage.util import view_as_windows
 
 
@@ -57,19 +57,19 @@ class NoiseLevelEstimation:
         try:
             third_dim_size = self.img.shape[2]
         except IndexError:
-            self.img = np.expand_dims(self.img, 2)
-            third_dim_size = self.img.shape[2]
+            img = np.expand_dims(self.img, 2)
+            third_dim_size = img.shape[2]
 
         nlevel = np.ndarray(third_dim_size)
         th = np.ndarray(third_dim_size)
         num = np.ndarray(third_dim_size)
 
-        kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 1), 2)
+        kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
         imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest')
         imgh = imgh[:, 1: imgh.shape[1] - 1, :]
         imgh = imgh * imgh
 
-        kv = np.expand_dims(np.matrix(kh).getH(), 2)
+        kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
         imgv = scipy.ndimage.correlate(self.img, kv, mode='nearest')
         imgv = imgv[1: imgv.shape[0] - 1, :, :]
         imgv = imgv * imgv
@@ -82,49 +82,51 @@ class NoiseLevelEstimation:
         r = np.double(matrix_rank(DD))
         Dtr = np.trace(DD)
 
-        tau0 = invgamma.cdf(self.conf,r/2, scale=2*Dtr/r)
+        tau0 = gamma.ppf(self.conf, r / 2, scale=(2 * Dtr / r))
 
         for cha in range(third_dim_size):
-            X = view_as_windows(self.img[:,:,cha], (self.patchsize, self.patchsize))
-            X = X.reshape(np.int(X.size/self.patchsize**2), self.patchsize**2, order='F')
+            X = view_as_windows(self.img[:, :, cha], (self.patchsize, self.patchsize))
+            X = X.reshape(np.int(X.size / self.patchsize ** 2), self.patchsize ** 2, order='F').transpose()
 
-            Xh = view_as_windows(imgh[:,:, cha], (self.patchsize, self.patchsize - 2))
-            Xh = Xh.reshape(np.int(Xh.size/((self.patchsize - 2) * self.patchsize)), ((self.patchsize - 2) * self.patchsize), order='F')
+            Xh = view_as_windows(imgh[:, :, cha], (self.patchsize, self.patchsize - 2))
+            Xh = Xh.reshape(np.int(Xh.size / ((self.patchsize - 2) * self.patchsize)),
+                            ((self.patchsize - 2) * self.patchsize), order='F').transpose()
 
-            Xv = view_as_windows(imgv[:,:, cha], (self.patchsize - 2, self.patchsize))
-            Xv = Xv.reshape(np.int(Xv.size / ((self.patchsize - 2) * self.patchsize)), ((self.patchsize - 2) * self.patchsize), order='F')
+            Xv = view_as_windows(imgv[:, :, cha], (self.patchsize - 2, self.patchsize))
+            Xv = Xv.reshape(np.int(Xv.size / ((self.patchsize - 2) * self.patchsize)),
+                            ((self.patchsize - 2) * self.patchsize), order='F').transpose()
 
-            Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=1), axis=1), 1)
+            Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
 
             if self.decim > 0:
                 XtrX = np.sort(np.concatenate((Xtr, X), axis=1), axis=1)
-                p = np.floor(XtrX.shape[0] / (self.decim + 1))
-                p = np.arange(0, p) * (self.decim + 1)
-                Xtr = XtrX[p.astype('int'), 0]
-                X = XtrX[p.astype('int'), 1:XtrX.shape[1]]
+                p = np.floor(XtrX.shape[1] / (self.decim + 1))
+                p = np.expand_dims(np.arange(0, p) * (self.decim + 1), 0)
+                Xtr = XtrX[0, p.astype('int')]
+                X = np.squeeze(XtrX[1:XtrX.shape[1], p.astype('int')])
 
             # noise level estimation
             tau = np.inf
 
-            if X.shape[1] > X.shape[0]:
+            if X.shape[1] < X.shape[0]:
                 sig2 = 0
             else:
-                cov = (np.asmatrix(X).getH() @ np.asmatrix(X)) / (X.shape[0] - 1)
+                cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
                 d = np.linalg.eig(cov)[0]
                 sig2 = d[0]
 
-            for i in range(1,self.itr):
+            for i in range(1, self.itr):
                 # weak texture selection
                 tau = sig2 * tau0
                 p = Xtr < tau
-                Xtr = Xtr[:, p]
-                X = X[:, p]
+                Xtr = Xtr[p]
+                X = X[:, np.squeeze(p)]
 
                 # noise level estimation
-                if X.shape[1] > X.shape[0]:
+                if X.shape[1] < X.shape[0]:
                     break
 
-                cov = (np.asmatrix(X).getH() @ np.asmatrix(X)) / (X.shape[0] - 1)
+                cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
                 d = np.linalg.eig(cov)[0]
                 sig2 = d[0]
 
@@ -140,6 +142,7 @@ class NoiseLevelEstimation:
         # m — Rows in convolution matrix
         # n — Columns in convolution matrix
 
+        H = np.squeeze(H, 2)
         s = np.shape(H)
         T = np.zeros([(m - s[0] + 1) * (n - s[1] + 1), m * n])
 
@@ -147,26 +150,19 @@ class NoiseLevelEstimation:
         for i in range((m - s[0] + 1)):
             for j in range((n - s[1] + 1)):
                 for p in range(s[0]):
-                    index_a = (i - 1 + p - 1) * n + (j - 1)
-                    index_b = (i - 1 + p - 1) * n + (j - 1) + s[1] - 1
-
-                    if index_a == index_b:
-                        T[k, index_a] = H[p, :]
-                    else:
-                        T[k, index_a: index_b] = H[p, :]
+                    T[k, (i + p) * n + j: (i + p) * n + j + 1 + s[1] - 1] = H[p, :]
                 k = k + 1
-        
         return T
 
     def  weaktexturemask(self):
 
-        kh = np.array([-1 / 2, 0, 1 / 2])
-        imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest').transpose()
+        kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
+        imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest')
         imgh = imgh[:, 1: imgh.shape[1] - 1, :]
         imgh = imgh * imgh
 
-        kv = np.matrix(kh).getH()
-        imgv = scipy.ndimage.correlate(self.img, kv, mode='nearest').transpose()
+        kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
+        imgv = scipy.ndimage.correlate(self.img, kv, mode='nearest')
         imgv = imgv[1: imgv.shape[0] - 1, :, :]
         imgv = imgv * imgv
 
@@ -175,10 +171,16 @@ class NoiseLevelEstimation:
 
         for cha in range(s[2]):
             m = np.zeros_like(view_as_windows(self.img[:,:,cha], (self.patchsize, self.patchsize)))
-            Xh = view_as_windows(imgh[:,:, cha], (self.patchsize, self.patchsize - 2))
-            Xv = view_as_windows(imgv[:,:, cha], (self.patchsize - 2, self.patchsize))
 
-            Xtr = np.sum(np.concatenate((Xh, Xv)), axis=0)
+            Xh = view_as_windows(imgh[:, :, cha], (self.patchsize, self.patchsize - 2))
+            Xh = Xh.reshape(np.int(Xh.size / ((self.patchsize - 2) * self.patchsize)),
+                            ((self.patchsize - 2) * self.patchsize), order='F').transpose()
+
+            Xv = view_as_windows(imgv[:, :, cha], (self.patchsize - 2, self.patchsize))
+            Xv = Xv.reshape(np.int(Xv.size / ((self.patchsize - 2) * self.patchsize)),
+                            ((self.patchsize - 2) * self.patchsize), order='F').transpose()
+
+            Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
 
             p = Xtr < self.th[cha]
             ind = 1
