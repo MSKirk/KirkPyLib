@@ -30,11 +30,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NoiseLevel.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NoiseLevel.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NoiseLevel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1530">
-              <caret line="102" column="64" lean-forward="false" selection-start-line="102" selection-start-column="64" selection-end-line="102" selection-end-column="64" />
+            <state relative-caret-position="-74">
+              <caret line="7" column="18" lean-forward="false" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -42,11 +42,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NoiseLevel_test.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NoiseLevel_test.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/NoiseLevel_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="543">
-              <caret line="74" column="0" lean-forward="false" selection-start-line="74" selection-start-column="0" selection-end-line="75" selection-end-column="59" />
+            <state relative-caret-position="423">
+              <caret line="35" column="37" lean-forward="true" selection-start-line="35" selection-start-column="37" selection-end-line="35" selection-end-column="37" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -100,8 +100,8 @@
         <option value="$PROJECT_DIR$/AIA_pipline.py" />
         <option value="$PROJECT_DIR$/AIA_pipeline.py" />
         <option value="$PROJECT_DIR$/DeconvolutionCompare.ipynb" />
-        <option value="$PROJECT_DIR$/NoiseLevel_test.py" />
         <option value="$PROJECT_DIR$/NoiseLevel.py" />
+        <option value="$PROJECT_DIR$/NoiseLevel_test.py" />
       </list>
     </option>
   </component>
@@ -361,7 +361,14 @@
       <option name="project" value="LOCAL" />
       <updated>1532461596309</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Line by line matlab comparison corrections.">
+      <created>1532467149935</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1532467149935</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -555,20 +562,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NoiseLevel_test.py">
+    <entry file="file://$PROJECT_DIR$/NoiseLevel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="543">
-          <caret line="74" column="0" lean-forward="false" selection-start-line="74" selection-start-column="0" selection-end-line="75" selection-end-column="59" />
+        <state relative-caret-position="-74">
+          <caret line="7" column="18" lean-forward="false" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NoiseLevel.py">
+    <entry file="file://$PROJECT_DIR$/NoiseLevel_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1530">
-          <caret line="102" column="64" lean-forward="false" selection-start-line="102" selection-start-column="64" selection-end-line="102" selection-end-column="64" />
+        <state relative-caret-position="423">
+          <caret line="35" column="37" lean-forward="true" selection-start-line="35" selection-start-column="37" selection-end-line="35" selection-end-column="37" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>

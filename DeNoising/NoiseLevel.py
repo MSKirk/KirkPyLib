@@ -193,4 +193,4 @@ class NoiseLevelEstimation:
                         msk[row: row + self.patchsize - 1, col: col + self.patchsize - 1, cha] = 1
                     ind = ind + 1
 
-        return msk
+        return np.squeeze(msk)
