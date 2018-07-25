@@ -2,8 +2,10 @@ import scipy.ndimage
 import numpy as np
 from numpy.linalg import matrix_rank
 from scipy.stats import gamma
-from skimage.util import view_as_windows, random_noise
+from skimage.util import view_as_windows
 from skimage import data
+from PIL import Image
+import matplotlib.pyplot as plt
 
 
 def convmtx2(H, m, n):
@@ -25,9 +27,11 @@ def convmtx2(H, m, n):
     return T
 
 
-img = data.camera()
+img = np.array(Image.open('/Users/mskirk/matlab/invansc_v203/images/cameraman.tif'))
+noise = img + np.random.standard_normal(img.shape) * 10.
 
-def NoiseLevel_test(img = random_noise(img), patchsize = 7, decim=1, conf=1-1E-6, itr=3):
+
+def NoiseLevel_test(img = noise, patchsize = 7, decim=1, conf=1-1E-6, itr=3):
 
     try:
         third_dim_size = img.shape[2]
@@ -88,7 +92,7 @@ def NoiseLevel_test(img = random_noise(img), patchsize = 7, decim=1, conf=1-1E-6
             sig2 = 0
         else:
             cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
-            d = np.linalg.eig(cov)[0]
+            d = np.flip(np.linalg.eig(cov)[0], axis=0)
             sig2 = d[0]
 
         for i in range(1, itr):
@@ -103,7 +107,7 @@ def NoiseLevel_test(img = random_noise(img), patchsize = 7, decim=1, conf=1-1E-6
                 break
 
             cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
-            d = np.linalg.eig(cov)[0]
+            d = np.flip(np.linalg.eig(cov)[0], axis=0)
             sig2 = d[0]
 
         nlevel[cha] = np.sqrt(sig2)
@@ -114,6 +118,11 @@ def NoiseLevel_test(img = random_noise(img), patchsize = 7, decim=1, conf=1-1E-6
 
 
 def  weaktexturemask(th, img = data.camera(), patchsize = 7):
+
+        try:
+            print(img.shape[2])
+        except IndexError:
+            img = np.expand_dims(img, 2)
 
         kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
         imgh = scipy.ndimage.correlate(img, kh, mode='nearest')

@@ -57,8 +57,8 @@ class NoiseLevelEstimation:
         try:
             third_dim_size = self.img.shape[2]
         except IndexError:
-            img = np.expand_dims(self.img, 2)
-            third_dim_size = img.shape[2]
+            self.img = np.expand_dims(self.img, 2)
+            third_dim_size = self.img.shape[2]
 
         nlevel = np.ndarray(third_dim_size)
         th = np.ndarray(third_dim_size)
@@ -113,7 +113,7 @@ class NoiseLevelEstimation:
                 sig2 = 0
             else:
                 cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
-                d = np.linalg.eig(cov)[0]
+                d = np.flip(np.linalg.eig(cov)[0], axis=0)
                 sig2 = d[0]
 
             for i in range(1, self.itr):
@@ -128,12 +128,15 @@ class NoiseLevelEstimation:
                     break
 
                 cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
-                d = np.linalg.eig(cov)[0]
+                d = np.flip(np.linalg.eig(cov)[0], axis=0)
                 sig2 = d[0]
 
             nlevel[cha] = np.sqrt(sig2)
             th[cha] = tau
             num[cha] = X.shape[1]
+
+        # clean up
+        self.img = np.squeeze(self.img)
 
         return nlevel, th, num
 
@@ -156,6 +159,11 @@ class NoiseLevelEstimation:
         return T
 
     def  weaktexturemask(self):
+
+        try:
+            print(self.img.shape[2])
+        except IndexError:
+            self.img = np.expand_dims(self.img, 2)
 
         kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
         imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest')
@@ -192,5 +200,8 @@ class NoiseLevelEstimation:
                     if p[:,ind]:
                         msk[row: row + self.patchsize - 1, col: col + self.patchsize - 1, cha] = 1
                     ind = ind + 1
+
+        # clean up
+        self.img = np.squeeze(self.img)
 
         return np.squeeze(msk)
