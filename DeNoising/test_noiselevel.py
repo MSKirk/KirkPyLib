@@ -1,18 +1,18 @@
 import numpy as np
 from skimage import data
-from NoiseLevel import NoiseLevelEstimation as nle
+from noiselevel import NoiseLevelEstimation as nle
 
 
 img = data.camera()
 
 
-def convmtx2_test():
+def test_convmtx2():
 
     tt = nle.convmtx2(img, 11., 7.)
     assert tt.shape == ((11-img.shape[0] + 1) * (7 - img.shape[1] + 1),11.*7.)
 
 
-def noiselevel_test():
+def test_noiselevel():
 
     noise_levels = np.array([5., 10., 20., 42.])
     n_levels = np.zeros_like(noise_levels)
@@ -28,7 +28,7 @@ def noiselevel_test():
     assert n_patches > 10000.
 
 
-def  weaktexturemask_test():
+def  test_weaktexturemask():
     noise_levels = 5
     noise = img + np.random.standard_normal(img.shape) * noise_levels
     output = nle(noise, patchsize=11, itr=5)
