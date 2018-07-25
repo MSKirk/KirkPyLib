@@ -71,8 +71,8 @@ class NoiseLevelEstimation:
         imgv = imgv[1: imgv.shape[0] - 1, :, :]
         imgv = imgv * imgv
 
-        Dh = np.matrix(self.convmtx2(kh, self.patchsize, self.patchsize))
-        Dv = np.matrix(self.convmtx2(kv, self.patchsize, self.patchsize))
+        Dh = np.matrix(self.convmtx2(np.squeeze(kh,2), self.patchsize, self.patchsize))
+        Dv = np.matrix(self.convmtx2(np.squeeze(kv,2), self.patchsize, self.patchsize))
 
         DD = Dh.getH() * Dh + Dv.getH() * Dv
 
@@ -143,7 +143,6 @@ class NoiseLevelEstimation:
         # m — Rows in convolution matrix
         # n — Columns in convolution matrix
 
-        H = np.squeeze(H, 2)
         s = np.shape(H)
         T = np.zeros([(m - s[0] + 1) * (n - s[1] + 1), m * n])
 
