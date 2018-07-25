@@ -1,7 +1,6 @@
-import scipy.ndimage
 import numpy as np
-from numpy.linalg import matrix_rank
 from scipy.stats import gamma
+from scipy.ndimage import correlate
 from skimage.util import view_as_windows
 
 
@@ -24,9 +23,10 @@ class NoiseLevelEstimation:
             mask: weak-texture mask. 0 and 1 represent non-weak-texture and weak-texture regions, respectively
 
         Example:
-            estimate = NoiseLevelEstimation(image_array, patchsize=11, itr=10)
+            estimate = NoiseLevelEstimation(noisy_image_array, patchsize=11, itr=10)
 
         Python Version: 20180718
+        Python Author: M. Kirk
 
         Translated from Noise Level Estimation Matlab code: noiselevel.m
 
@@ -54,23 +54,20 @@ class NoiseLevelEstimation:
 
     def noiselevel(self):
 
-        try:
-            third_dim_size = self.img.shape[2]
-        except IndexError:
+        if len(self.img.shape) < 3:
             self.img = np.expand_dims(self.img, 2)
-            third_dim_size = self.img.shape[2]
 
-        nlevel = np.ndarray(third_dim_size)
-        th = np.ndarray(third_dim_size)
-        num = np.ndarray(third_dim_size)
+        nlevel = np.ndarray(self.img.shape[2])
+        th = np.ndarray(self.img.shape[2])
+        num = np.ndarray(self.img.shape[2])
 
-        kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
-        imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest')
+        kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 0),2)
+        imgh = correlate(self.img, kh, mode='nearest')
         imgh = imgh[:, 1: imgh.shape[1] - 1, :]
         imgh = imgh * imgh
 
-        kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
-        imgv = scipy.ndimage.correlate(self.img, kv, mode='nearest')
+        kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 2)
+        imgv = correlate(self.img, kv, mode='nearest')
         imgv = imgv[1: imgv.shape[0] - 1, :, :]
         imgv = imgv * imgv
 
@@ -79,12 +76,12 @@ class NoiseLevelEstimation:
 
         DD = Dh.getH() * Dh + Dv.getH() * Dv
 
-        r = np.double(matrix_rank(DD))
+        r = np.double(np.linalg.matrix_rank(DD))
         Dtr = np.trace(DD)
 
         tau0 = gamma.ppf(self.conf, r / 2, scale=(2 * Dtr / r))
 
-        for cha in range(third_dim_size):
+        for cha in range(self.img.shape[2]):
             X = view_as_windows(self.img[:, :, cha], (self.patchsize, self.patchsize))
             X = X.reshape(np.int(X.size / self.patchsize ** 2), self.patchsize ** 2, order='F').transpose()
 
@@ -160,18 +157,16 @@ class NoiseLevelEstimation:
 
     def  weaktexturemask(self):
 
-        try:
-            print(self.img.shape[2])
-        except IndexError:
+        if len(self.img.shape) < 3:
             self.img = np.expand_dims(self.img, 2)
 
         kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
-        imgh = scipy.ndimage.correlate(self.img, kh, mode='nearest')
+        imgh = correlate(self.img, kh, mode='nearest')
         imgh = imgh[:, 1: imgh.shape[1] - 1, :]
         imgh = imgh * imgh
 
         kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
-        imgv = scipy.ndimage.correlate(self.img, kv, mode='nearest')
+        imgv = correlate(self.img, kv, mode='nearest')
         imgv = imgv[1: imgv.shape[0] - 1, :, :]
         imgv = imgv * imgv
 

@@ -8,7 +8,11 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 
-def convmtx2(H, m, n):
+img = np.array(Image.open('/Users/mskirk/matlab/invansc_v203/images/cameraman.tif'))
+noise = img + np.random.standard_normal(img.shape) * 10.
+
+
+def convmtx2_test(H, m, n):
     # Specialized 2D convolution matrix generation
     # H — Input matrix
     # m — Rows in convolution matrix
@@ -27,11 +31,7 @@ def convmtx2(H, m, n):
     return T
 
 
-img = np.array(Image.open('/Users/mskirk/matlab/invansc_v203/images/cameraman.tif'))
-noise = img + np.random.standard_normal(img.shape) * 10.
-
-
-def NoiseLevel_test(img = noise, patchsize = 7, decim=1, conf=1-1E-6, itr=3):
+def noiselevel_test(img = noise, patchsize = 11, decim=1, conf=1-1E-6, itr=3):
 
     try:
         third_dim_size = img.shape[2]
@@ -117,7 +117,7 @@ def NoiseLevel_test(img = noise, patchsize = 7, decim=1, conf=1-1E-6, itr=3):
     return nlevel, th, num
 
 
-def  weaktexturemask(th, img = data.camera(), patchsize = 7):
+def  weaktexturemask_test(th, img = data.camera(), patchsize = 7):
 
         try:
             print(img.shape[2])
