@@ -406,7 +406,14 @@
       <option name="project" value="LOCAL" />
       <updated>1532551911974</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Docs update">
+      <created>1532639061298</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1532639061298</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -453,7 +460,8 @@
     <MESSAGE value="Cleaning code" />
     <MESSAGE value="Tests for NoiseLevel" />
     <MESSAGE value="Naming conventions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Naming conventions" />
+    <MESSAGE value="Docs update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Docs update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
