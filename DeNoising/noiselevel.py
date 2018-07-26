@@ -7,32 +7,40 @@ from skimage.util import view_as_windows
 class NoiseLevelEstimation:
     def __init__(self, img, patchsize=7, decim=0, conf=1-1E-6, itr=3):
         """
-        NoiseLevel estimates noise level of input single noisy image.
+        Estimates noise level of input single noisy image assuming additive white Gaussian noise.
 
-        Input parameters:
+        Parameters
+        ----------
             img: input single numpy image array
-            patchsize (optional): patch size (default: 7)
-            decim (optional): decimation factor. If you put large number, the calculation will be accelerated. (default: 0)
-            conf (optional): confidence interval to determin the threshold for the weak texture. In this algorithm, this value is usually set the value very close to one. (default: 0.99)
-            itr (optional): number of iteration. (default: 3)
 
-        Calculated parameters:
+            patchsize (optional): patch size (default: 7)
+            decim (optional): decimation factor. The larger the number, the faster the processing. (default: 0)
+            conf (optional): confidence interval to determine the threshold for the weak texture. This value is typically set very close to one. (default: 0.99)
+            itr (optional): number of iterations. (default: 3)
+
+        Attributes
+        ----------
             nlevel: estimated noise levels.
             th: threshold to extract weak texture patches at the last iteration.
             num: number of extracted weak texture patches at the last iteration.
             mask: weak-texture mask. 0 and 1 represent non-weak-texture and weak-texture regions, respectively
 
-        Example:
+        Example
+        ----------
             estimate = NoiseLevelEstimation(noisy_image_array, patchsize=11, itr=10)
 
+
+        Notes
+        -----
         Python Version: 20180718
         Python Author: M. Kirk
 
         Translated from Noise Level Estimation Matlab code: noiselevel.m
 
-        noiselevel.m Copyright (C) 2012-2015 Masayuki Tanaka
+        noiselevel.m Copyright (C) 2012-2015 Masayuki Tanaka; distributed under the BSD-2-Clause license
 
-        Reference:
+        Reference
+        ---------
         Xinhao Liu, Masayuki Tanaka and Masatoshi Okutomi
         Noise Level Estimation Using Weak Textured Patches of a Single Noisy Image
         IEEE International Conference on Image Processing (ICIP), 2012.
