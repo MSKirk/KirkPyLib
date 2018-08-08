@@ -362,8 +362,8 @@ class PCH_Detection:
 
             hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=6, sigma=errors)
 
-            # Need fit with several degrees
-            # Need to define error in trigfit – Check?
+            # Need fit with several degrees – implement fitted line length measure
+            # Need to define error in trigfit – Done?
             # Need to off set center of mass
             # Neet to confirm trig fitting
 

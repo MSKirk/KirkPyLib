@@ -4,7 +4,6 @@
     <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/PCH_Detection.py" afterPath="$PROJECT_DIR$/PCH_Detection.py" />
-      <change beforePath="$PROJECT_DIR$/PCH_tests.py" afterPath="$PROJECT_DIR$/PCH_tests.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,8 +17,8 @@
       <file leaf-file-name="PCH_Detection.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="609">
-              <caret line="367" column="43" lean-forward="true" selection-start-line="367" selection-start-column="43" selection-end-line="367" selection-end-column="43" />
+            <state relative-caret-position="763">
+              <caret line="367" column="42" lean-forward="true" selection-start-line="367" selection-start-column="42" selection-end-line="367" selection-end-column="42" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -207,13 +206,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Plot PCH data">
-      <created>1515190133178</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1515190133178</updated>
     </task>
     <task id="LOCAL-00005" summary="Plot PCH data">
       <created>1515190353646</created>
@@ -551,7 +543,14 @@
       <option name="project" value="LOCAL" />
       <updated>1533744455687</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Bug fix in hole_area">
+      <created>1533763421515</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1533763421515</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -598,7 +597,8 @@
     <MESSAGE value="Implementing the hole area calculation." />
     <MESSAGE value="Plots." />
     <MESSAGE value="Bug fix in pick_hole_extremes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug fix in pick_hole_extremes" />
+    <MESSAGE value="Bug fix in hole_area" />
+    <option name="LAST_COMMIT_MESSAGE" value="Bug fix in hole_area" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1106,8 +1106,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="609">
-          <caret line="367" column="43" lean-forward="true" selection-start-line="367" selection-start-column="43" selection-end-line="367" selection-end-column="43" />
+        <state relative-caret-position="763">
+          <caret line="367" column="42" lean-forward="true" selection-start-line="367" selection-start-column="42" selection-end-line="367" selection-end-column="42" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
