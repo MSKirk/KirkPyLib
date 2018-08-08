@@ -141,8 +141,6 @@ def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
     # returns a fractional hole quality between 0 and 1
     # 1 is a very well defined hole, 0 is an undefined hole (not actually possible)
 
-    # something is not working here - continually returns values over 1
-
     arc_width = rsun_pix(masked_map)[0] * (0.995 - 0.965)
     degree_sep = GreatArc(hole_start, hole_end).inner_angle.to(u.deg)
     arc_length = 2 * np.pi * rsun_pix(masked_map)[0] * u.pix * (degree_sep/(360. * u.deg))
@@ -152,6 +150,7 @@ def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
 
 
 def pick_hole_extremes(hole_coordinates):
+    # picks the points in the detected hole that are the furthest from each other
 
     hole_lat_max = np.where(hole_coordinates.heliographic_stonyhurst.lat == hole_coordinates.heliographic_stonyhurst.lat.max())[0]
     hole_lat_min = np.where(hole_coordinates.heliographic_stonyhurst.lat == hole_coordinates.heliographic_stonyhurst.lat.min())[0]
@@ -201,11 +200,13 @@ def pch_mark(masked_map):
 
             if only_polar_holes[0].size > 0:
                 hole_coords = hole_coords[only_polar_holes]
-                pts = pick_hole_extremes(hole_coords)
-                edge_points.add_row((pts[0].heliographic_stonyhurst.lat, pts[0].heliographic_stonyhurst.lon,
-                                    pts[1].heliographic_stonyhurst.lat, pts[1].heliographic_stonyhurst.lon,
-                                    GreatArc(pts[0], pts[1]).inner_angle.to(u.deg),
-                                    pch_quality(masked_map, pts[0], pts[1], np.where(holes == r_number)[0].size * u.pix)))
+                hole_start, hole_end = pick_hole_extremes(hole_coords)
+                pchq = pch_quality(masked_map, hole_start, hole_end, np.sum(holes == r_number) * u.pix)
+                if pchq > 1:
+                    pchq = 1.0
+                edge_points.add_row((hole_start.heliographic_stonyhurst.lat, hole_start.heliographic_stonyhurst.lon,
+                                    hole_end.heliographic_stonyhurst.lat, hole_end.heliographic_stonyhurst.lon,
+                                    GreatArc(hole_start, hole_end).inner_angle.to(u.deg), pchq))
                 print(edge_points)
     if not len(edge_points):
         edge_points.add_row((np.nan, np.nan, np.nan, np.nan, np.nan, 0))
@@ -333,7 +334,7 @@ class PCH_Detection:
         self.point_detection.sort(['Harvey_Rotation'])
 
         # Adding in Area Calculation each point with one HR previous measurements
-        # self.point_detection['Area'] = [self.hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
+        self.point_detection['Area'] = [self.hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
 
     def hole_area(self, h_rotation_number):
         # Reurns the area as a fraction of the total solar surface area
@@ -348,25 +349,28 @@ class PCH_Detection:
         else:
             # A southern hole
             index_measurements = np.where(self.point_detection[begin:end]['StartLat'] < 0)
+            northern = False
 
         if len(index_measurements[0]) < 10:
             return np.nan
         else:
             lons = np.concatenate([self.point_detection[index_measurements]['H_StartLon'].data.data,
-                                   self.point_detection[index_measurements]['H_EndLon'].data.data])
+                                   self.point_detection[index_measurements]['H_EndLon'].data.data]) * u.deg
             lats = np.concatenate([self.point_detection[index_measurements]['StartLat'].data.data,
-                                   self.point_detection[index_measurements]['EndLat'].data.data])
+                                   self.point_detection[index_measurements]['EndLat'].data.data]) * u.deg
+            errors = np.concatenate([1/self.point_detection[index_measurements]['Quality'],1/self.point_detection[index_measurements]['Quality']])
 
-            hole_fit = PCH_Tools.trigfit((lons * u.rad), (lats * u.rad), degree=6)
+            hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=6, sigma=errors)
 
             # Need fit with several degrees
-            # Need to define error in trigfit
+            # Need to define error in trigfit – Check?
             # Need to off set center of mass
+            # Neet to confirm trig fitting
 
             # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
             # A sphere is 4π steradians in surface area
 
-            lamb_x = np.radians(np.arange(0,360,0.01)) * u.rad
+            lamb_x = np.deg2rad(np.arange(0,360,0.01)*u.deg)
             lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value)) * u.rad
 
             if northern:

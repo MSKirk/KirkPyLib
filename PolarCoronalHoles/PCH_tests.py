@@ -59,3 +59,8 @@ def test_pick_hole_extremes():
         print(hole_start, hole_end)
 
     plt.show()
+
+
+def test_chole_area():
+    PCH_Detection.pch_mask(test_map)
+
