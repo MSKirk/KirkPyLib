@@ -51,10 +51,11 @@ def test_pick_hole_extremes():
     plot_map.plot(axes=ax)
 
     for r_number in range(1, np.max(holes)+1, 1):
-        hole_coords = masked_map.pixel_to_world(np.where(holes == r_number)[1] * u.pixel,
+        hole_coords = test_map.pixel_to_world(np.where(holes == r_number)[1] * u.pixel,
                                                 np.where(holes == r_number)[0] * u.pixel, 0)
         hole_start, hole_end = PCH_Detection.pick_hole_extremes(hole_coords)
         great_arc = GreatArc(hole_start, hole_end)
         ax.plot_coord(great_arc.coordinates(), color='c')
+        print(hole_start, hole_end)
 
     plt.show()

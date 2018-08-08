@@ -153,22 +153,18 @@ def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
 
 def pick_hole_extremes(hole_coordinates):
 
-    inner_angles = np.zeros([4,4])
-
     hole_lat_max = np.where(hole_coordinates.heliographic_stonyhurst.lat == hole_coordinates.heliographic_stonyhurst.lat.max())[0]
     hole_lat_min = np.where(hole_coordinates.heliographic_stonyhurst.lat == hole_coordinates.heliographic_stonyhurst.lat.min())[0]
     hole_lon_max = np.where(hole_coordinates.heliographic_stonyhurst.lon == hole_coordinates.heliographic_stonyhurst.lon.max())[0]
     hole_lon_min = np.where(hole_coordinates.heliographic_stonyhurst.lon == hole_coordinates.heliographic_stonyhurst.lon.min())[0]
 
-    test_coords = [hole_coordinates[hole_lat_max][0], hole_coordinates[hole_lat_min][0],
-                   hole_coordinates[hole_lon_max][0], hole_coordinates[hole_lon_min][0]]
+    test_coords_loc = [hole_lat_max[0], hole_lat_min[0], hole_lon_max[0], hole_lon_min[0]]
+    max_sep = [hole_coordinates[hole_pix_loc].separation(hole_coordinates).max().value for hole_pix_loc in test_coords_loc]
 
-    for ii, point1 in enumerate(test_coords):
-        for jj, point2 in enumerate(test_coords):
-            if ii > jj:
-                inner_angles[ii,jj] = GreatArc(point1,point2).inner_angle.value
+    beginning_point = hole_coordinates[test_coords_loc[max_sep.index(max(max_sep))]]
+    ending_point = hole_coordinates[np.where(beginning_point.separation(hole_coordinates) == beginning_point.separation(hole_coordinates).max())[0][0]]
 
-    return [test_coords[np.where(inner_angles == inner_angles.max())[0][0]], test_coords[np.where(inner_angles == inner_angles.max())[1][0]]]
+    return beginning_point, ending_point
 
 
 def pch_mark(masked_map):
