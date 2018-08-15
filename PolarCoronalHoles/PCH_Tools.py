@@ -350,3 +350,12 @@ def coord_spher2rec(rr, beta, lamb):
     zz = rr * np.sin(beta)
 
     return [xx, yy, zz]
+
+
+def curve_length(xx, yy):
+    # linear approximation
+
+    length_square = (xx - np.roll(xx, 1))**2 + (yy - np.roll(yy, 1))**2
+
+    return np.sum(np.sqrt(length_square[1:]))
+

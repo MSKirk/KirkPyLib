@@ -189,7 +189,6 @@ def pch_mark(masked_map):
         hole_xx = np.where(holes == r_number)[0] * u.pixel
         hole_yy = np.where(holes == r_number)[1] * u.pixel
 
-        # Double check Size Filter
         if len(hole_xx) > 10:
 
             hole_coords = masked_map.pixel_to_world(hole_yy, hole_xx,0)
@@ -208,8 +207,11 @@ def pch_mark(masked_map):
                                     hole_end.heliographic_stonyhurst.lat, hole_end.heliographic_stonyhurst.lon,
                                     GreatArc(hole_start, hole_end).inner_angle.to(u.deg), pchq))
                 print(edge_points)
-    if not len(edge_points):
-        edge_points.add_row((np.nan, np.nan, np.nan, np.nan, np.nan, 0))
+    # Adding in a Zero detection
+    if not (edge_points['StartLat'] > 0).any():
+        edge_points.add_row((90., 0, 90., 0, np.nan, 1.0))
+    if not (edge_points['StartLat'] < 0).any():
+        edge_points.add_row((-90., 0, -90., 0, np.nan, 1.0))
 
     return edge_points
 
@@ -314,10 +316,10 @@ class PCH_Detection:
                 self.detector = solar_image.detector
 
                 if ii == 0:
-                    self.begin_date = solar_image.date.year
+                    self.begin_date = solar_image.date
 
                 if ii == len(self.files)-1:
-                    self.end_date = solar_image.date.year
+                    self.end_date = solar_image.date
 
                 if image_integrity_check(solar_image):
                     pch_mask(solar_image)
@@ -334,25 +336,38 @@ class PCH_Detection:
         self.point_detection.sort(['Harvey_Rotation'])
 
         # Adding in Area Calculation each point with one HR previous measurements
-        self.point_detection['Area'] = [self.hole_area(h_rot)for h_rot in self.point_detection['Harvey_Rotation']]
+        area = [] ; fit = []
+        for h_rot in self.point_detection['Harvey_Rotation']:
+            ar, ft = self.hole_area(h_rot)
+            area = area + [ar]
+            fit = fit +[ft]
+
+        self.point_detection['Area'] = np.asarray(area)
+        self.point_detection['Fit'] = np.asarray(fit) * u.deg
 
     def hole_area(self, h_rotation_number):
-        # Reurns the area as a fraction of the total solar surface area
+        # Returns the area as a fraction of the total solar surface area
+        # Returns the location of the perimeter fit for the given h_rotation_number
 
         begin = np.min(np.where(self.point_detection['Harvey_Rotation'] > (h_rotation_number - 1)))
         end = np.max(np.where(self.point_detection['Harvey_Rotation'] == h_rotation_number))
 
         if self.point_detection[end]['StartLat'] > 0:
-            # A northern hole
-            index_measurements = np.where(self.point_detection[begin:end]['StartLat'] > 0)
+            # A northern hole with Arclength Filter for eliminating small holes
+            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] > 0) & (self.point_detection[begin:end]['ArcLength'] > 3.0))
             northern = True
         else:
-            # A southern hole
-            index_measurements = np.where(self.point_detection[begin:end]['StartLat'] < 0)
+            # A southern hole with Arclength Filter for eliminating small holes
+            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] < 0) & (self.point_detection[begin:end]['ArcLength'] > 3.0))
             northern = False
 
+        # Filters for incomplete hole measurements: at least 10 points and half a harvey rotation needs to be defined
         if len(index_measurements[0]) < 10:
-            return np.nan
+            return (np.nan, np.nan, np.nan), np.array([np.nan, np.nan, np.nan])
+
+        elif self.point_detection['Harvey_Rotation'][index_measurements[0][-1]] - self.point_detection['Harvey_Rotation'][index_measurements[0][0]] < 0.5:
+            return (np.nan, np.nan, np.nan), np.array([np.nan, np.nan, np.nan])
+
         else:
             lons = np.concatenate([self.point_detection[index_measurements]['H_StartLon'].data.data,
                                    self.point_detection[index_measurements]['H_EndLon'].data.data]) * u.deg
@@ -360,25 +375,46 @@ class PCH_Detection:
                                    self.point_detection[index_measurements]['EndLat'].data.data]) * u.deg
             errors = np.concatenate([1/self.point_detection[index_measurements]['Quality'],1/self.point_detection[index_measurements]['Quality']])
 
-            hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=6, sigma=errors)
+            perimeter_length = np.zeros(6) * u.rad
+            fit_location = np.zeros(6) * u.rad
+            hole_area = np.zeros(6)
 
-            # Need fit with several degrees – implement fitted line length measure
+            for ii, degrees in enumerate([4,5,6,7,8,9]):
+                hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=degrees, sigma=errors)
+
+                # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
+                # A sphere is 4π steradians in surface area
+
+                lamb_x = np.deg2rad(np.arange(0,360,0.01)*u.deg)
+                lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value)) * u.rad
+
+                fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number))).value)) * u.deg
+
+                perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
+
+                if northern:
+                    hole_area[ii] = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
+                else:
+                    hole_area[ii] = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
+
+            # allowing for a 5% perimeter deviation off of a circle
+            good_areas = hole_area[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
+            good_fits = fit_location[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
+
+            if good_areas.size > 0:
+                percent_hole_area = (np.min(good_areas) / (4 * np.pi), np.mean(good_areas) / (4 * np.pi), np.max(good_areas) / (4 * np.pi))
+                # in degrees
+                hole_perimeter_location = (np.rad2deg(np.min(good_fits)).value, np.rad2deg(np.mean(good_fits)).value, np.rad2deg(np.max(good_fits)).value)
+            else:
+                percent_hole_area = (np.nan, np.nan, np.nan)
+                hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
+
             # Need to define error in trigfit – Done?
             # Need to off set center of mass
             # Neet to confirm trig fitting
 
-            # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
-            # A sphere is 4π steradians in surface area
-
-            lamb_x = np.deg2rad(np.arange(0,360,0.01)*u.deg)
-            lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value)) * u.rad
-
-            if northern:
-                hole_area = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
-            else:
-                hole_area = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
-
-            return hole_area / (4 * np.pi)
+            # Tuples of shape (Min, Mean, Max)
+            return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location)
 
     def add_harvey_coordinates(self):
         # Modifies the point detection to add in harvey lon.
@@ -390,10 +426,10 @@ class PCH_Detection:
 
     def write_table(self, write_dir=''):
 
-        if self.begin_date == self.end_date:
-            date_string = str(self.begin_date)
+        if self.begin_date.year == self.end_date.year:
+            date_string = str(self.begin_date.year)
         else:
-            date_string = str(self.begin_date)+'-'+str(self.end_date)
+            date_string = str(self.begin_date.year)+'-'+str(self.end_date.year)
 
         if write_dir == '':
             write_dir = self.dir
