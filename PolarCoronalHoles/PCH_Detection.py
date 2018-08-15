@@ -207,11 +207,18 @@ def pch_mark(masked_map):
                                     hole_end.heliographic_stonyhurst.lat, hole_end.heliographic_stonyhurst.lon,
                                     GreatArc(hole_start, hole_end).inner_angle.to(u.deg), pchq))
                 print(edge_points)
-    # Adding in a Zero detection
+
+    # Adding in a Zero detection in case of no detection
     if not (edge_points['StartLat'] > 0).any():
         edge_points.add_row((90., 0, 90., 0, np.nan, 1.0))
     if not (edge_points['StartLat'] < 0).any():
         edge_points.add_row((-90., 0, -90., 0, np.nan, 1.0))
+
+    # if only small holes are detected, add in a zero point which won't be filtered out
+    if (edge_points['ArcLength'][np.where(edge_points['StartLat'] > 0)] < 3).any():
+        edge_points.add_row((90., 0, 90., 0, np.nan, 1.0))
+    if (edge_points['ArcLength'][np.where(edge_points['StartLat'] < 0)] < 3).any():
+        edge_points.add_row((90., 0, 90., 0, np.nan, 1.0))
 
     return edge_points
 
@@ -353,12 +360,12 @@ class PCH_Detection:
         end = np.max(np.where(self.point_detection['Harvey_Rotation'] == h_rotation_number))
 
         if self.point_detection[end]['StartLat'] > 0:
-            # A northern hole with Arclength Filter for eliminating small holes
-            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] > 0) & (self.point_detection[begin:end]['ArcLength'] > 3.0))
+            # A northern hole with Arclength Filter for eliminating small holes but not zeros
+            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] > 0) & (not self.point_detection[begin:end]['ArcLength'] < 3.0))
             northern = True
         else:
             # A southern hole with Arclength Filter for eliminating small holes
-            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] < 0) & (self.point_detection[begin:end]['ArcLength'] > 3.0))
+            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] < 0) & (not self.point_detection[begin:end]['ArcLength'] < 3.0))
             northern = False
 
         # Filters for incomplete hole measurements: at least 10 points and half a harvey rotation needs to be defined
