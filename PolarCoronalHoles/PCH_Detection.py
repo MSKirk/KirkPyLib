@@ -206,7 +206,6 @@ def pch_mark(masked_map):
                 edge_points.add_row((hole_start.heliographic_stonyhurst.lat, hole_start.heliographic_stonyhurst.lon,
                                     hole_end.heliographic_stonyhurst.lat, hole_end.heliographic_stonyhurst.lon,
                                     GreatArc(hole_start, hole_end).inner_angle.to(u.deg), pchq))
-                print(edge_points)
 
     # Adding in a Zero detection in case of no detection
     if not (edge_points['StartLat'] > 0).any():
@@ -332,6 +331,8 @@ class PCH_Detection:
                     pch_mask(solar_image)
                     pts = pch_mark(solar_image)
 
+                    print(pts)
+
                     if len(pts) > 0:
                         pts['FileName'] = [image_file] * len(pts)
                         pts['Date'] = [Time(solar_image.date)] * len(pts)
@@ -361,11 +362,13 @@ class PCH_Detection:
 
         if self.point_detection[end]['StartLat'] > 0:
             # A northern hole with Arclength Filter for eliminating small holes but not zeros
-            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] > 0) & (not self.point_detection[begin:end]['ArcLength'] < 3.0))
+            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] > 0) & np.logical_not(
+                self.point_detection[begin:end]['ArcLength'] < 3.0))
             northern = True
         else:
             # A southern hole with Arclength Filter for eliminating small holes
-            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] < 0) & (not self.point_detection[begin:end]['ArcLength'] < 3.0))
+            index_measurements = np.where((self.point_detection[begin:end]['StartLat'] < 0) & np.logical_not(
+                self.point_detection[begin:end]['ArcLength'] < 3.0))
             northern = False
 
         # Filters for incomplete hole measurements: at least 10 points and half a harvey rotation needs to be defined
