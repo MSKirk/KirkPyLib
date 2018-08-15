@@ -386,10 +386,11 @@ class PCH_Detection:
             errors = np.concatenate([np.asarray(1/self.point_detection[index_measurements]['Quality']),
                                      np.asarray(1/self.point_detection[index_measurements]['Quality'])])
 
-
             perimeter_length = np.zeros(6) * u.rad
             fit_location = np.zeros(6) * u.rad
             hole_area = np.zeros(6)
+
+            # Add in centroid offset
 
             for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
                 hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=degrees, sigma=errors)
@@ -400,6 +401,7 @@ class PCH_Detection:
                 lamb_x = np.deg2rad(np.arange(0,360,0.01)*u.deg)
                 lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value)) * u.rad
 
+                # Remember to remove centroid offset
                 fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number))).value)) * u.deg
 
                 perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
@@ -422,7 +424,6 @@ class PCH_Detection:
                 hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
 
             # Need to define error in trigfit – Done?
-            # Need to off set center of mass
             # Neet to confirm trig fitting
 
             # Tuples of shape (Min, Mean, Max)
