@@ -383,13 +383,15 @@ class PCH_Detection:
                                    self.point_detection[index_measurements]['H_EndLon'].data.data]) * u.deg
             lats = np.concatenate([self.point_detection[index_measurements]['StartLat'].data.data,
                                    self.point_detection[index_measurements]['EndLat'].data.data]) * u.deg
-            errors = np.concatenate([1/self.point_detection[index_measurements]['Quality'],1/self.point_detection[index_measurements]['Quality']])
+            errors = np.concatenate([np.asarray(1/self.point_detection[index_measurements]['Quality']),
+                                     np.asarray(1/self.point_detection[index_measurements]['Quality'])])
+
 
             perimeter_length = np.zeros(6) * u.rad
             fit_location = np.zeros(6) * u.rad
             hole_area = np.zeros(6)
 
-            for ii, degrees in enumerate([4,5,6,7,8,9]):
+            for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
                 hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=degrees, sigma=errors)
 
                 # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Adding in a zero point detection.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Adding in a zero point filters.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
     </list>
@@ -23,14 +23,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1849" />
-          <entry key="txt" value="104" />
+          <entry key="py" value="1867" />
+          <entry key="txt" value="128" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="104" />
-          <entry key="Python" value="1849" />
+          <entry key="PLAIN_TEXT" value="128" />
+          <entry key="Python" value="1867" />
         </counts>
       </usages-collector>
     </session>
@@ -40,8 +40,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="850">
-              <caret line="372" lean-forward="true" selection-start-line="372" selection-end-line="372" />
+            <state relative-caret-position="827">
+              <caret line="393" column="61" lean-forward="true" selection-start-line="393" selection-start-column="61" selection-end-line="393" selection-end-column="61" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -76,8 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2155">
-              <caret line="321" column="20" lean-forward="true" selection-start-line="321" selection-start-column="20" selection-end-line="321" selection-end-column="20" />
+            <state relative-caret-position="268">
+              <caret line="198" column="105" lean-forward="true" selection-start-line="198" selection-start-column="105" selection-end-line="198" selection-end-column="105" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <marker date="1534274232000" expanded="true" signature="12992:12997" ph="..." />
@@ -219,13 +219,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Plot PCH data">
-      <created>1515441052528</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1515441052528</updated>
     </task>
     <task id="LOCAL-00009" summary="Plot PCH data">
       <created>1515441104787</created>
@@ -563,7 +556,14 @@
       <option name="project" value="LOCAL" />
       <updated>1534358693873</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="Adding in a zero point filters.">
+      <created>1534360897883</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1534360897883</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -614,7 +614,8 @@
     <MESSAGE value="Bug fix in hole_area" />
     <MESSAGE value="Recalculating hole areas and updating fitting procedure." />
     <MESSAGE value="Adding in a zero point detection." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding in a zero point detection." />
+    <MESSAGE value="Adding in a zero point filters." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding in a zero point filters." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/07F4C7A3-340B-4385-B7DD-C3EAC4BA0985/example_hec.py">
@@ -652,8 +653,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2155">
-          <caret line="321" column="20" lean-forward="true" selection-start-line="321" selection-start-column="20" selection-end-line="321" selection-end-column="20" />
+        <state relative-caret-position="268">
+          <caret line="198" column="105" lean-forward="true" selection-start-line="198" selection-start-column="105" selection-end-line="198" selection-end-column="105" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
             <marker date="1534274232000" expanded="true" signature="12992:12997" ph="..." />
@@ -663,8 +664,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="850">
-          <caret line="372" lean-forward="true" selection-start-line="372" selection-end-line="372" />
+        <state relative-caret-position="827">
+          <caret line="393" column="61" lean-forward="true" selection-start-line="393" selection-start-column="61" selection-end-line="393" selection-end-column="61" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
