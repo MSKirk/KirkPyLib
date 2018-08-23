@@ -411,13 +411,13 @@ class PCH_Detection:
                     lamb_y = np.sin((np.pi * 0.5) - hole_fit['fitfunc'](lamb_x.value) - np.deg2rad(offset_cm[1]).value) * u.rad
 
                     lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
-                    fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number))).value) - np.deg2rad(offset_cm[1]).value) * u.deg
+                    fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - np.deg2rad(offset_cm[1]).value) * u.deg
                 else:
                     lamb_x = np.deg2rad(np.arange(0,360,0.01) * u.deg)
                     lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.rad
 
                     lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
-                    fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number))).value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
+                    fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
 
                 perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
 
