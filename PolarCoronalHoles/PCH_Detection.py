@@ -390,19 +390,34 @@ class PCH_Detection:
             fit_location = np.zeros(6) * u.rad
             hole_area = np.zeros(6)
 
-            # Add in centroid offset
+            # Centroid offset for better fitting results
+            if northern:
+                offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) - lats]))
+            else:
+                offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
+
+            offset_cm = PCH_Tools.center_of_mass(offset_coords, mass=1/errors) * u.deg
+            offset_lons = offset_coords[:, 0] * u.deg - offset_cm[0]
+            offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
 
             for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
-                hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=degrees, sigma=errors)
+                hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons), np.deg2rad(offset_lats), degree=degrees, sigma=errors)
 
                 # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
                 # A sphere is 4π steradians in surface area
+                # And removing centroid offset
+                if northern:
+                    lamb_x = np.deg2rad(np.arange(0,360,0.01) * u.deg)
+                    lamb_y = np.sin((np.pi * 0.5) - hole_fit['fitfunc'](lamb_x.value) - np.deg2rad(offset_cm[1]).value) * u.rad
 
-                lamb_x = np.deg2rad(np.arange(0,360,0.01)*u.deg)
-                lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value)) * u.rad
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                    fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number))).value) - np.deg2rad(offset_cm[1]).value) * u.deg
+                else:
+                    lamb_x = np.deg2rad(np.arange(0,360,0.01) * u.deg)
+                    lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.rad
 
-                # Remember to remove centroid offset
-                fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number))).value)) * u.deg
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                    fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number))).value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
 
                 perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
 
@@ -423,7 +438,6 @@ class PCH_Detection:
                 percent_hole_area = (np.nan, np.nan, np.nan)
                 hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
 
-            # Need to define error in trigfit – Done?
             # Neet to confirm trig fitting
 
             # Tuples of shape (Min, Mean, Max)

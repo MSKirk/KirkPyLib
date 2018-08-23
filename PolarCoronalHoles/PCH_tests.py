@@ -64,3 +64,31 @@ def test_pick_hole_extremes():
 def test_chole_area():
     PCH_Detection.pch_mask(test_map)
 
+
+
+
+if northern:
+    offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) - lats]))
+else:
+    offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
+
+offset = PCH_Tools.center_of_mass(offset_coords, mass=1 / errors)
+offset_lons = offset_coords[:, 0] - offset[0]
+offset_lats = offset_coords[:, 1] - offset[1]
+
+hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=6, sigma=errors)
+co_hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_coords[:,0])*u.rad, np.deg2rad(offset_coords[:,1])*u.rad, degree=6, sigma=errors)
+offset_hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons)*u.rad, np.deg2rad(offset_lats)*u.rad, degree=6, sigma=errors)
+
+
+fit_yy =  hole_fit['fitfunc'](np.deg2rad(lons).value)
+co_fit_yy = co_hole_fit['fitfunc'](np.deg2rad(offset_coords[:,0]))
+offset_fit_yy = offset_hole_fit['fitfunc'](np.deg2rad(offset_lons))
+
+
+plt.plot(np.deg2rad(lons).value, fit_yy - np.deg2rad(lats).value, '.')
+plt.plot(np.deg2rad(offset_coords[:,0]), co_fit_yy - np.deg2rad(offset_coords[:,1]), '.')
+plt.plot(np.deg2rad(offset_lons), offset_fit_yy - np.deg2rad(offset_lats), '.')
+
+plt.plot(np.deg2rad(lons).value, fit_yy, '.')
+plt.plot(np.deg2rad(offset_lons+np.deg2rad(offset[0])), offset_fit_yy - (np.pi *0.5)+ np.deg2rad(offset[1]), '.')
