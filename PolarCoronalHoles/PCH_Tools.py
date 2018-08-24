@@ -5,6 +5,7 @@ import math
 import astropy
 import astropy.units as u
 from astropy.coordinates import Longitude, Latitude
+import warnings
 
 '''
 A collection of tools used in PCH detection. This replicates the following IDL routines:
@@ -154,7 +155,7 @@ def trigfit(theta_in, rho_in, sigma=None, degree=1):
             F += a10 * np.cos(10 * t + p10)
             return F
 
-    popt, pcov = optimize.curve_fit(cos_series, tt, yy, p0=guess.tolist(), sigma=sigma)
+    popt, pcov = optimize.curve_fit(cos_series, tt, yy, p0=guess.tolist(), sigma=sigma, maxfev=3000)
 
     if degree == 1:
         fitfunc = lambda t: popt[0] + popt[1] * np.cos(1 * t + popt[2])

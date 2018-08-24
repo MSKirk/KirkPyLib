@@ -344,7 +344,8 @@ class PCH_Detection:
         self.point_detection.sort(['Harvey_Rotation'])
 
         # Adding in Area Calculation each point with one HR previous measurements
-        area = [] ; fit = []
+        area = []
+        fit = []
         for h_rot in self.point_detection['Harvey_Rotation']:
             ar, ft = self.hole_area(h_rot)
             area = area + [ar]
@@ -401,30 +402,43 @@ class PCH_Detection:
             offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
 
             for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
-                hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons), np.deg2rad(offset_lats), degree=degrees, sigma=errors)
+                try:
+                    hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons), np.deg2rad(offset_lats), degree=degrees,
+                                                 sigma=errors)
 
-                # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
-                # A sphere is 4π steradians in surface area
-                # And removing centroid offset
-                if northern:
-                    lamb_x = np.deg2rad(np.arange(0,360,0.01) * u.deg)
-                    lamb_y = np.sin((np.pi * 0.5) - hole_fit['fitfunc'](lamb_x.value) - np.deg2rad(offset_cm[1]).value) * u.rad
+                    # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
+                    # A sphere is 4π steradians in surface area
+                    # And removing centroid offset
+                    if northern:
+                        lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                        lamb_y = np.sin(
+                            (np.pi * 0.5) - hole_fit['fitfunc'](lamb_x.value) - np.deg2rad(offset_cm[1]).value) * u.rad
 
-                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
-                    fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - np.deg2rad(offset_cm[1]).value) * u.deg
-                else:
-                    lamb_x = np.deg2rad(np.arange(0,360,0.01) * u.deg)
-                    lamb_y = np.sin(hole_fit['fitfunc'](lamb_x.value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.rad
+                        lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                        fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(
+                            PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[
+                                0]).value) - np.deg2rad(offset_cm[1]).value) * u.deg
+                    else:
+                        lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                        lamb_y = np.sin(
+                            hole_fit['fitfunc'](lamb_x.value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.rad
 
-                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
-                    fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
+                        lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                        fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(
+                            PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - (
+                                                                  np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
 
-                perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
+                    perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
 
-                if northern:
-                    hole_area[ii] = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
-                else:
-                    hole_area[ii] = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
+                    if northern:
+                        hole_area[ii] = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
+                    else:
+                        hole_area[ii] = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
+
+                except RuntimeError:
+                    hole_area[ii] = np.nan
+                    perimeter_length[ii] = np.inf * u.rad
+                    fit_location[ii] = np.nan
 
             # allowing for a 5% perimeter deviation off of a circle
             good_areas = hole_area[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
