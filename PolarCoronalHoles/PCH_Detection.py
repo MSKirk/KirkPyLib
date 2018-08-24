@@ -407,7 +407,6 @@ class PCH_Detection:
                                                  sigma=errors)
 
                     # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
-                    # A sphere is 4π steradians in surface area
                     # And removing centroid offset
                     if northern:
                         lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
@@ -444,6 +443,7 @@ class PCH_Detection:
             good_areas = hole_area[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
             good_fits = fit_location[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
 
+            # A sphere is 4π steradians in surface area
             if good_areas.size > 0:
                 percent_hole_area = (np.min(good_areas) / (4 * np.pi), np.mean(good_areas) / (4 * np.pi), np.max(good_areas) / (4 * np.pi))
                 # in degrees
@@ -452,8 +452,6 @@ class PCH_Detection:
                 percent_hole_area = (np.nan, np.nan, np.nan)
                 hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
 
-            # Neet to confirm trig fitting
-
             # Tuples of shape (Min, Mean, Max)
             return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location)
 
@@ -461,9 +459,10 @@ class PCH_Detection:
         # Modifies the point detection to add in harvey lon.
 
         self.point_detection['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in self.point_detection['Date']]
-        harvey_lon = np.array([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]).reshape(self.point_detection['Date'].size) * u.deg
-        self.point_detection['H_StartLon'] = Longitude(harvey_lon + np.array(self.point_detection['StartLon']) * u.deg)
-        self.point_detection['H_EndLon'] = Longitude(harvey_lon + np.array(self.point_detection['EndLon']) * u.deg)
+        self.point_detection['Harvey_Longitude'] = [PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]
+        # harvey_lon = np.array([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]).reshape(self.point_detection['Date'].size) * u.deg
+        self.point_detection['H_StartLon'] = Longitude(np.asarray(self.point_detection['Harvey_Longitude']) + np.array(self.point_detection['StartLon']) * u.deg)
+        self.point_detection['H_EndLon'] = Longitude(np.asarray(self.point_detection['Harvey_Longitude']) + np.array(self.point_detection['EndLon']) * u.deg)
 
     def write_table(self, write_dir=''):
 
