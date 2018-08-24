@@ -297,7 +297,7 @@ class PCH_Detection:
     def __init__(self, image_dir):
 
         # Quiet things a bit
-        warnings.simplefilter('ignore', UserWarning)
+        warnings.simplefilter('ignore', Warning)
 
         self.dir = os.path.abspath(image_dir)
 
