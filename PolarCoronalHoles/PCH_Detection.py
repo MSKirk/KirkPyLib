@@ -321,12 +321,6 @@ class PCH_Detection:
 
                 self.detector = solar_image.detector
 
-                if ii == 0:
-                    self.begin_date = solar_image.date
-
-                if ii == len(self.files)-1:
-                    self.end_date = solar_image.date
-
                 if image_integrity_check(solar_image):
                     pch_mask(solar_image)
                     pts = pch_mark(solar_image)
@@ -339,9 +333,12 @@ class PCH_Detection:
 
                         self.point_detection = join(pts, self.point_detection, join_type='outer')
 
-        self.point_detection.remove_row(np.where(self.point_detection['ArcLength'] == 0)[0][0])
+        self.point_detection.remove_row(np.where(self.point_detection['Date'] == Time('1900-01-04'))[0][0])
         self.add_harvey_coordinates()
         self.point_detection.sort(['Harvey_Rotation'])
+
+        self.begin_date = self.point_detection['Date'][0]
+        self.end_date = self.point_detection['Date'][-1]
 
         # Adding in Area Calculation each point with one HR previous measurements
         area = []
@@ -351,8 +348,13 @@ class PCH_Detection:
             area = area + [ar]
             fit = fit +[ft]
 
-        self.point_detection['Area'] = np.asarray(area)
-        self.point_detection['Fit'] = np.asarray(fit) * u.deg
+        self.point_detection['Area'] = np.asarray(area)[:, 1]
+        self.point_detection['Area_min'] = np.asarray(area)[:, 0]
+        self.point_detection['Area_max'] = np.asarray(area)[:, 2]
+
+        self.point_detection['Fit'] = np.asarray(fit)[:, 1] * u.deg
+        self.point_detection['Fit_min'] = np.asarray(fit)[:, 0] * u.deg
+        self.point_detection['Fit_max'] = np.asarray(fit)[:, 2] * u.deg
 
     def hole_area(self, h_rotation_number):
         # Returns the area as a fraction of the total solar surface area
@@ -474,7 +476,7 @@ class PCH_Detection:
         if write_dir == '':
             write_dir = self.dir
 
-        write_file = write_dir+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string+'.csv'
+        write_file = write_dir+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string+'.vot'
 
-        ascii.write(self.point_detection, write_file, format='ecsv')
+        self.point_detection.write(write_file, format='votable')
 
