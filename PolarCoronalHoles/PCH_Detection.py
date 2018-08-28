@@ -466,7 +466,7 @@ class PCH_Detection:
         self.point_detection['H_StartLon'] = Longitude(np.asarray(self.point_detection['Harvey_Longitude']) + np.array(self.point_detection['StartLon']) * u.deg)
         self.point_detection['H_EndLon'] = Longitude(np.asarray(self.point_detection['Harvey_Longitude']) + np.array(self.point_detection['EndLon']) * u.deg)
 
-    def write_table(self, write_dir=''):
+    def write_table(self, write_dir='', format=''):
 
         if self.begin_date.year == self.end_date.year:
             date_string = str(self.begin_date.year)
@@ -476,7 +476,19 @@ class PCH_Detection:
         if write_dir == '':
             write_dir = self.dir
 
-        write_file = write_dir+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string+'.vot'
+        write_file = write_dir+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string
 
-        self.point_detection.write(write_file, format='votable')
-
+        if format.lower() == 'votable':
+            self.point_detection.write(write_file+'.vot', format='votable', overwrite=True)
+        elif format.lower() == 'hdf':
+            self.point_detection.write(self.detector+'_'+self.point_detection.meta['name']+date_string+'.hdf',
+                                       path=write_dir, format='hdf5', overwrite=True)
+        elif format.lower() == 'ascii':
+            ascii.write(self.point_detection, write_file+'.csv', format='ecsv', overwrite=True)
+        elif format.lower() == 'csv':
+            ascii.write(self.point_detection, write_file + '.csv', format='csv', overwrite=True)
+        elif format.lower() == 'fits':
+            self.point_detection.write(write_file+'.fits', format='fits', overwrite=True)
+        else:
+            self.point_detection.write(self.detector + '_' + self.point_detection.meta['name'] + date_string + '.hdf',
+                                       path=write_dir, format='hdf5', overwrite=True)
