@@ -462,9 +462,10 @@ class PCH_Detection:
 
         self.point_detection['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in self.point_detection['Date']]
         self.point_detection['Harvey_Longitude'] = [PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]
-        # harvey_lon = np.array([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]).reshape(self.point_detection['Date'].size) * u.deg
-        self.point_detection['H_StartLon'] = Longitude(np.asarray(self.point_detection['Harvey_Longitude']) + np.array(self.point_detection['StartLon']) * u.deg)
-        self.point_detection['H_EndLon'] = Longitude(np.asarray(self.point_detection['Harvey_Longitude']) + np.array(self.point_detection['EndLon']) * u.deg)
+        self.point_detection['H_StartLon'] = Longitude((np.squeeze(np.asarray(self.point_detection['Harvey_Longitude']))
+                                                       + np.array(self.point_detection['StartLon'])) * u.deg)
+        self.point_detection['H_EndLon'] = Longitude((np.squeeze(np.asarray(self.point_detection['Harvey_Longitude']))
+                                                     + np.array(self.point_detection['EndLon'])) * u.deg)
 
     def write_table(self, write_dir='', format=''):
 
