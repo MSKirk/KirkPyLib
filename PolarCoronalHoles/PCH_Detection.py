@@ -310,7 +310,7 @@ class PCH_Detection:
 
         self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
                                      names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
-                                     meta={'name': 'Coordinate_Detections'})
+                                     meta={'name': 'PCH_Detections'})
 
         for ii, image_file in enumerate(self.files):
 
@@ -328,7 +328,7 @@ class PCH_Detection:
                     print(pts)
 
                     if len(pts) > 0:
-                        pts['FileName'] = [image_file] * len(pts)
+                        pts['FileName'] = [os.path.basename(image_file)] * len(pts)
                         pts['Date'] = [Time(solar_image.date)] * len(pts)
 
                         self.point_detection = join(pts, self.point_detection, join_type='outer')
@@ -461,7 +461,7 @@ class PCH_Detection:
         # Modifies the point detection to add in harvey lon.
 
         self.point_detection['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in self.point_detection['Date']]
-        self.point_detection['Harvey_Longitude'] = [PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']]
+        self.point_detection['Harvey_Longitude'] = np.squeeze([PCH_Tools.get_harvey_lon(date) for date in self.point_detection['Date']])
         self.point_detection['H_StartLon'] = Longitude((np.squeeze(np.asarray(self.point_detection['Harvey_Longitude']))
                                                        + np.array(self.point_detection['StartLon'])) * u.deg)
         self.point_detection['H_EndLon'] = Longitude((np.squeeze(np.asarray(self.point_detection['Harvey_Longitude']))
@@ -469,21 +469,23 @@ class PCH_Detection:
 
     def write_table(self, write_dir='', format=''):
 
-        if self.begin_date.year == self.end_date.year:
-            date_string = str(self.begin_date.year)
+        if self.begin_date.datetime.year == self.end_date.datetime.year:
+            date_string = str(self.begin_date.datetime.year)
         else:
-            date_string = str(self.begin_date.year)+'-'+str(self.end_date.year)
+            date_string = str(self.begin_date.datetime.year)+'-'+str(self.end_date.datetime.year)
 
         if write_dir == '':
             write_dir = self.dir
 
-        write_file = write_dir+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string
+        write_file = os.path.abspath(write_dir)+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string
 
         if format.lower() == 'votable':
             self.point_detection.write(write_file+'.vot', format='votable', overwrite=True)
         elif format.lower() == 'hdf':
+            self.point_detection['Date'] = [datetime.jd for datetime in self.point_detection['Date']]
+            self.point_detection['FileName'] = self.point_detection['FileName'].astype('S60')
             self.point_detection.write(self.detector+'_'+self.point_detection.meta['name']+date_string+'.hdf',
-                                       path=write_dir, format='hdf5', overwrite=True)
+                                       path=os.path.abspath(write_dir), format='hdf5', overwrite=True)
         elif format.lower() == 'ascii':
             ascii.write(self.point_detection, write_file+'.csv', format='ecsv', overwrite=True)
         elif format.lower() == 'csv':
@@ -491,5 +493,4 @@ class PCH_Detection:
         elif format.lower() == 'fits':
             self.point_detection.write(write_file+'.fits', format='fits', overwrite=True)
         else:
-            self.point_detection.write(self.detector + '_' + self.point_detection.meta['name'] + date_string + '.hdf',
-                                       path=write_dir, format='hdf5', overwrite=True)
+            ascii.write(self.point_detection, write_file + '.csv', format='ecsv', overwrite=True)
