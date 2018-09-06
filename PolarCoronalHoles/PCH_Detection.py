@@ -282,7 +282,17 @@ def file_integrity_check(infile):
 
         if 'NAXIS3' in hdu1[0].header:
             return False
+
+        try:
+            type(hdu1[0].header['CDELT1'])
+        except KeyError:
+            return False
         if type(hdu1[0].header['CDELT1']) != float:
+            return False
+
+        try:
+            type(hdu1[0].header['CDELT2'])
+        except KeyError:
             return False
         if type(hdu1[0].header['CDELT2']) != float:
             return False

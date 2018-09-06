@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Fixed memory leak.">
-      <change afterPath="$PROJECT_DIR$/PCH_Data_Download.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../AIA_Spikes/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Fixed filename bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
     </list>
@@ -26,14 +24,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4096" />
-          <entry key="txt" value="364" />
+          <entry key="py" value="4169" />
+          <entry key="txt" value="416" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="364" />
-          <entry key="Python" value="4096" />
+          <entry key="PLAIN_TEXT" value="416" />
+          <entry key="Python" value="4169" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -53,8 +51,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1841">
-              <caret line="310" column="41" lean-forward="true" selection-start-line="310" selection-start-column="41" selection-end-line="310" selection-end-column="41" />
+            <state relative-caret-position="747">
+              <caret line="293" column="42" lean-forward="true" selection-start-line="293" selection-start-column="42" selection-end-line="293" selection-end-column="42" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -78,8 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1155">
-              <caret line="83" column="53" selection-start-line="83" selection-start-column="53" selection-end-line="83" selection-end-column="53" />
+            <state relative-caret-position="195">
+              <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
               <folding>
                 <element signature="e#0#54#0" expanded="true" />
               </folding>
@@ -142,6 +140,7 @@
       <find>warning</find>
       <find>Warning</find>
       <find>FileName</find>
+      <find>try</find>
     </findStrings>
     <replaceStrings>
       <replace>mask_map.</replace>
@@ -250,20 +249,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-    </task>
-    <task id="LOCAL-00019" summary="Plot PCH data">
-      <created>1515779645094</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1515779645094</updated>
-    </task>
-    <task id="LOCAL-00020" summary="Plot PCH data">
-      <created>1515789243706</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1515789243706</updated>
     </task>
     <task id="LOCAL-00021" summary="Plot PCH data">
       <created>1515790012005</created>
@@ -594,7 +579,21 @@
       <option name="project" value="LOCAL" />
       <updated>1535646885363</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="Fixed Saving bugs.">
+      <created>1536241794757</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1536241794758</updated>
+    </task>
+    <task id="LOCAL-00069" summary="Fixed filename bug">
+      <created>1536241923491</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1536241923491</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -653,21 +652,13 @@
     <MESSAGE value="Adapting Table to work with ecsv and hdf save formats." />
     <MESSAGE value="Adding save formats." />
     <MESSAGE value="Fixed memory leak." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed memory leak." />
+    <MESSAGE value="Fixed Saving bugs." />
+    <MESSAGE value="Fixed filename bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed filename bug" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/07F4C7A3-340B-4385-B7DD-C3EAC4BA0985/example_hec.py">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1155">
-          <caret line="83" column="53" selection-start-line="83" selection-start-column="53" selection-end-line="83" selection-end-column="53" />
-          <folding>
-            <element signature="e#0#54#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_series.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -689,17 +680,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2156">
-          <caret line="156" selection-start-line="156" selection-end-line="156" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <marker date="1535123868000" expanded="true" signature="13021:13026" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
@@ -711,10 +691,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2156">
+          <caret line="156" selection-start-line="156" selection-end-line="156" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1535123868000" expanded="true" signature="13021:13026" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1841">
-          <caret line="310" column="41" lean-forward="true" selection-start-line="310" selection-start-column="41" selection-end-line="310" selection-end-column="41" />
+        <state relative-caret-position="747">
+          <caret line="293" column="42" lean-forward="true" selection-start-line="293" selection-start-column="42" selection-end-line="293" selection-end-column="42" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
