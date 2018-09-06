@@ -305,7 +305,7 @@ class PCH_Detection:
 
         for root, dirnames, filenames in os.walk(image_dir):
             for filename in filenames:
-                if filename.endswith(('.fts', '.fits') or filename.startswith('efz')):
+                if filename.endswith(('.fts', '.fits')) or filename.startswith('efz'):
                     self.files.append(os.path.join(root, filename))
 
         self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
