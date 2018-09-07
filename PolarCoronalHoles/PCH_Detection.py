@@ -36,9 +36,12 @@ def rsun_pix(inmap):
     # Returns rsun in pixel units
     rsun = np.array([inmap.rsun_obs.to('deg').value])
 
+    # Fix for missing Solar Radius information from EIT
     if rsun == 0:
         if inmap.detector == 'EIT':
             rsun = 0.27346886111111113
+        else:
+            rsun = np.nan
 
     return np.array([inmap.wcs.all_world2pix(rsun, rsun, 0)[0] - inmap.wcs.all_world2pix(0, 0, 0)[0],
                      inmap.wcs.all_world2pix(rsun, rsun, 0)[1] - inmap.wcs.all_world2pix(0, 0, 0)[1]])
