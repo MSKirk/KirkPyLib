@@ -36,6 +36,10 @@ def rsun_pix(inmap):
     # Returns rsun in pixel units
     rsun = np.array([inmap.rsun_obs.to('deg').value])
 
+    if rsun == 0:
+        if inmap.detector == 'EIT':
+            rsun = 0.27346886111111113
+
     return np.array([inmap.wcs.all_world2pix(rsun, rsun, 0)[0] - inmap.wcs.all_world2pix(0, 0, 0)[0],
                      inmap.wcs.all_world2pix(rsun, rsun, 0)[1] - inmap.wcs.all_world2pix(0, 0, 0)[1]])
 
@@ -60,6 +64,8 @@ def pch_mask(mask_map, factor=0.5):
         mask_map.data[mask_map.data > 10000] = 10000
 
         mask_map.data[mask_map.data < 0] = 0
+
+        mask_map.data[:] = mask_map.data[:] - mask_map.data.min()
 
         rsun_in_pix = rsun_pix(mask_map)
 
@@ -281,6 +287,20 @@ def file_integrity_check(infile):
             hdu1.writeto(file_path, overwrite=True)
 
         if 'NAXIS3' in hdu1[0].header:
+            return False
+
+        try:
+            type(hdu1[0].header['CRVAL1'])
+        except KeyError:
+            return False
+        if type(hdu1[0].header['CRVAL1']) != float:
+            return False
+
+        try:
+            type(hdu1[0].header['CRVAL2'])
+        except KeyError:
+            return False
+        if type(hdu1[0].header['CRVAL2']) != float:
             return False
 
         try:
