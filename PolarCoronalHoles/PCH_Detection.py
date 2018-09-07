@@ -245,10 +245,10 @@ def image_integrity_check(inmap):
         if 'QUALITYV0' in inmap.meta:
             good_image = False
 
-        if 'MISSVALS' in inmap.data:
+        if inmap.meta['MISSVALS'] > 0.01 * inmap.meta['TOTVALS']:
             good_image = False
 
-        if inmap.meta['Quality'] not in [2097152, 1073741824, 1073741828, 1075838976]:
+        if inmap.meta['Quality'] not in [0, 2097152, 1073741824, 1073741828, 1075838976]:
             good_image = False
 
     if inmap.detector == 'EIT':
