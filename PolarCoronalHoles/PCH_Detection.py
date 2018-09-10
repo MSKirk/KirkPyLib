@@ -353,6 +353,7 @@ class PCH_Detection:
                 print(image_file)
 
                 self.detector = solar_image.detector
+                self.wavelength = solar_image.wavelength
 
                 if image_integrity_check(solar_image):
                     pch_mask(solar_image)
@@ -510,15 +511,15 @@ class PCH_Detection:
         if write_dir == '':
             write_dir = self.dir
 
-        write_file = os.path.abspath(write_dir)+'/'+self.detector+'_'+self.point_detection.meta['name']+date_string
+        write_file_name = +self.detector+np.str(np.int(self.wavelength.value))+'_'+self.point_detection.meta['name']+date_string
+        write_file = os.path.abspath(write_dir)+'/'+ write_file_name
 
         if format.lower() == 'votable':
             self.point_detection.write(write_file+'.vot', format='votable', overwrite=True)
         elif format.lower() == 'hdf':
             self.point_detection['Date'] = [datetime.jd for datetime in self.point_detection['Date']]
             self.point_detection['FileName'] = self.point_detection['FileName'].astype('S60')
-            self.point_detection.write(self.detector+'_'+self.point_detection.meta['name']+date_string+'.hdf',
-                                       path=os.path.abspath(write_dir), format='hdf5', overwrite=True)
+            self.point_detection.write(write_file_name+'.hdf', path=os.path.abspath(write_dir), format='hdf5', overwrite=True)
         elif format.lower() == 'ascii':
             ascii.write(self.point_detection, write_file+'.csv', format='ecsv', overwrite=True)
         elif format.lower() == 'csv':
