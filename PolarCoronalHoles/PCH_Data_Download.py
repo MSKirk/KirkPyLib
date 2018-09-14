@@ -21,7 +21,15 @@ def aia_pch_data_download(rootpath=''):
 
         downloaded_files = Fido.fetch(results, path=path+'/'+np.str(waves)+'/{file}')
 
-        ## check downloaded files...
+        if results.file_num == len(downloaded_files):
+            print('Download between 2016/1/1 and 2018/6/30 successful')
+        else:
+            print('Expected '+np.str(results.file_num)+' files.')
+            print('Got '+np.str(len(downloaded_files))+' files.')
+
+            with open(path+'/'+np.str(waves)+'filelist_16-18.txt', 'w') as f:
+                for item in downloaded_files:
+                    f.write("%s\n" % item)
 
         results = blank_results
 
@@ -31,3 +39,12 @@ def aia_pch_data_download(rootpath=''):
         downloaded_files = Fido.fetch(results, path=path+'/'+np.str(waves)+'/{file}')
 
         ## check downloaded files...
+        if results.file_num == len(downloaded_files):
+            print('Download between 2010/1/1 and 2015/6/30 successful')
+        else:
+            print('Expected '+np.str(results.file_num)+' files.')
+            print('Got '+np.str(len(downloaded_files))+' files.')
+
+            with open(path+'/'+np.str(waves)+'filelist_10-15.txt', 'w') as f:
+                for item in downloaded_files:
+                    f.write("%s\n" % item)
