@@ -6,14 +6,15 @@ import numpy as np
 
 def aia_pch_data_download(rootpath=''):
 
-    if not rootpath:
-        path = os.path.abspath(os.path.curdir)
-    else:
-        path = os.path.abspath(rootpath)
-
     blank_results = Fido.search(a.Time('2030/1/1', '2030/1/2'), a.Instrument('aia'))
 
     for waves in [171,193,304]:
+
+        if not rootpath:
+            path = os.path.abspath(os.path.curdir)
+        else:
+            path = os.path.abspath(rootpath)+'/'+np.str(waves)
+
         results = blank_results
 
         while results.file_num == 0:
@@ -38,7 +39,6 @@ def aia_pch_data_download(rootpath=''):
 
         downloaded_files = Fido.fetch(results, path=path+'/'+np.str(waves)+'/{file}')
 
-        ## check downloaded files...
         if results.file_num == len(downloaded_files):
             print('Download between 2010/1/1 and 2015/6/30 successful')
         else:
