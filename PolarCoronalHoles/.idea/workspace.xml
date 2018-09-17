@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="AIA Download script edits.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Added print statements on soft error.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_Data_Download.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Data_Download.py" afterDir="false" />
     </list>
@@ -24,14 +24,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="5229" />
-          <entry key="txt" value="636" />
+          <entry key="py" value="5318" />
+          <entry key="txt" value="748" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="636" />
-          <entry key="Python" value="5229" />
+          <entry key="PLAIN_TEXT" value="748" />
+          <entry key="Python" value="5318" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -63,11 +63,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="889">
-              <caret line="72" lean-forward="true" selection-start-line="72" selection-end-line="72" />
+            <state relative-caret-position="649">
+              <caret line="60" column="28" lean-forward="true" selection-start-line="60" selection-start-column="28" selection-end-line="60" selection-end-column="28" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
-                <marker date="1537199233000" expanded="true" signature="185:186" ph="..." />
+                <marker date="1537203374000" expanded="true" signature="185:186" ph="..." />
               </folding>
             </state>
           </provider>
@@ -251,20 +251,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-    </task>
-    <task id="LOCAL-00029" summary="Plot PCH data">
-      <created>1516916517867</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1516916517867</updated>
-    </task>
-    <task id="LOCAL-00030" summary="Plot PCH data">
-      <created>1516918459075</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1516918459075</updated>
     </task>
     <task id="LOCAL-00031" summary="Plot PCH data">
       <created>1516918463680</created>
@@ -595,7 +581,21 @@
       <option name="project" value="LOCAL" />
       <updated>1536938531920</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="Restructured data download to deal with the VSO/FIDO issues.">
+      <created>1537200134596</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1537200134596</updated>
+    </task>
+    <task id="LOCAL-00079" summary="Added print statements on soft error.">
+      <created>1537200947728</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1537200947728</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -634,8 +634,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed Table errors&#10;Fixed writing errors" />
-    <MESSAGE value="Query Addition&#10;Comments" />
     <MESSAGE value="flienames fix" />
     <MESSAGE value="Progress toward hole area" />
     <MESSAGE value="Implementing the hole area calculation." />
@@ -659,7 +657,9 @@
     <MESSAGE value="Fixing image integrity criteria for AIA." />
     <MESSAGE value="Keep wavelength information in pch object." />
     <MESSAGE value="AIA Download script edits." />
-    <option name="LAST_COMMIT_MESSAGE" value="AIA Download script edits." />
+    <MESSAGE value="Restructured data download to deal with the VSO/FIDO issues." />
+    <MESSAGE value="Added print statements on soft error." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added print statements on soft error." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/07F4C7A3-340B-4385-B7DD-C3EAC4BA0985/example_hec.py">
@@ -718,11 +718,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="889">
-          <caret line="72" lean-forward="true" selection-start-line="72" selection-end-line="72" />
+        <state relative-caret-position="649">
+          <caret line="60" column="28" lean-forward="true" selection-start-line="60" selection-start-column="28" selection-end-line="60" selection-end-column="28" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
-            <marker date="1537199233000" expanded="true" signature="185:186" ph="..." />
+            <marker date="1537203374000" expanded="true" signature="185:186" ph="..." />
           </folding>
         </state>
       </provider>

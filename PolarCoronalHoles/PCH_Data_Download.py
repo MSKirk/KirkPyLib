@@ -20,7 +20,9 @@ def aia_pch_data_download(rootpath='', waves=[171,193,304]):
         results = blank_results
 
         while results.file_num == 0:
-            results = Fido.search(a.Time('2016/1/1', '2018/6/30'), a.Instrument('aia'), a.Wavelength(wave * u.angstrom), a.vso.Sample(3 * u.hour))
+            results = Fido.search(a.jsoc.Time('2016/1/1', '2018/6/30'), a.jsoc.Notify('michael.s.kirk@nasa.gov'),
+                                  a.jsoc.Series('aia.lev1_euv_12s'), a.jsoc.Wavelength(wave * u.angstrom),
+                                  a.Sample(3 * u.hour))
 
         expected_number = 7210.
         neededfileindex = []
@@ -51,7 +53,9 @@ def aia_pch_data_download(rootpath='', waves=[171,193,304]):
         results = blank_results
 
         while results.file_num == 0:
-            results = Fido.search(a.Time('2010/1/1', '2015/12/31'), a.Instrument('aia'), a.Wavelength(wave * u.angstrom), a.vso.Sample(3 * u.hour))
+            results = Fido.search(a.jsoc.Time('2016/1/1', '2018/6/30'), a.jsoc.Notify('michael.s.kirk@nasa.gov'),
+                                  a.jsoc.Series('aia.lev1_euv_12s'), a.jsoc.Wavelength(wave * u.angstrom),
+                                  a.Sample(3 * u.hour))
 
         expected_number = 16456.
         neededfileindex = []
