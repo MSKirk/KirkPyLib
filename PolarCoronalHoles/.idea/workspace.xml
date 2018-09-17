@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Keep wavelength information in pch object.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="AIA Download script edits.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_Data_Download.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Data_Download.py" afterDir="false" />
     </list>
@@ -24,14 +24,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4787" />
-          <entry key="txt" value="596" />
+          <entry key="py" value="5229" />
+          <entry key="txt" value="636" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="596" />
-          <entry key="Python" value="4787" />
+          <entry key="PLAIN_TEXT" value="636" />
+          <entry key="Python" value="5229" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -63,11 +63,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="660">
-              <caret line="44" column="65" lean-forward="true" selection-start-line="44" selection-start-column="65" selection-end-line="44" selection-end-column="65" />
+            <state relative-caret-position="889">
+              <caret line="72" lean-forward="true" selection-start-line="72" selection-end-line="72" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
-                <marker date="1536938058000" expanded="true" signature="135:136" ph="..." />
+                <marker date="1537199233000" expanded="true" signature="185:186" ph="..." />
               </folding>
             </state>
           </provider>
@@ -88,7 +88,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_series.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3885">
+            <state relative-caret-position="994">
               <caret line="268" column="24" selection-start-line="268" selection-start-column="16" selection-end-line="268" selection-end-column="24" />
               <folding>
                 <element signature="e#1#19#0" expanded="true" />
@@ -141,6 +141,7 @@
       <find>Warning</find>
       <find>FileName</find>
       <find>try</find>
+      <find>waves</find>
     </findStrings>
     <replaceStrings>
       <replace>mask_map.</replace>
@@ -148,6 +149,7 @@
       <replace>8</replace>
       <replace>5</replace>
       <replace>hole_start</replace>
+      <replace>wave</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -249,20 +251,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-    </task>
-    <task id="LOCAL-00027" summary="Plot PCH data">
-      <created>1516833565306</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1516833565306</updated>
-    </task>
-    <task id="LOCAL-00028" summary="Plot PCH data">
-      <created>1516915843624</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1516915843624</updated>
     </task>
     <task id="LOCAL-00029" summary="Plot PCH data">
       <created>1516916517867</created>
@@ -593,7 +581,21 @@
       <option name="project" value="LOCAL" />
       <updated>1536680945574</updated>
     </task>
-    <option name="localTasksCounter" value="76" />
+    <task id="LOCAL-00076" summary="AIA Download script edits.">
+      <created>1536938409935</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1536938409936</updated>
+    </task>
+    <task id="LOCAL-00077" summary="AIA Download script edits.">
+      <created>1536938531919</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1536938531920</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -632,7 +634,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Range expansion for enhanced data." />
     <MESSAGE value="Fixed Table errors&#10;Fixed writing errors" />
     <MESSAGE value="Query Addition&#10;Comments" />
     <MESSAGE value="flienames fix" />
@@ -657,7 +658,8 @@
     <MESSAGE value="Fixed bug where rsun_obs is not set." />
     <MESSAGE value="Fixing image integrity criteria for AIA." />
     <MESSAGE value="Keep wavelength information in pch object." />
-    <option name="LAST_COMMIT_MESSAGE" value="Keep wavelength information in pch object." />
+    <MESSAGE value="AIA Download script edits." />
+    <option name="LAST_COMMIT_MESSAGE" value="AIA Download script edits." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/07F4C7A3-340B-4385-B7DD-C3EAC4BA0985/example_hec.py">
@@ -683,16 +685,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_series.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3885">
-          <caret line="268" column="24" selection-start-line="268" selection-start-column="16" selection-end-line="268" selection-end-column="24" />
-          <folding>
-            <element signature="e#1#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3960">
@@ -714,13 +706,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_series.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="994">
+          <caret line="268" column="24" selection-start-line="268" selection-start-column="16" selection-end-line="268" selection-end-column="24" />
+          <folding>
+            <element signature="e#1#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="660">
-          <caret line="44" column="65" lean-forward="true" selection-start-line="44" selection-start-column="65" selection-end-line="44" selection-end-column="65" />
+        <state relative-caret-position="889">
+          <caret line="72" lean-forward="true" selection-start-line="72" selection-end-line="72" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
-            <marker date="1536938058000" expanded="true" signature="135:136" ph="..." />
+            <marker date="1537199233000" expanded="true" signature="185:186" ph="..." />
           </folding>
         </state>
       </provider>
