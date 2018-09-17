@@ -33,6 +33,7 @@ def aia_pch_data_download(rootpath='', waves=[171,193,304]):
                 print(int((ii/results.file_num)*10000.)/100.)
 
                 if not downloaded_file:
+                    print('Error in file number '+np.str(file_number))
                     neededfileindex += [file_number]
 
         if results.file_num == len(fnmatch.filter(os.listdir(path), '*.fits')):
@@ -63,6 +64,7 @@ def aia_pch_data_download(rootpath='', waves=[171,193,304]):
                 print(int((ii/results.file_num)*10000.)/100.)
 
                 if not downloaded_file:
+                    print('Error in file number ' + np.str(file_number))
                     neededfileindex += [file_number]
 
         if results.file_num == len(fnmatch.filter(os.listdir(path), '*.fits')):
