@@ -279,45 +279,48 @@ def file_integrity_check(infile):
 
     if file_path.is_file():
         hdu1 = fits.open(file_path)
-        hdu1[0].verify('fix')
+
+        head_loc = np.argmax([len(hdu.header) for hdu in hdu1])
+            
+        hdu1[head_loc].verify('fix')
 
         # SWAP Stacked image fix
-        if 'CTYPE1' not in hdu1[0].header:
-            hdu1[0].header['CTYPE1'] = 'HPLN-TAN'
+        if 'CTYPE1' not in hdu1[head_loc].header:
+            hdu1[head_loc].header['CTYPE1'] = 'HPLN-TAN'
 
-        if 'CTYPE2' not in hdu1[0].header:
-            hdu1[0].header['CTYPE2'] = 'HPLT-TAN'
+        if 'CTYPE2' not in hdu1[head_loc].header:
+            hdu1[head_loc].header['CTYPE2'] = 'HPLT-TAN'
             hdu1.writeto(file_path, overwrite=True)
 
-        if 'NAXIS3' in hdu1[0].header:
+        if 'NAXIS3' in hdu1[head_loc].header:
             return False
 
         try:
-            type(hdu1[0].header['CRVAL1'])
+            type(hdu1[head_loc].header['CRVAL1'])
         except KeyError:
             return False
-        if type(hdu1[0].header['CRVAL1']) != float:
+        if type(hdu1[head_loc].header['CRVAL1']) != float:
             return False
 
         try:
-            type(hdu1[0].header['CRVAL2'])
+            type(hdu1[head_loc].header['CRVAL2'])
         except KeyError:
             return False
-        if type(hdu1[0].header['CRVAL2']) != float:
+        if type(hdu1[head_loc].header['CRVAL2']) != float:
             return False
 
         try:
-            type(hdu1[0].header['CDELT1'])
+            type(hdu1[head_loc].header['CDELT1'])
         except KeyError:
             return False
-        if type(hdu1[0].header['CDELT1']) != float:
+        if type(hdu1[head_loc].header['CDELT1']) != float:
             return False
 
         try:
-            type(hdu1[0].header['CDELT2'])
+            type(hdu1[head_loc].header['CDELT2'])
         except KeyError:
             return False
-        if type(hdu1[0].header['CDELT2']) != float:
+        if type(hdu1[head_loc].header['CDELT2']) != float:
             return False
         else:
             return True

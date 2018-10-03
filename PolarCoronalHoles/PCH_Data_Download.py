@@ -1,5 +1,5 @@
 import astropy.units as u
-from sunpy.net import Fido, attrs as a
+from sunpy.net import Fido, jsoc, attrs as a
 import os
 import numpy as np
 import random
