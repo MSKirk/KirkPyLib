@@ -259,13 +259,6 @@
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
     </task>
-    <task id="LOCAL-00035" summary="Plot PCH data">
-      <created>1517348659528</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1517348659528</updated>
-    </task>
     <task id="LOCAL-00036" summary="Plot PCH data">
       <created>1517348665423</created>
       <option name="number" value="00036" />
@@ -602,7 +595,14 @@
       <option name="project" value="LOCAL" />
       <updated>1538602413213</updated>
     </task>
-    <option name="localTasksCounter" value="84" />
+    <task id="LOCAL-00084" summary="AIA HDU list correction">
+      <created>1538602493278</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1538602493278</updated>
+    </task>
+    <option name="localTasksCounter" value="85" />
     <servers />
   </component>
   <component name="ToolWindowManager">
