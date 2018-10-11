@@ -353,6 +353,11 @@ class PCH_Detection:
             if file_integrity_check(image_file):
                 solar_image = sunpy.map.Map(image_file)
 
+                # Resample AIA images to lower resolution for better processing times
+                if solar_image.dimensions[0] > 2049. * u.pixel:
+                    dimensions = u.Quantity([2048, 2048], u.pixel)
+                    solar_image = solar_image.resample(dimensions)
+
                 print(image_file)
 
                 self.detector = solar_image.detector
