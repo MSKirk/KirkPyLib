@@ -56,8 +56,8 @@
       <file leaf-file-name="PCH_Detection.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="583">
-              <caret line="360" column="53" lean-forward="false" selection-start-line="360" selection-start-column="53" selection-end-line="360" selection-end-column="53" />
+            <state relative-caret-position="2203">
+              <caret line="531" column="0" lean-forward="true" selection-start-line="531" selection-start-column="0" selection-end-line="531" selection-end-column="0" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -149,6 +149,7 @@
       <find>waves</find>
       <find>results.file_num</find>
       <find>[0]</find>
+      <find>offset</find>
     </findStrings>
     <replaceStrings>
       <replace>mask_map.</replace>
@@ -376,13 +377,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-    </task>
-    <task id="LOCAL-00039" summary="Plot PCH data">
-      <created>1517953844009</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1517953844009</updated>
     </task>
     <task id="LOCAL-00040" summary="Plot PCH data">
       <created>1518023906247</created>
@@ -720,7 +714,14 @@
       <option name="project" value="LOCAL" />
       <updated>1539805005047</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="Added in Center of Mass output">
+      <created>1539809932668</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1539809932668</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -753,7 +754,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Bug fix in pick_hole_extremes" />
     <MESSAGE value="Bug fix in hole_area" />
     <MESSAGE value="Recalculating hole areas and updating fitting procedure." />
     <MESSAGE value="Adding in a zero point detection." />
@@ -778,7 +778,8 @@
     <MESSAGE value="Forced JSOC source" />
     <MESSAGE value="AIA HDU list correction" />
     <MESSAGE value="Resample AIA images to 2048x2048" />
-    <option name="LAST_COMMIT_MESSAGE" value="Resample AIA images to 2048x2048" />
+    <MESSAGE value="Added in Center of Mass output" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added in Center of Mass output" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1025,8 +1026,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="583">
-          <caret line="360" column="53" lean-forward="false" selection-start-line="360" selection-start-column="53" selection-end-line="360" selection-end-column="53" />
+        <state relative-caret-position="2203">
+          <caret line="531" column="0" lean-forward="true" selection-start-line="531" selection-start-column="0" selection-end-line="531" selection-end-column="0" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>

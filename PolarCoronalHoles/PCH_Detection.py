@@ -358,8 +358,8 @@ class PCH_Detection:
                     self.files.append(os.path.join(root, filename))
 
         # # Check the CoM additions.
-        self.point_detection = Table([[0], [0], [0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
-                                     names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'CoM_lat', 'CoM_lon', 'ArcLength', 'Quality', 'FileName', 'Date'),
+        self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
+                                     names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
                                      meta={'name': 'PCH_Detections'})
 
         for ii, image_file in enumerate(self.files):
@@ -405,10 +405,12 @@ class PCH_Detection:
         # Adding in Area Calculation each point with one HR previous measurements
         area = []
         fit = []
+        center = []
         for h_rot in self.point_detection['Harvey_Rotation']:
-            ar, ft = self.hole_area(h_rot)
+            ar, ft, cm = self.hole_area(h_rot)
             area = area + [ar]
-            fit = fit +[ft]
+            fit = fit + [ft]
+            center = center + [cm]
 
         self.point_detection['Area'] = np.asarray(area)[:, 1]
         self.point_detection['Area_min'] = np.asarray(area)[:, 0]
@@ -417,6 +419,9 @@ class PCH_Detection:
         self.point_detection['Fit'] = np.asarray(fit)[:, 1] * u.deg
         self.point_detection['Fit_min'] = np.asarray(fit)[:, 0] * u.deg
         self.point_detection['Fit_max'] = np.asarray(fit)[:, 2] * u.deg
+
+        self.point_detection['Center_lat'] = np.asarray(center)[:, 1] * u.deg
+        self.point_detection['Center_lon'] = np.asarray(center)[:, 0] * u.deg
 
     def hole_area(self, h_rotation_number):
         # Returns the area as a fraction of the total solar surface area
@@ -462,8 +467,6 @@ class PCH_Detection:
                 offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
 
             offset_cm = PCH_Tools.center_of_mass(offset_coords, mass=1/errors) * u.deg
-            self.point_detection['CoM_Lat'] = offset_cm[0]
-            self.point_detection['CoM_Lon'] = offset_cm[1]
             offset_lons = offset_coords[:, 0] * u.deg - offset_cm[0]
             offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
 
@@ -518,8 +521,14 @@ class PCH_Detection:
                 percent_hole_area = (np.nan, np.nan, np.nan)
                 hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
 
+            # From co-lat to lat
+            if northern:
+                offset_cm[1] = (90 * u.deg) - offset_cm[1]
+            else:
+                offset_cm[1] = (90 * u.deg) + offset_cm[1]
+
             # Tuples of shape (Min, Mean, Max)
-            return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location)
+            return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)
 
     def add_harvey_coordinates(self):
         # Modifies the point detection to add in harvey lon.
