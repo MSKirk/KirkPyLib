@@ -268,6 +268,9 @@ def image_integrity_check(inmap):
     if inmap.data.max() < 1:
         good_image = False
 
+    if not good_image:
+        warnings.warn('Bad Image Detected')
+
     return good_image
 
 
@@ -293,38 +296,48 @@ def file_integrity_check(infile):
             hdu1.writeto(file_path, overwrite=True)
 
         if 'NAXIS3' in hdu1[head_loc].header:
+            warnings.warn('Bad File Detected')
             return False
 
         try:
             type(hdu1[head_loc].header['CRVAL1'])
         except KeyError:
+            warnings.warn('Bad File Detected')
             return False
         if type(hdu1[head_loc].header['CRVAL1']) != float:
+            warnings.warn('Bad File Detected')
             return False
 
         try:
             type(hdu1[head_loc].header['CRVAL2'])
         except KeyError:
+            warnings.warn('Bad File Detected')
             return False
         if type(hdu1[head_loc].header['CRVAL2']) != float:
+            warnings.warn('Bad File Detected')
             return False
 
         try:
             type(hdu1[head_loc].header['CDELT1'])
         except KeyError:
+            warnings.warn('Bad File Detected')
             return False
         if type(hdu1[head_loc].header['CDELT1']) != float:
+            warnings.warn('Bad File Detected')
             return False
 
         try:
             type(hdu1[head_loc].header['CDELT2'])
         except KeyError:
+            warnings.warn('Bad File Detected')
             return False
         if type(hdu1[head_loc].header['CDELT2']) != float:
+            warnings.warn('Bad File Detected')
             return False
         else:
             return True
     else:
+        warnings.warn('Bad File Detected')
         return False
 
 
@@ -353,17 +366,18 @@ class PCH_Detection:
             if file_integrity_check(image_file):
                 solar_image = sunpy.map.Map(image_file)
 
-                # Resample AIA images to lower resolution for better processing times
-                if solar_image.dimensions[0] > 2049. * u.pixel:
-                    dimensions = u.Quantity([2048, 2048], u.pixel)
-                    solar_image = solar_image.resample(dimensions)
-
                 print(image_file)
 
                 self.detector = solar_image.detector
                 self.wavelength = solar_image.wavelength
 
                 if image_integrity_check(solar_image):
+
+                    # Resample AIA images to lower resolution for better processing times
+                    if solar_image.dimensions[0] > 2049. * u.pixel:
+                        dimensions = u.Quantity([2048, 2048], u.pixel)
+                        solar_image = solar_image.resample(dimensions)
+
                     pch_mask(solar_image)
                     pts = pch_mark(solar_image)
 
@@ -374,6 +388,11 @@ class PCH_Detection:
                         pts['Date'] = [Time(solar_image.date)] * len(pts)
 
                         self.point_detection = join(pts, self.point_detection, join_type='outer')
+                    # Variable Cleanup
+                    del pts
+                # Variable Cleanup
+                del solar_image
+
 
         self.point_detection.remove_row(np.where(self.point_detection['Date'] == Time('1900-01-04'))[0][0])
         self.add_harvey_coordinates()
