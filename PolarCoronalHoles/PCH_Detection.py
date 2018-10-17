@@ -357,8 +357,9 @@ class PCH_Detection:
                 if filename.endswith(('.fts', '.fits')) or filename.startswith('efz'):
                     self.files.append(os.path.join(root, filename))
 
-        self.point_detection = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
-                                     names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
+        # # Check the CoM additions.
+        self.point_detection = Table([[0], [0], [0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
+                                     names=('StartLat', 'StartLon', 'EndLat', 'EndLon', 'CoM_lat', 'CoM_lon', 'ArcLength', 'Quality', 'FileName', 'Date'),
                                      meta={'name': 'PCH_Detections'})
 
         for ii, image_file in enumerate(self.files):
@@ -461,6 +462,8 @@ class PCH_Detection:
                 offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
 
             offset_cm = PCH_Tools.center_of_mass(offset_coords, mass=1/errors) * u.deg
+            self.point_detection['CoM_Lat'] = offset_cm[0]
+            self.point_detection['CoM_Lon'] = offset_cm[1]
             offset_lons = offset_coords[:, 0] * u.deg - offset_cm[0]
             offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
 
