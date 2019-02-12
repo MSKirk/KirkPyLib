@@ -28,13 +28,13 @@ def aia_eff_area(wavelnth, target_time, ratio=True, filename=None):
         soup = BeautifulSoup(requests.get(url).text, 'html.parser')
         all_versions = [node.get('href') for node in soup.find_all('a') if
                         node.get('href').endswith('_response_table.txt')]
-        latest_table_url = url + sorted([table_files for table_files in all_versions if table_files.startswith('aia_V')])[-1]
+        latest_table_url = url + sorted([table_files for table_files in all_versions if
+                                         table_files.startswith('aia_V')])[-1]
         tbl = requests.get(latest_table_url).content
         response_table = io.StringIO(tbl.decode('utf-8'))
 
     # Read in response table
-    dat = pd.read_csv(response_table, sep='\s+',
-                      parse_dates=[1], infer_datetime_format=True, index_col=1)
+    dat = pd.read_csv(response_table, sep='\s+', parse_dates=[1], infer_datetime_format=True, index_col=1)
 
     eff_area_series = dat[dat.WAVELNTH == wavelnth].EFF_AREA
 
