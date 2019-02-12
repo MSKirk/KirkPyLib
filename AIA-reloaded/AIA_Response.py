@@ -75,4 +75,5 @@ def time_interpolate(ts, target_time):
     # Insert empty value at target time.
     s = s.reindex(pd.to_datetime(list(s.index.values) + [pd.to_datetime(target_time)]))
 
+    # Linear interpolation is the most logical
     return s.interpolate('time').loc[target_time]
