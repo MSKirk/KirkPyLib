@@ -3,7 +3,7 @@ import datetime
 import os
 
 
-class Jp2ImageDownload:
+class JP2ImageDownload:
 
     def __init__(self, save_dir='', full_image_set=False, tstart='2011/05/30 23:59:59', tend='2011/05/31 23:59:59'):
 
@@ -24,9 +24,11 @@ class Jp2ImageDownload:
         self.date_list = self.gen_date_list()
         self.date_string_list = [tt.strftime(self.date_format) for tt in self.date_list]
 
+        self.download_images()
+
     def download_images(self):
 
-        for ii, download_date in enumerate(self.date_list):
+        for ii, download_date in enumerate(self.date_list[:-1]):
             directories = download_date.strftime("%Y/%m/%d")
             save_path = os.path.join(self.save_dir, directories)
             os.makedirs(save_path, exist_ok=True)
@@ -34,7 +36,7 @@ class Jp2ImageDownload:
             self.get_spoca_images(self.date_string_list[ii + 1], self.date_string_list[ii], save_path)
             self.get_sunspot_images(self.date_string_list[ii + 1], self.date_string_list[ii], save_path)
 
-        return True
+        print('Images downloaded into '+self.save_dir)
 
     def get_all_sdo_images(self, time_in, save_path=''):
         # Get a complete set of the SDO images in AIA and HMI for a given time
@@ -55,7 +57,7 @@ class Jp2ImageDownload:
     def get_spoca_images(self, time_start, time_end, save_dir):
 
         client = hek.HEKClient()
-        result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.name == 'SPoCA')
+        result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'SPoCA')
 
         times = list(set([elem["event_starttime"] for elem in result]))
 
@@ -65,7 +67,7 @@ class Jp2ImageDownload:
     def get_sunspot_images(self, time_start, time_end, save_dir):
 
         client = hek.HEKClient()
-        result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.name == 'EGSO_SFC')
+        result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'EGSO_SFC')
 
         times = list(set([elem["event_starttime"] for elem in result]))
 
