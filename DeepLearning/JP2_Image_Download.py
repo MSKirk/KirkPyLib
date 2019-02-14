@@ -56,6 +56,8 @@ class JP2ImageDownload:
 
     def get_spoca_images(self, time_start, time_end, save_dir):
 
+        # Add in feature polygon extraction
+
         client = hek.HEKClient()
         result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'SPoCA')
 
@@ -66,6 +68,8 @@ class JP2ImageDownload:
 
     def get_sunspot_images(self, time_start, time_end, save_dir):
 
+        # Add in feature polygon extraction
+        
         client = hek.HEKClient()
         result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'EGSO_SFC')
 
