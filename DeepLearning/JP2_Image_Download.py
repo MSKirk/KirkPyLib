@@ -3,9 +3,9 @@ import datetime
 import os
 
 
-class JP2ImageDownload:
+class Jp2ImageDownload:
 
-    def __init__(self, save_dir='', full_image_set=False, tstart='2011/05/30 23:59:59', tend='2011/05/31 23:59:59'):
+    def __init__(self, save_dir='', full_image_set=False, tstart='2012/05/30 23:59:59', tend='2012/05/31 23:59:59'):
 
         if full_image_set:
             tstart = '2010/05/31 23:59:59'
@@ -24,11 +24,9 @@ class JP2ImageDownload:
         self.date_list = self.gen_date_list()
         self.date_string_list = [tt.strftime(self.date_format) for tt in self.date_list]
 
-        self.download_images()
-
     def download_images(self):
 
-        for ii, download_date in enumerate(self.date_list[:-1]):
+        for ii, download_date in enumerate(self.date_list):
             directories = download_date.strftime("%Y/%m/%d")
             save_path = os.path.join(self.save_dir, directories)
             os.makedirs(save_path, exist_ok=True)
@@ -36,7 +34,7 @@ class JP2ImageDownload:
             self.get_spoca_images(self.date_string_list[ii + 1], self.date_string_list[ii], save_path)
             self.get_sunspot_images(self.date_string_list[ii + 1], self.date_string_list[ii], save_path)
 
-        print('Images downloaded into '+self.save_dir)
+        return True
 
     def get_all_sdo_images(self, time_in, save_path=''):
         # Get a complete set of the SDO images in AIA and HMI for a given time
@@ -56,24 +54,28 @@ class JP2ImageDownload:
 
     def get_spoca_images(self, time_start, time_end, save_dir):
 
-        # Add in feature polygon extraction
-
         client = hek.HEKClient()
         result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'SPoCA')
 
         times = list(set([elem["event_starttime"] for elem in result]))
+        times.sort()
+
+        CH = [elem for elem in result if elem['event_type'] == 'CH']
+
+        AR = [elem for elem in result if elem['event_type'] == 'AR']
 
         for time_in in times:
             self.get_all_sdo_images(time_in, save_path=save_dir)
 
     def get_sunspot_images(self, time_start, time_end, save_dir):
 
-        # Add in feature polygon extraction
-        
         client = hek.HEKClient()
         result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'EGSO_SFC')
 
         times = list(set([elem["event_starttime"] for elem in result]))
+        times.sort()
+
+        SS = [elem for elem in result if elem['event_type'] == 'SS']
 
         for time_in in times:
             self.get_all_sdo_images(time_in, save_path=save_dir)
