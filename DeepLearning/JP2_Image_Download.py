@@ -1,4 +1,14 @@
 from sunpy.net import hek, helioviewer
+from sunpy.time import parse_time
+from sunpy.coordinates import frames
+from sunpy.map import Map
+import sunpy.io.jp2
+
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
+import numpy as np
+
 import datetime
 import os
 
@@ -31,8 +41,7 @@ class Jp2ImageDownload:
             save_path = os.path.join(self.save_dir, directories)
             os.makedirs(save_path, exist_ok=True)
 
-            self.get_spoca_images(self.date_string_list[ii + 1], self.date_string_list[ii], save_path)
-            self.get_sunspot_images(self.date_string_list[ii + 1], self.date_string_list[ii], save_path)
+            self.get_feature_images(self.date_string_list[ii + 1], self.date_string_list[ii], save_path)
 
         return True
 
@@ -41,46 +50,63 @@ class Jp2ImageDownload:
 
         hv = helioviewer.HelioviewerClient()
 
-        wavelnths = ['094', '131', '171', '193', '211', '304', '335', '1600', '1700']
+        wavelnths = ['1600', '1700', '094', '131', '171', '193', '211', '304', '335']
         measurement = ['continuum', 'magnetogram']
 
         for wav in wavelnths:
-            filepath = hv.download_jp2(time_in, observatory='SDO', instrument='AIA', detector='AIA', measurement=wav,
+            aia_filepath = hv.download_jp2(time_in, observatory='SDO', instrument='AIA', detector='AIA', measurement=wav,
                                        directory=save_path, overwrite=True)
 
         for measure in measurement:
-            filepath = hv.download_jp2(time_in, observatory='SDO', instrument='HMI', detector='HMI',
+            hmi_filepath = hv.download_jp2(time_in, observatory='SDO', instrument='HMI', detector='HMI',
                                        measurement=measure, directory=save_path, overwrite=True)
 
-    def get_spoca_images(self, time_start, time_end, save_dir):
+        return aia_filepath
+
+    def get_feature_images(self, time_start, time_end, save_dir):
 
         client = hek.HEKClient()
-        result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'SPoCA')
+        result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'SPoCA')  # CH and AR
+        result += client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'EGSO_SFC')  # SS
 
         times = list(set([elem["event_starttime"] for elem in result]))
         times.sort()
 
-        CH = [elem for elem in result if elem['event_type'] == 'CH']
-
-        AR = [elem for elem in result if elem['event_type'] == 'AR']
-
-        for time_in in times:
-            self.get_all_sdo_images(time_in, save_path=save_dir)
-
-    def get_sunspot_images(self, time_start, time_end, save_dir):
-
-        client = hek.HEKClient()
-        result = client.search(hek.attrs.Time(time_start, time_end), hek.attrs.FRM.Name == 'EGSO_SFC')
-
-        times = list(set([elem["event_starttime"] for elem in result]))
-        times.sort()
-
-        SS = [elem for elem in result if elem['event_type'] == 'SS']
+        ch = [elem for elem in result if elem['event_type'] == 'CH']
+        ar = [elem for elem in result if elem['event_type'] == 'AR']
+        ss = [elem for elem in result if elem['event_type'] == 'SS']
 
         for time_in in times:
-            self.get_all_sdo_images(time_in, save_path=save_dir)
+            image_file = self.get_all_sdo_images(time_in, save_path=save_dir)
+            ch_mask = self.gen_feature_mask(time_in, [elem for elem in ch if elem['event_starttime'] == time_in], image_file)
+            ar_mask = self.gen_feature_mask(time_in, [elem for elem in ar if elem['event_starttime'] == time_in], image_file)
+            ss_mask = self.gen_feature_mask(time_in, [elem for elem in ss if elem['event_starttime'] == time_in], image_file)
+
 
     def gen_date_list(self):
 
         time_between = self.tend - self.tstart
         return [self.tend - datetime.timedelta(days=dd) for dd in range(0, time_between.days + 1)]
+
+    def gen_feature_mask(self, feature_time, feature_list, image_filepath):
+
+        aia_map = Map(image_filepath)
+
+        mask = np.zeros([4096,4096])
+
+        for feature in feature_list:
+            p1 = feature["hpc_boundcc"][9:-2]
+            p2 = p1.split(',')
+            p3 = [v.split(" ") for v in p2]
+            feature_date = parse_time(feature_time)
+
+            feature_boundary = SkyCoord([(float(v[0]), float(v[1])) * u.arcsec for v in p3], obstime=feature_date,
+                                        frame=frames.Helioprojective)
+
+            pixel_contour = feature_boundary.to_pixel(aia_map.wcs)
+
+
+
+
+        return mask
+
