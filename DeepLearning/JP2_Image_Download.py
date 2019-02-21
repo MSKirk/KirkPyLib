@@ -2,12 +2,12 @@ from sunpy.net import hek, helioviewer
 from sunpy.time import parse_time
 from sunpy.coordinates import frames
 from sunpy.map import Map
-import sunpy.io.jp2
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
 import numpy as np
+from scipy.misc import imsave
 
 import datetime
 import os
@@ -82,6 +82,9 @@ class Jp2ImageDownload:
             ar_mask = self.gen_feature_mask(time_in, [elem for elem in ar if elem['event_starttime'] == time_in], image_file)
             ss_mask = self.gen_feature_mask(time_in, [elem for elem in ss if elem['event_starttime'] == time_in], image_file)
 
+            self.write_feature_mask(ch_mask, time_in, 'CH', save_path=save_dir)
+            self.write_feature_mask(ar_mask, time_in, 'AR', save_path=save_dir)
+            self.write_feature_mask(ss_mask, time_in, 'SS', save_path=save_dir)
 
     def gen_date_list(self):
 
@@ -103,10 +106,18 @@ class Jp2ImageDownload:
             feature_boundary = SkyCoord([(float(v[0]), float(v[1])) * u.arcsec for v in p3], obstime=feature_date,
                                         frame=frames.Helioprojective)
 
+            # Contour of feature
             pixel_contour = feature_boundary.to_pixel(aia_map.wcs)
-
-
-
+            mask[np.round(pixel_contour[0]).astype('int'), np.round(pixel_contour[1]).astype('int')] = True
 
         return mask
+
+    def write_feature_mask(self, mask_in, feature_time, feature_type='Mask', save_path=''):
+
+        feature_date = parse_time(feature_time)
+
+        feature_mask_name = feature_date.strftime("%Y_%m_%d__%H_%M_%S")+'__'+feature_type+'_mask.jp2'
+        save_mask_name = os.path.join(save_path, feature_mask_name)
+
+        imsave(save_mask_name, mask_in.astype('uint8'))
 
