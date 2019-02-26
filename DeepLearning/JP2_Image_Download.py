@@ -1,12 +1,14 @@
 from sunpy.net import hek, helioviewer
 from sunpy.time import parse_time
 from sunpy.coordinates import frames
-from sunpy.map import Map
+from sunpy.io import read_file_header
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+from astropy.wcs import WCS
 
 import numpy as np
+
 from imageio import imwrite
 
 import datetime
@@ -39,6 +41,7 @@ class Jp2ImageDownload:
 
         self.date_list = self.gen_date_list()
         self.date_string_list = [tt.strftime('%Y/%m/%d %H:%M:%S') for tt in self.date_list]
+        self.download_images()
 
     def download_images(self):
         """
@@ -65,7 +68,7 @@ class Jp2ImageDownload:
 
         hv = helioviewer.HelioviewerClient()
 
-        wavelnths = ['1600', '1700', '094', '131', '171', '193', '211', '304', '335']
+        wavelnths = ['1600', '1700', '094', '131', '171', '211', '304', '335', '193']
         measurement = ['continuum', 'magnetogram']
 
         for wav in wavelnths:
@@ -128,9 +131,12 @@ class Jp2ImageDownload:
         :return: binary mask of feature
         """
 
-        aia_map = Map(image_filepath)
+        aia_wcs = WCS(self.get_header(image_filepath)[0])
 
         mask = np.zeros([4096,4096])
+
+        if aia_wcs.array_shape != mask.shape:
+            raise ValueError('Mask and WCS array shapes do not agree.')
 
         # parsing boundary coordinate string for each feature
         for feature in feature_list:
@@ -143,7 +149,7 @@ class Jp2ImageDownload:
                                         frame=frames.Helioprojective)
 
             # Vertices  of feature
-            pixel_vertex = feature_boundary.to_pixel(aia_map.wcs)
+            pixel_vertex = feature_boundary.to_pixel(aia_wcs)
             mask[np.round(pixel_vertex[0]).astype('int'), np.round(pixel_vertex[1]).astype('int')] = True
 
             # Need to add in contours between vertices
@@ -168,4 +174,42 @@ class Jp2ImageDownload:
         save_mask_name = os.path.join(save_path, feature_mask_name)
 
         imwrite(save_mask_name, mask_in.astype('uint8'))
+
+    def get_header(self, filepath):
+        """
+        Reads the header from the file and sanitizes it to Fits standards.
+
+        Parameters
+        ----------
+        filepath : `str`
+            The file to be read
+
+        Returns
+        -------
+        headers : list
+            A list of headers read from the file
+        """
+
+        sunpyhead = read_file_header(filepath)
+
+        for subhead in sunpyhead:
+            # Remove newlines from comment and history
+            if 'comment' in subhead:
+                subhead['comment'] = subhead['comment'].replace("\n", "")
+            if 'history' in subhead:
+                subhead['history'] = subhead['history'].replace("\n", "")
+    
+            badkeys = []
+    
+            # dumps header keywords that are NaN
+            for key, value in subhead.items():
+                if type(value) in (int, float):
+                    if np.isnan(value):
+                        badkeys += [key]
+    
+            for key in badkeys:
+                subhead.pop(key, None)
+
+        return sunpyhead
+
 
