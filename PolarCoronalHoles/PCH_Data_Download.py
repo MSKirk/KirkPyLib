@@ -7,6 +7,9 @@ import os
 import numpy as np
 import fnmatch
 
+from bs4 import BeautifulSoup 
+from urllib import request, parse
+
 
 def aia_pch_data_download(rootpath='', waves=[171, 193, 211, 304]):
 
@@ -56,4 +59,43 @@ def aia_pch_data_download(rootpath='', waves=[171, 193, 211, 304]):
                 with open(save_dir+'/'+np.str(wave)+'NeededFileIndex_'+date_list[ii].strftime('%Y')+'.txt', 'w') as f:
                     for item in neededfileindex:
                         f.write("%s\n" % item)
+                        
+def euvi_pch_data_download(rootpath=''):
+	
+	# Crawl through and scrape the EUVI wavelet images
+	
+	url_head = 'http://sd-www.jhuapl.edu/secchi/wavelets/fits/'
 
+	resp = request.urlopen(url_head) 
+    soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+    subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]        
+    
+    url_subdir1 = [parse.urljoin(url_head, sub_dir) for sub_dir in subs]
+    
+    # Continue recursively crawling until a full list has been generated
+    for subdir1 in url_subdir1:
+    		resp = request.urlopen(subdir1) 
+    		soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+    		subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]        
+    
+    		url_subdir2 = [parse.urljoin(subdir1, sub_dir) for sub_dir in subs]
+    		    
+    		    for subdir2 in url_subdir2:
+    				resp = request.urlopen(subdir2) 
+    				soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+    				subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]        
+    
+    				url_subdir3 = [parse.urljoin(subdir2, sub_dir) for sub_dir in subs]
+    				
+    				for subdir3 in url_subdir3:
+    					resp = request.urlopen(subdir3) 
+    					soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+    					subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('.fits.gz')]        
+    
+    					image_url = [parse.urljoin(subdir3, sub_dir) for sub_dir in subs]
+    					
+    					# create a path from removing the url_head
+    					# download each image
+    
+    	
+    	.                                                 
