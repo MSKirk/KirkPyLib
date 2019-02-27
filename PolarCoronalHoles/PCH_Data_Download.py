@@ -1,93 +1,59 @@
 import astropy.units as u
 from sunpy.net import Fido, jsoc, attrs as a
+from sunpy.time import parse_time
+import datetime
+from dateutil.rrule import rrule, MONTHLY
 import os
 import numpy as np
-import random
 import fnmatch
-import time
 
 
-def aia_pch_data_download(rootpath='', waves=[171,193,304]):
+def aia_pch_data_download(rootpath='', waves=[171, 193, 211, 304]):
 
-    client = jsoc.JSOCClient()
-    blank_results = Fido.search(a.Time('2030/1/1', '2030/1/2'), a.Instrument('aia'))
+    blank_results = Fido.search(a.jsoc.Time('2030/1/1', '2030/1/2'), a.jsoc.Series('aia.lev1_euv_12s'))
+
+    base = parse_time('2010/06/01 00:00:00')
+    ending = parse_time('2019/01/01 00:00:00')
+
+    date_list = [dt for dt in rrule(MONTHLY, dtstart=base, until=ending)]
 
     for wave in waves:
+        for ii in range(0, len(date_list)-1):
 
-        if not rootpath:
-            path = os.path.abspath(os.path.curdir)
-        else:
-            path = os.path.abspath(rootpath)+'/'+np.str(wave)
+            if not rootpath:
+                save_dir = os.path.abspath(os.path.curdir)
+            else:
+                save_dir = os.path.abspath(rootpath)
 
-        results = blank_results
+            directories = np.str(wave)+date_list[ii].strftime("/%Y/%m")
+            save_path = os.path.join(save_dir, directories)
+            os.makedirs(save_path, exist_ok=True)
 
-        while len(results.table) == 0:
-            results = client.search(a.jsoc.Time('2016/1/1', '2018/6/30'), a.jsoc.Notify('michael.s.kirk@nasa.gov'),
-                                  a.jsoc.Series('aia.lev1_euv_12s'), a.jsoc.Wavelength(wave * u.angstrom),
-                                  a.Sample(3 * u.hour))
+            results = blank_results
 
-        expected_number = 7210.
-        neededfileindex = []
+            while results.file_num == 0:
+                results = Fido.search(a.jsoc.Time(date_list[ii].strftime('%Y/%m/%d'), date_list[ii+1].strftime('%Y/%m/%d')),
+                                      a.jsoc.Notify('michael.s.kirk@nasa.gov'), a.jsoc.Series('aia.lev1_euv_12s'),
+                                      a.jsoc.Wavelength(wave * u.angstrom), a.Sample(3 * u.hour))
 
-#
-#        if (len(results.table) / expected_number) > 0.98:
-#            while requests.status != 0:
-#                requests = client.request_data(results)
-#                if requests.status != 0:
-#                    time.sleep(60*5.)
+            expected_number = 9.
+            neededfileindex = []
 
+            if (results.file_num/expected_number) > 0.50:
 
-
-        if (len(results.table)/expected_number) > 0.98:
-            file_order = random.sample(range(len(results.table)), len(results.table))
-
-            for ii, file_number in enumerate(file_order):
-                downloaded_file = Fido.fetch(results[0, file_number], path=path+'/{file}')
-                print(int((ii/len(results.table))*10000.)/100.)
+                downloaded_file = Fido.fetch(results, path=save_path+'/{file}')
 
                 if not downloaded_file:
-                    print('Error in file number '+np.str(file_number))
-                    neededfileindex += [file_number]
+                    print('Error in ' + date_list[ii].strftime('%Y/%m/%d') + ' ' + np.str(wave))
+                    neededfileindex += [date_list[ii]]
 
-        if len(results.table) == len(fnmatch.filter(os.listdir(path), '*.fits')):
-            print('Download between 2016/1/1 and 2018/6/30 successful')
-        else:
-            print('Expected '+np.str(len(results.table))+' files.')
-            print('Got '+np.str(len(fnmatch.filter(os.listdir(path), '*.fits')))+' files.')
+            if results.file_num == len(fnmatch.filter(os.listdir(save_path), '*.fits')):
+                print('Download between '+date_list[ii].strftime('%Y/%m/%d')+' and ' + date_list[ii+1].strftime('%Y/%m/%d') + ' successful')
+            else:
+                print('Expected '+np.str(results.file_num)+' files.')
+                print('Got '+np.str(len(fnmatch.filter(os.listdir(save_path), '*.fits')))+' files.')
 
-            with open(path+'/'+np.str(wave)+'NeededFileIndex_16-18.txt', 'w') as f:
-                for item in neededfileindex:
-                    f.write("%s\n" % item)
+                with open(save_dir+'/'+np.str(wave)+'NeededFileIndex_'+date_list[ii].strftime('%Y')+'.txt', 'w') as f:
+                    for item in neededfileindex:
+                        f.write("%s\n" % item)
 
-        # ----------------------------------------------------
-
-        results = blank_results
-
-        while len(results.table) == 0:
-            results = client.search(a.jsoc.Time('2010/1/1', '2015/12/31'), a.jsoc.Notify('michael.s.kirk@nasa.gov'),
-                                  a.jsoc.Series('aia.lev1_euv_12s'), a.jsoc.Wavelength(wave * u.angstrom),
-                                  a.Sample(3 * u.hour))
-
-        expected_number = 16456.
-        neededfileindex = []
-
-        if (len(results.table)/expected_number) > 0.98:
-            file_order = random.sample(range(len(results.table)), len(results.table))
-
-            for ii, file_number in enumerate(file_order):
-                downloaded_file = Fido.fetch(results[0, file_number], path=path+'/{file}')
-                print(int((ii/len(results.table))*10000.)/100.)
-
-                if not downloaded_file:
-                    print('Error in file number ' + np.str(file_number))
-                    neededfileindex += [file_number]
-
-        if len(results.table) == len(fnmatch.filter(os.listdir(path), '*.fits')):
-            print('Download between 2010/1/1 and 2015/6/30 successful')
-        else:
-            print('Expected '+np.str(len(results.table))+' files.')
-            print('Got '+np.str(len(fnmatch.filter(os.listdir(path), '*.fits')))+' files.')
-
-            with open(path+'/'+np.str(wave)+'NeededFileIndex_10-15.txt', 'w') as f:
-                for item in neededfileindex:
-                    f.write("%s\n" % item)
