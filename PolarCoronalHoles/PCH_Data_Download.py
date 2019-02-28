@@ -59,7 +59,8 @@ def aia_pch_data_download(rootpath='', waves=[171, 193, 211, 304]):
                 with open(save_dir+'/'+np.str(wave)+'NeededFileIndex_'+date_list[ii].strftime('%Y')+'.txt', 'w') as f:
                     for item in neededfileindex:
                         f.write("%s\n" % item)
-                        
+
+
 def euvi_pch_data_download(rootpath=''):
     # Crawl through and scrape the EUVI wavelet images
 
@@ -70,8 +71,13 @@ def euvi_pch_data_download(rootpath=''):
     subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]        
     
     url_subdir1 = [parse.urljoin(url_head, sub_dir) for sub_dir in subs]
-    
-    # Continue recursively crawling until a full list has been generated
+
+    if not rootpath:
+        save_dir = os.path.abspath(os.path.curdir)
+    else:
+        save_dir = os.path.abspath(rootpath)
+
+    #  crawling until a full list has been generated
     for subdir1 in url_subdir1:
         resp = request.urlopen(subdir1)
         soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
@@ -87,13 +93,47 @@ def euvi_pch_data_download(rootpath=''):
             url_subdir3 = [parse.urljoin(subdir2, sub_dir) for sub_dir in subs]
 
             for subdir3 in url_subdir3:
+                subs = []
                 resp = request.urlopen(subdir3)
                 soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
-                subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('.fits.gz')]
-    
-                image_url = [parse.urljoin(subdir3, sub_dir) for sub_dir in subs]
+                subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('.fts.gz')]
 
-                return image_url
-                # create a path from removing the url_head
-    			# download each image
+                if len(subs) > 1:
+                    image_url = [parse.urljoin(subdir3, sub_dir) for sub_dir in subs]
+                    save_path = [os.path.join(save_dir, subdir3.split('fits/')[1], path) for path in subs]
+
+                    os.makedirs(os.path.join(save_dir, subdir3.split('fits/')[1]), exist_ok=True)
+
+                    image_times = [datetime_from_euvi_filename(filepath) for filepath in save_path]
+
+                    # grab every 4 hours
+                    dt = list(np.logical_not([np.mod((time - image_times[0]).seconds, 14400) for time in image_times]))
+
+                    if np.sum(dt) < 6:
+                        dt2 = list(np.logical_not([np.mod((time - image_times[1]).seconds, 14400) for time in image_times]))
+                        if len(dt2) > len(dt):
+                            dt = dt2
+
+                    # download each image
+                    for good_image, image_loc, image_destination in zip(dt, image_url, save_path):
+                        if good_image:
+                            request.urlretrieve(image_loc, image_destination)
+
+                    print('Downloaded EUVI ' + wavelength_from_euvi_filename(save_path[0]) + 'images for ' +
+                          image_times[0].strftime('%Y-%m-%d'))
+                else:
+                    print('Too few images detected in: ', subdir3)
+
+
+def datetime_from_euvi_filename(filepath):
+    basename = os.path.basename(filepath)[0:15]
+    file_time_str = basename[:4] + '-' + basename[4:6] + '-' + basename[6:8] + 'T' + basename[9:11] + ':' + \
+                    basename[11:13] + ':' + basename[13:15]
+    file_datetime = parse_time(file_time_str)
+    return file_datetime
+
+def wavelength_from_euvi_filename(filepath):
+    return os.path.basename(filepath)[16:19]
+
+
 
