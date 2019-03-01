@@ -118,7 +118,7 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
                     
                     st = [tt >= start_date for tt in image_times]
                     et = [tt <= start_date for tt in image_times]
-                    goodness = dt * st * et
+                    goodness = dt and st and et
                     
                     # download each image
                     for good_image, image_loc, image_destination in zip(goodness, image_url, save_path):
