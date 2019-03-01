@@ -65,6 +65,8 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
     # Crawl through and scrape the EUVI wavelet images
 
     url_head = 'http://sd-www.jhuapl.edu/secchi/wavelets/fits/'
+    start_date = parse_time(start_date)
+    end_date = parse_time(end_date)
 
     resp = request.urlopen(url_head)
     soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
