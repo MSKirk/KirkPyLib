@@ -61,7 +61,7 @@ def aia_pch_data_download(rootpath='', waves=[171, 193, 211, 304]):
                         f.write("%s\n" % item)
 
 
-def euvi_pch_data_download(rootpath=''):
+def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/01/01'):
     # Crawl through and scrape the EUVI wavelet images
 
     url_head = 'http://sd-www.jhuapl.edu/secchi/wavelets/fits/'
@@ -113,9 +113,13 @@ def euvi_pch_data_download(rootpath=''):
                         dt2 = list(np.logical_not([np.mod((time - image_times[1]).seconds, 14400) for time in image_times]))
                         if len(dt2) > len(dt):
                             dt = dt2
-
+                    
+                    st = [tt >= start_date for tt in image_times]
+                    et = [tt <= start_date for tt in image_times]
+                    goodness = dt * st * et
+                    
                     # download each image
-                    for good_image, image_loc, image_destination in zip(dt, image_url, save_path):
+                    for good_image, image_loc, image_destination in zip(goodness, image_url, save_path):
                         if good_image:
                             request.urlretrieve(image_loc, image_destination)
 
