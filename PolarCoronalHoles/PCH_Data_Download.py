@@ -104,8 +104,6 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
                     image_url = [parse.urljoin(subdir3, sub_dir) for sub_dir in subs]
                     save_path = [os.path.join(save_dir, subdir3.split('fits/')[1], path) for path in subs]
 
-                    os.makedirs(os.path.join(save_dir, subdir3.split('fits/')[1]), exist_ok=True)
-
                     image_times = [datetime_from_euvi_filename(filepath) for filepath in save_path]
 
                     # grab every 4 hours
@@ -120,6 +118,9 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
                     et = [tt <= end_date for tt in image_times]
                     goodness = [(aa and bb and cc) for aa, bb, cc in zip(dt,st,et)]
 
+                    if np.sum(goodness):
+                        os.makedirs(os.path.join(save_dir, subdir3.split('fits/')[1]), exist_ok=True)
+                        
                     # download each image
                     for good_image, image_loc, image_destination in zip(goodness, image_url, save_path):
                         if good_image:
