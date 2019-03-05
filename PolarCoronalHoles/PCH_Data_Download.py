@@ -72,7 +72,10 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
     soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
     subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]        
     
-    url_subdir1 = [parse.urljoin(url_head, sub_dir) for sub_dir in subs]
+    substime=[datetime.datetime.strptime(s, '%Y%m/') for s in subs]
+    gooddate = [s >= (start_date - datetime.timedelta(days=start_date.day-1)) and (s <= end_date) for s in substime]
+    
+    url_subdir1 = [parse.urljoin(url_head, sub_dir) for sub_dir, gd in zip(subs,gooddate) if gd]
 
     if not rootpath:
         save_dir = os.path.abspath(os.path.curdir)
