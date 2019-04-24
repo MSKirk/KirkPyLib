@@ -3,7 +3,7 @@ from sunpy.map import Map
 import numpy as np
 import os
 from pathlib import Path
-from PolarCoronalHoles import PCH_Tools
+import PCH_Tools
 import astropy.units as u
 from skimage import exposure, morphology, measure
 from sunpy.coordinates.utils import GreatArc
@@ -89,6 +89,8 @@ def pch_mask(mask_map, factor=0.5):
                 factor = 0.62
             if mask_map.wavelength == 304 * u.AA:
                 factor = 0.15
+            if mask_map.wavelength == 211 * u.AA:
+                factor = 0.20
         if mask_map.detector == 'EIT':
             if mask_map.wavelength == 195 * u.AA:
                 factor = 0.27

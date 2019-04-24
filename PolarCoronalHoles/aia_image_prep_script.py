@@ -20,5 +20,13 @@ def aia_prepping_script(image_files, save_files, verbose=False):
         os.makedirs(savepath, exist_ok=True)
 
         im = AIAPrep(image)
-        im.data /= eff_area.effective_area_ratio(im.header['WAVELNTH'] * u.angstrom, parse_time(im.header['DATE-OBS']))
-        im.write_prepped(save_path=savepath)
+
+        try:
+            im.data /= eff_area.effective_area_ratio(im.header['WAVELNTH'] * u.angstrom, parse_time(im.header['DATE-OBS']))
+            im.write_prepped(save_path=savepath)
+        except ValueError:
+            print('Invalid DATE-OBS... using T_OBS instead.')
+            im.data /= eff_area.effective_area_ratio(im.header['WAVELNTH'] * u.angstrom, parse_time(im.header['T_OBS']))
+            im.write_prepped(save_path=savepath)
+        except:
+            print('FITS image write error... Skipping file.')
