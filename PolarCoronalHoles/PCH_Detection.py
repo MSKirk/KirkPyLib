@@ -445,10 +445,10 @@ class PCH_Detection:
 
         # Filters for incomplete hole measurements: at least 10 points and half a harvey rotation needs to be defined
         if len(index_measurements[0]) < 10:
-            return (np.nan, np.nan, np.nan), np.array([np.nan, np.nan, np.nan])
+            return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
 
         elif self.point_detection['Harvey_Rotation'][index_measurements[0][-1]] - self.point_detection['Harvey_Rotation'][index_measurements[0][0]] < 0.5:
-            return (np.nan, np.nan, np.nan), np.array([np.nan, np.nan, np.nan])
+            return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
 
         else:
             lons = np.concatenate([self.point_detection[index_measurements]['H_StartLon'].data.data,
