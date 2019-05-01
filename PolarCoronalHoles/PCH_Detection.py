@@ -413,6 +413,7 @@ class PCH_Detection:
             area = area + [ar]
             fit = fit + [ft]
             center = center + [cm]
+        center = np.vstack([arr[0:2] for arr in center])
 
         self.point_detection['Area'] = np.asarray(area)[:, 1]
         self.point_detection['Area_min'] = np.asarray(area)[:, 0]
@@ -422,8 +423,8 @@ class PCH_Detection:
         self.point_detection['Fit_min'] = np.asarray(fit)[:, 0] * u.deg
         self.point_detection['Fit_max'] = np.asarray(fit)[:, 2] * u.deg
 
-        self.point_detection['Center_lat'] = np.asarray(center)[:, 1] * u.deg
-        self.point_detection['Center_lon'] = np.asarray(center)[:, 0] * u.deg
+        self.point_detection['Center_lat'] = center[:, 1] * u.deg
+        self.point_detection['Center_lon'] = center[:, 0] * u.deg
 
     def hole_area(self, h_rotation_number):
         # Returns the area as a fraction of the total solar surface area
@@ -443,6 +444,8 @@ class PCH_Detection:
                 self.point_detection[begin:end]['ArcLength'] < 3.0))
             northern = False
 
+        index_measurements += begin
+
         # Filters for incomplete hole measurements: at least 10 points and half a harvey rotation needs to be defined
         if len(index_measurements[0]) < 10:
             return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
@@ -451,12 +454,12 @@ class PCH_Detection:
             return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
 
         else:
-            lons = np.concatenate([self.point_detection[index_measurements]['H_StartLon'].data.data,
-                                   self.point_detection[index_measurements]['H_EndLon'].data.data]) * u.deg
-            lats = np.concatenate([self.point_detection[index_measurements]['StartLat'].data.data,
-                                   self.point_detection[index_measurements]['EndLat'].data.data]) * u.deg
-            errors = np.concatenate([np.asarray(1/self.point_detection[index_measurements]['Quality']),
-                                     np.asarray(1/self.point_detection[index_measurements]['Quality'])])
+            lons = np.concatenate(np.vstack([self.point_detection[index_measurements]['H_StartLon'].data.data,
+                                             self.point_detection[index_measurements]['H_EndLon'].data.data])) * u.deg
+            lats = np.concatenate(np.vstack([self.point_detection[index_measurements]['StartLat'].data.data,
+                                             self.point_detection[index_measurements]['EndLat'].data.data])) * u.deg
+            errors = np.concatenate(np.vstack([np.asarray(1/self.point_detection[index_measurements]['Quality']),
+                                               np.asarray(1/self.point_detection[index_measurements]['Quality'])]))
 
             perimeter_length = np.zeros(6) * u.rad
             fit_location = np.zeros(6) * u.rad
@@ -516,9 +519,9 @@ class PCH_Detection:
 
             # A sphere is 4π steradians in surface area
             if good_areas.size > 0:
-                percent_hole_area = (np.min(good_areas) / (4 * np.pi), np.mean(good_areas) / (4 * np.pi), np.max(good_areas) / (4 * np.pi))
+                percent_hole_area = (np.nanmin(good_areas) / (4 * np.pi), np.nanmean(good_areas) / (4 * np.pi), np.nanmax(good_areas) / (4 * np.pi))
                 # in degrees
-                hole_perimeter_location = (np.rad2deg(np.min(good_fits)).value, np.rad2deg(np.mean(good_fits)).value, np.rad2deg(np.max(good_fits)).value)
+                hole_perimeter_location = (np.rad2deg(np.nanmin(good_fits)).value, np.rad2deg(np.nanmean(good_fits)).value, np.rad2deg(np.nanmax(good_fits)).value)
             else:
                 percent_hole_area = (np.nan, np.nan, np.nan)
                 hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
