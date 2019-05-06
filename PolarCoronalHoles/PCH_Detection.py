@@ -555,7 +555,7 @@ class PCH_Detection:
         if write_dir == '':
             write_dir = self.dir
 
-        write_file_name = +self.detector+np.str(np.int(self.wavelength.value))+'_'+self.point_detection.meta['name']+date_string
+        write_file_name = self.detector+np.str(np.int(self.wavelength.value))+'_'+self.point_detection.meta['name']+date_string
         write_file = os.path.abspath(write_dir)+'/'+ write_file_name
 
         if format.lower() == 'votable':
