@@ -474,7 +474,7 @@ class PCH_Detection:
                 offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
 
             offset_cm = PCH_Tools.center_of_mass(offset_coords, mass=1/errors) * u.deg
-            offset_lons = np.mod(offset_coords[:, 0] * u.deg - offset_cm[0], 360)
+            offset_lons = np.mod(offset_coords[:, 0] * u.deg - offset_cm[0], 360* u.deg)
             offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
 
             for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
@@ -533,7 +533,7 @@ class PCH_Detection:
             if northern:
                 if offset_cm[1] < 0:
                     offset_cm[1] = (90 * u.deg) + offset_cm[1]
-                    offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360)
+                    offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
                 else:
                     offset_cm[1] = (90 * u.deg) - offset_cm[1]
             else:
@@ -541,7 +541,7 @@ class PCH_Detection:
                     offset_cm[1] = (-90 * u.deg) + offset_cm[1]
                 else:
                     offset_cm[1] = (-90 * u.deg) - offset_cm[1]
-                    offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360)
+                    offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
 
             # Tuples of shape (Min, Mean, Max)
             return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)

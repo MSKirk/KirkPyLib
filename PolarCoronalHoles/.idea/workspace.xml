@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../AIA-reloaded/AIA_Response.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../AIA-reloaded/test_AIA_Response.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DeNoising/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../DeNoising/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Major bug fix in hole_area, solving N/S confusion.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCH_Tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCH_series.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_series.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -27,8 +19,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="585">
-              <caret line="419" column="56" lean-forward="true" selection-start-line="419" selection-start-column="56" selection-end-line="419" selection-end-column="56" />
+            <state relative-caret-position="465">
+              <caret line="538" column="17" lean-forward="true" selection-start-line="538" selection-start-column="17" selection-end-line="538" selection-end-column="17" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -235,14 +227,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
-      <workItem from="1556732473438" duration="14817000" />
-    </task>
-    <task id="LOCAL-00042" summary="Fixed Table errors&#10;Fixed writing errors">
-      <created>1518131075791</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1518131075791</updated>
+      <workItem from="1556732473438" duration="15878000" />
     </task>
     <task id="LOCAL-00043" summary="Fixed Table errors&#10;Fixed writing errors">
       <created>1518190440536</created>
@@ -580,11 +565,18 @@
       <option name="project" value="LOCAL" />
       <updated>1557152783443</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="Major bug fix in hole_area, solving N/S confusion.">
+      <created>1557257716107</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1557257716107</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14817000" />
+    <option name="totallyTimeSpent" value="15878000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1579" y="308" width="1479" height="1027" extended-state="0" />
@@ -617,7 +609,6 @@
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Recalculating hole areas and updating fitting procedure." />
     <MESSAGE value="Adding in a zero point detection." />
     <MESSAGE value="Adding in a zero point filters." />
     <MESSAGE value="Error fix." />
@@ -642,7 +633,8 @@
     <MESSAGE value="Resample AIA images to 2048x2048" />
     <MESSAGE value="Added in Center of Mass output" />
     <MESSAGE value="Corrected file name bug in table writing." />
-    <option name="LAST_COMMIT_MESSAGE" value="Corrected file name bug in table writing." />
+    <MESSAGE value="Major bug fix in hole_area, solving N/S confusion." />
+    <option name="LAST_COMMIT_MESSAGE" value="Major bug fix in hole_area, solving N/S confusion." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_tests.py">
@@ -698,8 +690,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="585">
-          <caret line="419" column="56" lean-forward="true" selection-start-line="419" selection-start-column="56" selection-end-line="419" selection-end-column="56" />
+        <state relative-caret-position="465">
+          <caret line="538" column="17" lean-forward="true" selection-start-line="538" selection-start-column="17" selection-end-line="538" selection-end-column="17" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
