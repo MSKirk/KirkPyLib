@@ -5,6 +5,7 @@ import seaborn as sns
 import os
 import fnmatch
 from astropy.time import Time
+from astropy.table import Table
 from sunpy.time import parse_time
 import pandas as pd
 from gatspy import periodic
@@ -46,41 +47,55 @@ class PCH:
         :return: Parsed PCH data
         """
 
-        pch_obj = np.loadtxt(file_path, skiprows=3, dtype={'names': ('Harvey_Rotation', 'North_Size', 'North_Spread',
-                                                                     'South_Size', 'South_Spread', 'N_Cent_Lon',
-                                                                     'N_Cent_CoLat', 'S_Cent_Lon', 'S_Cent_CoLat'),
-                                                           'formats': ('f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f')})
+        if os.path.basename(file_path).split('.')[1] == 'txt':
+            pch_obj = np.loadtxt(file_path, skiprows=3, dtype={'names': ('Harvey_Rotation', 'North_Size', 'North_Spread',
+                                                                         'South_Size', 'South_Spread', 'N_Cent_Lon',
+                                                                         'N_Cent_CoLat', 'S_Cent_Lon', 'S_Cent_CoLat'),
+                                                               'formats': ('f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f')})
 
-        pch_obj = pd.DataFrame(data=pch_obj, index=parse_time(self.HarRot2JD(pch_obj['Harvey_Rotation'], duplicates=False)))
+            pch_obj = pd.DataFrame(data=pch_obj, index=parse_time(self.HarRot2JD(pch_obj['Harvey_Rotation'], duplicates=False)))
 
-        # Create data masks for non-measurements - less than 0 or unphysical.
-        pch_obj['North_Size'] = pch_obj['North_Size'].mask(pch_obj['North_Size'] < 0)
-        pch_obj['North_Spread'] = pch_obj['North_Spread'].mask(pch_obj['North_Size'] < 0)
-        pch_obj['N_Cent_Lon'] = pch_obj['N_Cent_Lon'].mask(pch_obj['North_Size'] < 0)
-        pch_obj['N_Cent_CoLat'] = pch_obj['N_Cent_CoLat'].mask(pch_obj['North_Size'] < 0)
+            # Create data masks for non-measurements - less than 0 or unphysical.
+            pch_obj['North_Size'] = pch_obj['North_Size'].mask(pch_obj['North_Size'] < 0)
+            pch_obj['North_Spread'] = pch_obj['North_Spread'].mask(pch_obj['North_Size'] < 0)
+            pch_obj['N_Cent_Lon'] = pch_obj['N_Cent_Lon'].mask(pch_obj['North_Size'] < 0)
+            pch_obj['N_Cent_CoLat'] = pch_obj['N_Cent_CoLat'].mask(pch_obj['North_Size'] < 0)
 
-        pch_obj['South_Size'] = pch_obj['South_Size'].mask(pch_obj['South_Size'] < 0)
-        pch_obj['South_Spread'] = pch_obj['South_Spread'].mask(pch_obj['South_Size'] < 0)
-        pch_obj['S_Cent_Lon'] = pch_obj['S_Cent_Lon'].mask(pch_obj['South_Size'] < 0)
-        pch_obj['S_Cent_CoLat'] = pch_obj['S_Cent_CoLat'].mask(pch_obj['South_Size'] < 0)
+            pch_obj['South_Size'] = pch_obj['South_Size'].mask(pch_obj['South_Size'] < 0)
+            pch_obj['South_Spread'] = pch_obj['South_Spread'].mask(pch_obj['South_Size'] < 0)
+            pch_obj['S_Cent_Lon'] = pch_obj['S_Cent_Lon'].mask(pch_obj['South_Size'] < 0)
+            pch_obj['S_Cent_CoLat'] = pch_obj['S_Cent_CoLat'].mask(pch_obj['South_Size'] < 0)
 
-        # NAN hunting - periodogram does not deal with nans so well.
+            # NAN hunting - periodogram does not deal with nans so well.
 
-        pch_obj = pch_obj.dropna(subset=['North_Size'])
+            pch_obj = pch_obj.dropna(subset=['North_Size'])
 
-        pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Spread'] = \
-            pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Size']
+            pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Spread'] = \
+                pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Size']
 
-        pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Spread'] = \
-            pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Size']
-        
-        # Adding explicit Filters for periodogram
-        name = ''
-        name = name.join(file_path.split('/')[-1].split('_Area')[0].split('_'))
-        pch_obj['Filter'] = np.repeat(name[0]+name[-4]+name[-1], pch_obj['North_Size'].size)
+            pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Spread'] = \
+                pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Size']
 
-        pch_obj['Hole_Separation'] = self.haversine(pch_obj['N_Cent_Lon'], pch_obj['N_Cent_CoLat']-90.,
-                                                    pch_obj['S_Cent_Lon'],pch_obj['S_Cent_CoLat']-90.)
+            # Adding explicit Filters for periodogram
+            name = ''
+            name = name.join(file_path.split('/')[-1].split('_Area')[0].split('_'))
+            pch_obj['Filter'] = np.repeat(name[0]+name[-4]+name[-1], pch_obj['North_Size'].size)
+
+            pch_obj['Hole_Separation'] = self.haversine(pch_obj['N_Cent_Lon'], pch_obj['N_Cent_CoLat']-90.,
+                                                        pch_obj['S_Cent_Lon'],pch_obj['S_Cent_CoLat']-90.)
+
+        if os.path.basename(file_path).split('.')[1] == 'csv':
+            table = Table(file_path, format='ascii_ecsv')
+            pch_obj = table.to_pandas()
+
+            pch_obj = pch_obj.dropna(subset=['Area'])
+            pch_obj['Filter'] = np.repeat(os.path.basename(file_path).split('_')[0], pch_obj['StartLat'].size)
+
+            # pch_obj['Hole_Separation'] = self.haversine(
+
+        else:
+            print('File type not yet supported.')
+            pch_obj = []
 
         return pch_obj
 

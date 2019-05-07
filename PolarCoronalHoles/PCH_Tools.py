@@ -219,12 +219,12 @@ def center_of_mass(coords, mass=1, distance=False):
     #
 
     if type(mass) == int:
-        mass=np.ones_like(coords[:,0])
+        mass = np.ones_like(coords[:,0])
 
     if distance:
-        mass *= np.sqrt(np.sum(coords**2,axis=1))
+        mass *= np.sqrt(np.sum(coords**2, axis=1))
 
-    mm = np.transpose(np.tile(mass, (coords.shape[1],1)))
+    mm = np.transpose(np.tile(mass, (coords.shape[1], 1)))
 
     return np.sum(coords * mm, axis=0) / np.sum(mass)
 
@@ -292,7 +292,7 @@ def hist_percent(array, fraction, number_of_bins=200):
             n = i * 1.5
             i0 = i
             if n > h:
-                n=h
+                n = h
 
     return (i*(bins[1]-bins[0])) + np.min(array)
 

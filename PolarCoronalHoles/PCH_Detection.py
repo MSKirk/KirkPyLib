@@ -408,8 +408,12 @@ class PCH_Detection:
         area = []
         fit = []
         center = []
-        for h_rot in self.point_detection['Harvey_Rotation']:
-            ar, ft, cm = self.hole_area(h_rot)
+        for ii, h_rot in enumerate(self.point_detection['Harvey_Rotation']):
+            if self.point_detection[ii]['StartLat'] > 0:
+                northern = True
+            else:
+                northern = False
+            ar, ft, cm = self.hole_area(h_rot, northern=northern)
             area = area + [ar]
             fit = fit + [ft]
             center = center + [cm]
@@ -426,23 +430,21 @@ class PCH_Detection:
         self.point_detection['Center_lat'] = center[:, 1] * u.deg
         self.point_detection['Center_lon'] = center[:, 0] * u.deg
 
-    def hole_area(self, h_rotation_number):
+    def hole_area(self, h_rotation_number, northern=True):
         # Returns the area as a fraction of the total solar surface area
         # Returns the location of the perimeter fit for the given h_rotation_number
 
         begin = np.min(np.where(self.point_detection['Harvey_Rotation'] > (h_rotation_number - 1)))
         end = np.max(np.where(self.point_detection['Harvey_Rotation'] == h_rotation_number))
 
-        if self.point_detection[end]['StartLat'] > 0:
+        if northern:
             # A northern hole with Arclength Filter for eliminating small holes but not zeros
             index_measurements = np.where((self.point_detection[begin:end]['StartLat'] > 0) & np.logical_not(
                 self.point_detection[begin:end]['ArcLength'] < 3.0))
-            northern = True
         else:
             # A southern hole with Arclength Filter for eliminating small holes
             index_measurements = np.where((self.point_detection[begin:end]['StartLat'] < 0) & np.logical_not(
                 self.point_detection[begin:end]['ArcLength'] < 3.0))
-            northern = False
 
         index_measurements += begin
 
@@ -472,7 +474,7 @@ class PCH_Detection:
                 offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
 
             offset_cm = PCH_Tools.center_of_mass(offset_coords, mass=1/errors) * u.deg
-            offset_lons = offset_coords[:, 0] * u.deg - offset_cm[0]
+            offset_lons = np.mod(offset_coords[:, 0] * u.deg - offset_cm[0], 360)
             offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
 
             for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
@@ -527,10 +529,19 @@ class PCH_Detection:
                 hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
 
             # From co-lat to lat
+
             if northern:
-                offset_cm[1] = (90 * u.deg) - offset_cm[1]
+                if offset_cm[1] < 0:
+                    offset_cm[1] = (90 * u.deg) + offset_cm[1]
+                    offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360)
+                else:
+                    offset_cm[1] = (90 * u.deg) - offset_cm[1]
             else:
-                offset_cm[1] = (90 * u.deg) + offset_cm[1]
+                if offset_cm[1] > 0:
+                    offset_cm[1] = (-90 * u.deg) + offset_cm[1]
+                else:
+                    offset_cm[1] = (-90 * u.deg) - offset_cm[1]
+                    offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360)
 
             # Tuples of shape (Min, Mean, Max)
             return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)
