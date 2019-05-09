@@ -85,11 +85,15 @@ class PCH:
                                                         pch_obj['S_Cent_Lon'],pch_obj['S_Cent_CoLat']-90.)
 
         if os.path.basename(file_path).split('.')[1] == 'csv':
-            table = Table(file_path, format='ascii_ecsv')
+            table = Table.read(file_path, format='ascii.ecsv')
             pch_obj = table.to_pandas()
 
             pch_obj = pch_obj.dropna(subset=['Area'])
             pch_obj['Filter'] = np.repeat(os.path.basename(file_path).split('_')[0], pch_obj['StartLat'].size)
+
+            datetime = [Time(ii).to_datetime() for ii in pch_obj['Date']]
+            pch_obj['DateTime'] = datetime
+            pch_obj = pch_obj.set_index('DateTime')
 
             # pch_obj['Hole_Separation'] = self.haversine(
 
@@ -192,22 +196,27 @@ class PCH:
         else:
             return north_series, south_series
 
-    def peek(self, data_key):
+    def peek(self, pch_obj):
 
         sns.set(style="darkgrid")
 
-        self.time = self.HarRot2JD(self.data_sets[data_key]['Harvey_Rotation'])
-
-        self.stack_series(data_key)
+        north = pch_obj.Area[pch_obj.StartLat > 0].resample('33D').mean()
+        south = pch_obj.Area[pch_obj.StartLat < 0].resample('33D').mean()
 
         plt.figure()
         plt.title('Polar Coronal Hole Area')
 
         plt.subplot(2,1,1)
-        ax1 = sns.tsplot(data=self.north_pch, time=self.time.mjd, value="North PCH Area")
+        plt.plot(north)
+        plt.title('Northern Polar Coronal Hole')
+        plt.ylabel('Fractional Area')
+        plt.ylim(0, 0.08)
 
         plt.subplot(2, 1, 2)
-        ax2 = sns.tsplot(data=self.south_pch, time=self.time.mjd, value="South PCH Area")
+        plt.plot(south)
+        plt.title('Southern Polar Coronal Hole')
+        plt.ylabel('Fractional Area')
+        plt.ylim(0, 0.08)
 
         plt.show()
 

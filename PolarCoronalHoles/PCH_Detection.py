@@ -34,7 +34,11 @@ A pure python version reproducing the following IDL routines:
 
 def rsun_pix(inmap):
     # Returns rsun in pixel units
-    rsun = np.array([inmap.rsun_obs.to('deg').value])
+
+    try:
+        rsun = np.array([(inmap.rsun_arcseconds * u.arcsec).to('deg').value])
+    except AttributeError:
+        rsun = np.array([inmap.rsun_obs.to('deg').value])
 
     # Fix for missing Solar Radius information from EIT
     if rsun == 0:
@@ -75,7 +79,7 @@ def pch_mask(mask_map, factor=0.5):
         # EUVI Wavelet adjustment
         if mask_map.detector == 'EUVI':
             if mask_map.wavelength > 211*u.AA:
-                   mask_map.mask = exposure.equalize_hist(mask_map.data, mask=np.logical_not(PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.wcs.wcs.crpix)))
+                   mask_map.mask = exposure.equalize_hist(mask_map.data, mask=np.logical_not(PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.data.shape - np.flip(mask_map.wcs.wcs.crpix) -1)))
             else:
                 mask_map.mask = exposure.equalize_hist(mask_map.data)
         else:
@@ -126,14 +130,14 @@ def pch_mask(mask_map, factor=0.5):
             mask_map.mask = morphology.closing(morphology.opening(mask_map.mask, selem=structelem))
 
         # Masking off limb structures and Second morphological pass...
-        mask_map.mask = morphology.opening(mask_map.mask * PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.wcs.wcs.crpix), selem=structelem)
+        mask_map.mask = morphology.opening(mask_map.mask * PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.data.shape - np.flip(mask_map.wcs.wcs.crpix)-1), selem=structelem)
 
         # Extracting holes...
         thresh = PCH_Tools.hist_percent(mask_map.mask[np.nonzero(mask_map.mask)], factor, number_of_bins=1000)
         mask_map.mask = np.where(mask_map.mask >= thresh, mask_map.mask, 0)
 
         # Extracting annulus
-        mask_map.mask[PCH_Tools.annulus_mask(mask_map.data.shape, rsun_in_pix*0.965, rsun_in_pix*0.995, center=mask_map.wcs.wcs.crpix) == False] = np.nan
+        mask_map.mask[PCH_Tools.annulus_mask(mask_map.data.shape, rsun_in_pix*0.965, rsun_in_pix*0.995, center=mask_map.data.shape - np.flip(mask_map.wcs.wcs.crpix-1)) == False] = np.nan
 
         # Filter for hole size scaled to resolution of the image
 
