@@ -119,9 +119,9 @@ def pch_mask(mask_map, factor=0.5):
 
         # Creating a kernel for the morphological transforms
         if mask_map.wavelength == 304 * u.AA:
-            structelem = morphology.disk(np.round(np.average(rsun_in_pix) * 0.007))
+            structelem = morphology.disk(np.round(np.average(rsun_in_pix * mask_map.meta['cdelt1']) * 0.007))
         else:
-            structelem = morphology.disk(np.round(np.average(rsun_in_pix) * 0.004))
+            structelem = morphology.disk(np.round(np.average(rsun_in_pix * mask_map.meta['cdelt1']) * 0.004))
 
         # First morphological pass...
         if mask_map.wavelength == 304 * u.AA:
