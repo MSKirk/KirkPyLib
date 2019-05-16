@@ -16,7 +16,7 @@ class PCH:
     def __init__(self, directory):
 
         self.directory = directory
-        self.filelist = fnmatch.filter(os.listdir(self.directory), '*Area*.txt')
+        self.filelist = fnmatch.filter(os.listdir(self.directory), '*PCH_Detections*.csv')
         self.data_sets = pd.DataFrame()  # initialize a null dictionary
         self.filter_keys = {}
 
@@ -200,20 +200,20 @@ class PCH:
 
         sns.set(style="darkgrid")
 
-        north = pch_obj.Area[pch_obj.StartLat > 0].resample('33D').mean()
-        south = pch_obj.Area[pch_obj.StartLat < 0].resample('33D').mean()
+        north = pch_obj.Area[pch_obj.StartLat > 0]
+        south = pch_obj.Area[pch_obj.StartLat < 0]
 
         plt.figure()
-        plt.title('Polar Coronal Hole Area')
+        plt.title(pch_obj.Filter[0], loc='left')
 
         plt.subplot(2,1,1)
-        plt.plot(north)
+        plt.plot(north.resample('33D').median())
         plt.title('Northern Polar Coronal Hole')
         plt.ylabel('Fractional Area')
         plt.ylim(0, 0.08)
 
         plt.subplot(2, 1, 2)
-        plt.plot(south)
+        plt.plot(south.resample('33D').median())
         plt.title('Southern Polar Coronal Hole')
         plt.ylabel('Fractional Area')
         plt.ylim(0, 0.08)
@@ -734,3 +734,17 @@ class PCH:
 
         plt.savefig('/Users/mskirk/Desktop/S_Lon_periodogram.png')
 
+def combine_pch_obj(list_of_obj):
+
+    pchobj = pd.concat(list_of_obj).sort_index()
+
+    north_area = pchobj.Area[pchobj.StartLat > 0]
+    south_area = pchobj.Area[pchobj.StartLat < 0]
+
+    north_fit = pchobj.Fit[pchobj.StartLat > 0]
+    south_fit = pchobj.Fit[pchobj.StartLat < 0]
+
+    north_centroid = pchobj[['Center_lat','Center_lon']][pchobj.StartLat > 0]
+    south_centroid = pchobj[['Center_lat','Center_lon']][pchobj.StartLat < 0]
+
+    jd_time = Time(pchobj.index.tolist(), format='datetime').jd
