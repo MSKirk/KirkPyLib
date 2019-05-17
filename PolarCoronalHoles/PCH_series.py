@@ -6,10 +6,10 @@ import os
 import fnmatch
 from astropy.time import Time
 from astropy.table import Table
-from sunpy.time import parse_time
 import pandas as pd
 from gatspy import periodic
 from scipy import signal
+from sklearn.utils import resample
 
 
 class PCH:
@@ -17,17 +17,13 @@ class PCH:
 
         self.directory = directory
         self.filelist = fnmatch.filter(os.listdir(self.directory), '*PCH_Detections*.csv')
-        self.data_sets = pd.DataFrame()  # initialize a null dictionary
-        self.filter_keys = {}
+        self.list_of_obj = []  # initialize a null list
 
         for file in self.filelist:
-            name = ''
-            name = name.join(file.split('_Area')[0].split('_'))
-            self.data_sets = pd.concat([self.data_sets, self.pch_data_parse(os.path.join(self.directory, file))])
-            self.filter_keys[name] = name[0]+name[-4]+name[-1]
+            self.list_of_obj += [self.pch_data_parse(os.path.join(self.directory, file))]
 
-        self.data_names = np.sort([k for k in self.filter_keys])
-        self.data_sets =self.data_sets.sort_index()
+        self.pch_obj = self.combine_pch_obj(self.list_of_obj)
+
 
         plt.ion()
 
@@ -47,42 +43,43 @@ class PCH:
         :return: Parsed PCH data
         """
 
-        if os.path.basename(file_path).split('.')[1] == 'txt':
-            pch_obj = np.loadtxt(file_path, skiprows=3, dtype={'names': ('Harvey_Rotation', 'North_Size', 'North_Spread',
-                                                                         'South_Size', 'South_Spread', 'N_Cent_Lon',
-                                                                         'N_Cent_CoLat', 'S_Cent_Lon', 'S_Cent_CoLat'),
-                                                               'formats': ('f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f')})
-
-            pch_obj = pd.DataFrame(data=pch_obj, index=parse_time(self.HarRot2JD(pch_obj['Harvey_Rotation'], duplicates=False)))
-
-            # Create data masks for non-measurements - less than 0 or unphysical.
-            pch_obj['North_Size'] = pch_obj['North_Size'].mask(pch_obj['North_Size'] < 0)
-            pch_obj['North_Spread'] = pch_obj['North_Spread'].mask(pch_obj['North_Size'] < 0)
-            pch_obj['N_Cent_Lon'] = pch_obj['N_Cent_Lon'].mask(pch_obj['North_Size'] < 0)
-            pch_obj['N_Cent_CoLat'] = pch_obj['N_Cent_CoLat'].mask(pch_obj['North_Size'] < 0)
-
-            pch_obj['South_Size'] = pch_obj['South_Size'].mask(pch_obj['South_Size'] < 0)
-            pch_obj['South_Spread'] = pch_obj['South_Spread'].mask(pch_obj['South_Size'] < 0)
-            pch_obj['S_Cent_Lon'] = pch_obj['S_Cent_Lon'].mask(pch_obj['South_Size'] < 0)
-            pch_obj['S_Cent_CoLat'] = pch_obj['S_Cent_CoLat'].mask(pch_obj['South_Size'] < 0)
+#        # Obsolete. Preserved for old IDL parsing.
+#        if os.path.basename(file_path).split('.')[1] == 'txt':
+#            pch_obj = np.loadtxt(file_path, skiprows=3, dtype={'names': ('Harvey_Rotation', 'North_Size', 'North_Spread',
+#                                                                         'South_Size', 'South_Spread', 'N_Cent_Lon',
+#                                                                         'N_Cent_CoLat', 'S_Cent_Lon', 'S_Cent_CoLat'),
+#                                                               'formats': ('f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f')})
+#
+#           pch_obj = pd.DataFrame(data=pch_obj, index=parse_time(self.HarRot2JD(pch_obj['Harvey_Rotation'], duplicates=False)))
+#
+#            # Create data masks for non-measurements - less than 0 or unphysical.
+#            pch_obj['North_Size'] = pch_obj['North_Size'].mask(pch_obj['North_Size'] < 0)
+#            pch_obj['North_Spread'] = pch_obj['North_Spread'].mask(pch_obj['North_Size'] < 0)
+#            pch_obj['N_Cent_Lon'] = pch_obj['N_Cent_Lon'].mask(pch_obj['North_Size'] < 0)
+#            pch_obj['N_Cent_CoLat'] = pch_obj['N_Cent_CoLat'].mask(pch_obj['North_Size'] < 0)
+#
+#            pch_obj['South_Size'] = pch_obj['South_Size'].mask(pch_obj['South_Size'] < 0)
+#            pch_obj['South_Spread'] = pch_obj['South_Spread'].mask(pch_obj['South_Size'] < 0)
+#            pch_obj['S_Cent_Lon'] = pch_obj['S_Cent_Lon'].mask(pch_obj['South_Size'] < 0)
+#            pch_obj['S_Cent_CoLat'] = pch_obj['S_Cent_CoLat'].mask(pch_obj['South_Size'] < 0)
 
             # NAN hunting - periodogram does not deal with nans so well.
-
-            pch_obj = pch_obj.dropna(subset=['North_Size'])
-
-            pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Spread'] = \
-                pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Size']
-
-            pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Spread'] = \
-                pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Size']
-
-            # Adding explicit Filters for periodogram
-            name = ''
-            name = name.join(file_path.split('/')[-1].split('_Area')[0].split('_'))
-            pch_obj['Filter'] = np.repeat(name[0]+name[-4]+name[-1], pch_obj['North_Size'].size)
-
-            pch_obj['Hole_Separation'] = self.haversine(pch_obj['N_Cent_Lon'], pch_obj['N_Cent_CoLat']-90.,
-                                                        pch_obj['S_Cent_Lon'],pch_obj['S_Cent_CoLat']-90.)
+#
+#            pch_obj = pch_obj.dropna(subset=['North_Size'])
+#
+#            pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Spread'] = \
+#                pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Size']
+#
+#            pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Spread'] = \
+#                pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Size']
+#
+#            # Adding explicit Filters for periodogram
+#            name = ''
+#            name = name.join(file_path.split('/')[-1].split('_Area')[0].split('_'))
+#            pch_obj['Filter'] = np.repeat(name[0]+name[-4]+name[-1], pch_obj['North_Size'].size)
+#
+#            pch_obj['Hole_Separation'] = self.haversine(pch_obj['N_Cent_Lon'], pch_obj['N_Cent_CoLat']-90.,
+#                                                        pch_obj['S_Cent_Lon'],pch_obj['S_Cent_CoLat']-90.)
 
         if os.path.basename(file_path).split('.')[1] == 'csv':
             table = Table.read(file_path, format='ascii.ecsv')
@@ -95,116 +92,27 @@ class PCH:
             pch_obj['DateTime'] = datetime
             pch_obj = pch_obj.set_index('DateTime')
 
-            # pch_obj['Hole_Separation'] = self.haversine(
-
         else:
             print('File type not yet supported.')
             pch_obj = []
 
         return pch_obj
 
-    def HarRot2JD(self, hr, duplicates=True):
-        """
-
-        :param hr: Harvey Rotation Number
-                    Harvey Rotations are 33 day rotations where hr = 0 ::= Jan 4, 1900
-        :return: astropy.time Time object
-        """
-
-        jd = (((hr - 1.) * 360.) / (360. / 33.)) + 2415023.5
-
-        # If duplicates = false and the time stamp repeats, add a minute to the later one - account for rounding errors.
-
-        if not duplicates:
-            for iteration, time_stamp in enumerate(jd):
-                if not np.sum(np.unique(jd, return_index=True)[1] == iteration):
-                    jd[iteration] = time_stamp+(1./(24. * 60.))
-
-        return Time(jd, format='jd')
-
-    def haversine(self, lon1, lat1, lon2, lat2, degrees=True):
-        """
-        Calculate the great circle distance between two points
-        on a sphere (default in decimal degrees)
-        """
-
-        if degrees: # convert decimal degrees to radians
-            lon1, lat1, lon2, lat2 = np.deg2rad([lon1, lat1, lon2, lat2])
-
-        # haversine formula
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
-        c = 2 * np.arcsin(np.sqrt(a))
-        r = 1  # Normalized Radius - can change this to physical units later...
-
-        if degrees:
-            return np.rad2deg(c * r)
-        else:
-            return c * r
-
     def centroid_separation(self, data_key):
 
         # convert form co-lat to lat (north & south are inverted... but it results in the same answer)
-        return self.haversine(self.data_sets[data_key]['N_Cent_Lon'], self.data_sets[data_key]['N_Cent_CoLat']-90.,
+        return haversine(self.data_sets[data_key]['N_Cent_Lon'], self.data_sets[data_key]['N_Cent_CoLat']-90.,
                               self.data_sets[data_key]['S_Cent_Lon'],self.data_sets[data_key]['S_Cent_CoLat']-90.)
 
-    def stack_series(self, data_key):
-        self.north_pch = np.stack((self.data_sets[data_key]['North_Size']-self.data_sets[data_key]['North_Spread'],
-                                self.data_sets[data_key]['North_Size'],
-                                self.data_sets[data_key]['North_Size']+self.data_sets[data_key]['North_Spread']))
-
-        self.south_pch = np.stack((self.data_sets[data_key]['South_Size'] - self.data_sets[data_key]['South_Spread'],
-                              self.data_sets[data_key]['South_Size'],
-                              self.data_sets[data_key]['South_Size'] + self.data_sets[data_key]['South_Spread']))
-    def regrid_time(self):
-        jd_time = self.HarRot2JD(self._assemble_pch_set(time_only=True))
-
-        # one step per day
-        tsteps = np.floor((jd_time.mjd[-1] - jd_time.mjd[0]))
-
-        self.time_grid = Time(np.linspace(jd_time.mjd[0], jd_time.mjd[-1], tsteps), format='mjd')
-
-    def regrid_series(self, data_key, centroid=False):
-
-        # regularize across all data sets
-
-        self.regrid_time()
-
-        north_series = np.empty_like(self.time_grid.mjd)
-        north_series[:] = np.NAN
-        south_series = np.empty_like(self.time_grid.mjd)
-        south_series[:] = np.NAN
-        center_series = np.empty_like(self.time_grid.mjd)
-        center_series[:] = np.NAN
-
-        cent_sep = self.centroid_separation(data_key)
-
-        tmp_time = self.HarRot2JD(self.data_sets[data_key]['Harvey_Rotation'])
-        for ii, time_step in enumerate(self.time_grid.mjd[:-1]):
-            north_series[ii] = np.mean(self.data_sets[data_key]['North_Size']
-                                            [(tmp_time.mjd >= self.time_grid.mjd[ii]) *
-                                             (tmp_time.mjd < self.time_grid.mjd[ii + 1])])
-            south_series[ii] = np.mean(self.data_sets[data_key]['South_Size']
-                                            [(tmp_time.mjd >= self.time_grid.mjd[ii]) *
-                                             (tmp_time.mjd < self.time_grid.mjd[ii + 1])])
-            center_series[ii] = np.mean(cent_sep[(tmp_time.mjd >= self.time_grid.mjd[ii]) *
-                                                 (tmp_time.mjd < self.time_grid.mjd[ii + 1])])
-
-        if centroid:
-            return center_series
-        else:
-            return north_series, south_series
-
-    def peek(self, pch_obj):
+    def peek(self):
 
         sns.set(style="darkgrid")
 
-        north = pch_obj.Area[pch_obj.StartLat > 0]
-        south = pch_obj.Area[pch_obj.StartLat < 0]
+        north = self.pch_obj.Area[self.pch_obj.StartLat > 0]
+        south = self.pch_obj.Area[self.pch_obj.StartLat < 0]
 
         plt.figure()
-        plt.title(pch_obj.Filter[0], loc='left')
+        plt.title(self.pch_obj.Filter[0], loc='left')
 
         plt.subplot(2,1,1)
         plt.plot(north.resample('33D').median())
@@ -219,68 +127,6 @@ class PCH:
         plt.ylim(0, 0.08)
 
         plt.show()
-
-    def _assemble_pch_set(self, time_only=False, cent_series=False):
-
-        set_size = 0
-        for kk in self.data_sets:
-            set_size += self.data_sets[kk]['Harvey_Rotation'].size
-
-        north_pch = np.zeros(set_size)
-        north_dpch = np.zeros_like(north_pch)
-        north_filts = np.empty_like(north_pch, dtype='<U3')
-        north_colat = np.zeros_like(north_pch)
-        north_lon = np.zeros_like(north_pch)
-
-        set_time = np.zeros_like(north_pch)
-        hole_separation = np.zeros_like(north_pch)
-        
-        south_pch = np.zeros_like(north_pch)
-        south_dpch = np.zeros_like(north_pch)
-        south_filts = np.empty_like(north_pch, dtype='<U3')
-        south_colat = np.zeros_like(north_pch)
-        south_lon = np.zeros_like(north_pch)
-
-
-        bookmark = 0.
-        for sets in self.data_sets:
-            north_pch[bookmark:bookmark+self.data_sets[sets]['North_Size'].size] = self.data_sets[sets]['North_Size']
-            north_dpch[bookmark:bookmark + self.data_sets[sets]['North_Spread'].size] = \
-                self.data_sets[sets]['North_Spread']
-            north_filts[bookmark:bookmark + self.data_sets[sets]['North_Size'].size] = \
-                np.repeat(self.filter_keys[sets], self.data_sets[sets]['North_Size'].size)
-            north_colat[bookmark:bookmark + self.data_sets[sets]['North_Size'].size] = \
-                self.data_sets[sets]['N_Cent_CoLat']
-            north_lon[bookmark:bookmark + self.data_sets[sets]['North_Size'].size] = \
-                self.data_sets[sets]['N_Cent_Lon']
-
-            south_pch[bookmark:bookmark+self.data_sets[sets]['South_Size'].size] = self.data_sets[sets]['South_Size']
-            south_dpch[bookmark:bookmark + self.data_sets[sets]['South_Spread'].size] = \
-                self.data_sets[sets]['South_Spread']
-            south_filts[bookmark:bookmark + self.data_sets[sets]['South_Size'].size] = \
-                np.repeat(self.filter_keys[sets], self.data_sets[sets]['South_Size'].size)
-            south_colat[bookmark:bookmark + self.data_sets[sets]['South_Size'].size] = \
-                self.data_sets[sets]['S_Cent_CoLat']
-            south_lon[bookmark:bookmark + self.data_sets[sets]['South_Size'].size] = \
-                self.data_sets[sets]['S_Cent_Lon']
-
-            hole_separation[bookmark:bookmark + self.data_sets[sets]['Harvey_Rotation'].size] = \
-                self.centroid_separation(sets)
-            set_time[bookmark:bookmark + self.data_sets[sets]['Harvey_Rotation'].size] = \
-                self.data_sets[sets]['Harvey_Rotation']
-            bookmark += self.data_sets[sets]['Harvey_Rotation'].size
-
-        new_order = np.argsort(set_time)
-
-        if time_only:
-            return set_time[new_order]
-        elif cent_series:
-            return set_time[new_order], north_colat[new_order], north_lon[new_order], north_filts[new_order], \
-                   south_colat[new_order], south_lon[new_order], south_filts[new_order], hole_separation[new_order]
-        else:
-            return set_time[new_order], north_pch[new_order], north_dpch[new_order], north_filts[new_order], \
-                   south_pch[new_order], south_dpch[new_order], south_filts[new_order]
-
 
     def area_periodogram(self):
 
@@ -734,17 +580,239 @@ class PCH:
 
         plt.savefig('/Users/mskirk/Desktop/S_Lon_periodogram.png')
 
-def combine_pch_obj(list_of_obj):
+    def combine_pch_obj(self, list_of_obj):
 
-    pchobj = pd.concat(list_of_obj).sort_index()
+        pchobj = pd.concat(list_of_obj).sort_index()
 
-    north_area = pchobj.Area[pchobj.StartLat > 0]
-    south_area = pchobj.Area[pchobj.StartLat < 0]
+        self.north_area = pchobj.Area[pchobj.StartLat > 0]
+        self.south_area = pchobj.Area[pchobj.StartLat < 0]
 
-    north_fit = pchobj.Fit[pchobj.StartLat > 0]
-    south_fit = pchobj.Fit[pchobj.StartLat < 0]
+        self.north_fit = pchobj.Fit[pchobj.StartLat > 0]
+        self.south_fit = pchobj.Fit[pchobj.StartLat < 0]
 
-    north_centroid = pchobj[['Center_lat','Center_lon']][pchobj.StartLat > 0]
-    south_centroid = pchobj[['Center_lat','Center_lon']][pchobj.StartLat < 0]
+        self.north_centroid = pchobj[['Center_lat', 'Center_lon']][pchobj.StartLat > 0]
+        self.south_centroid = pchobj[['Center_lat', 'Center_lon']][pchobj.StartLat < 0]
 
-    jd_time = Time(pchobj.index.tolist(), format='datetime').jd
+        self.jd_time = Time(pchobj.index.tolist(), format='datetime').jd
+
+        return pchobj
+
+    def confidence_series(self):
+
+        c_obj = pd.DataFrame
+
+        comb_area = pd.concat([self.pch_obj.Area[self.pch_obj.StartLat > 0], self.pch_obj.Area_max[self.pch_obj.StartLat > 0], self.pch_obj.Area_min[self.pch_obj.StartLat > 0]]).sort_index()
+        c_obj['north_area'] = series_bootstrap(comb_area, interval='11D', iterations=5000, confidence=0.95, statistic=np.nanmedian)
+
+        comb_area = pd.concat([self.pch_obj.Area[self.pch_obj.StartLat < 0], self.pch_obj.Area_max[self.pch_obj.StartLat < 0], self.pch_obj.Area_min[self.pch_obj.StartLat < 0]]).sort_index()
+        c_obj['south_area'] = series_bootstrap(comb_area, interval='11D', iterations=5000, confidence=0.95, statistic=np.nanmedian)
+
+#    def stack_series(self, data_key):
+#        self.north_pch = np.stack((self.data_sets[data_key]['North_Size']-self.data_sets[data_key]['North_Spread'],
+#                                self.data_sets[data_key]['North_Size'],
+#                                self.data_sets[data_key]['North_Size']+self.data_sets[data_key]['North_Spread']))
+#
+#        self.south_pch = np.stack((self.data_sets[data_key]['South_Size'] - self.data_sets[data_key]['South_Spread'],
+#                              self.data_sets[data_key]['South_Size'],
+#                              self.data_sets[data_key]['South_Size'] + self.data_sets[data_key]['South_Spread']))
+#    def regrid_time(self):
+#        jd_time = self.HarRot2JD(self._assemble_pch_set(time_only=True))
+#
+#        # one step per day
+#        tsteps = np.floor((jd_time.mjd[-1] - jd_time.mjd[0]))
+#
+#        self.time_grid = Time(np.linspace(jd_time.mjd[0], jd_time.mjd[-1], tsteps), format='mjd')
+#
+#    def regrid_series(self, data_key, centroid=False):
+#
+#        # regularize across all data sets
+#
+#        self.regrid_time()
+#
+#        north_series = np.empty_like(self.time_grid.mjd)
+#        north_series[:] = np.NAN
+#        south_series = np.empty_like(self.time_grid.mjd)
+#        south_series[:] = np.NAN
+#        center_series = np.empty_like(self.time_grid.mjd)
+#        center_series[:] = np.NAN
+#
+#        cent_sep = self.centroid_separation(data_key)#
+#
+#        tmp_time = self.HarRot2JD(self.data_sets[data_key]['Harvey_Rotation'])
+#        for ii, time_step in enumerate(self.time_grid.mjd[:-1]):
+#            north_series[ii] = np.mean(self.data_sets[data_key]['North_Size']
+#                                            [(tmp_time.mjd >= self.time_grid.mjd[ii]) *
+#                                             (tmp_time.mjd < self.time_grid.mjd[ii + 1])])
+#            south_series[ii] = np.mean(self.data_sets[data_key]['South_Size']
+#                                            [(tmp_time.mjd >= self.time_grid.mjd[ii]) *
+#                                             (tmp_time.mjd < self.time_grid.mjd[ii + 1])])
+#            center_series[ii] = np.mean(cent_sep[(tmp_time.mjd >= self.time_grid.mjd[ii]) *
+#                                                 (tmp_time.mjd < self.time_grid.mjd[ii + 1])])
+#
+#        if centroid:
+#            return center_series
+#        else:
+#            return north_series, south_series
+#
+#    def _assemble_pch_set(self, time_only=False, cent_series=False):
+#
+#        set_size = 0
+#        for kk in self.data_sets:
+#            set_size += self.data_sets[kk]['Harvey_Rotation'].size
+#
+#        north_pch = np.zeros(set_size)
+#        north_dpch = np.zeros_like(north_pch)
+#        north_filts = np.empty_like(north_pch, dtype='<U3')
+#        north_colat = np.zeros_like(north_pch)
+#        north_lon = np.zeros_like(north_pch)
+#
+#        set_time = np.zeros_like(north_pch)
+#        hole_separation = np.zeros_like(north_pch)
+#
+#        south_pch = np.zeros_like(north_pch)
+#        south_dpch = np.zeros_like(north_pch)
+#        south_filts = np.empty_like(north_pch, dtype='<U3')
+#        south_colat = np.zeros_like(north_pch)
+#        south_lon = np.zeros_like(north_pch)#
+#
+#
+#        bookmark = 0.
+#        for sets in self.data_sets:
+#            north_pch[bookmark:bookmark+self.data_sets[sets]['North_Size'].size] = self.data_sets[sets]['North_Size']
+#            north_dpch[bookmark:bookmark + self.data_sets[sets]['North_Spread'].size] = \
+#                self.data_sets[sets]['North_Spread']
+#            north_filts[bookmark:bookmark + self.data_sets[sets]['North_Size'].size] = \
+#                np.repeat(self.filter_keys[sets], self.data_sets[sets]['North_Size'].size)
+#            north_colat[bookmark:bookmark + self.data_sets[sets]['North_Size'].size] = \
+#                self.data_sets[sets]['N_Cent_CoLat']
+#            north_lon[bookmark:bookmark + self.data_sets[sets]['North_Size'].size] = \
+#                self.data_sets[sets]['N_Cent_Lon']
+#
+#            south_pch[bookmark:bookmark+self.data_sets[sets]['South_Size'].size] = self.data_sets[sets]['South_Size']
+#            south_dpch[bookmark:bookmark + self.data_sets[sets]['South_Spread'].size] = \
+#                self.data_sets[sets]['South_Spread']
+#            south_filts[bookmark:bookmark + self.data_sets[sets]['South_Size'].size] = \
+#                np.repeat(self.filter_keys[sets], self.data_sets[sets]['South_Size'].size)
+#            south_colat[bookmark:bookmark + self.data_sets[sets]['South_Size'].size] = \
+#                self.data_sets[sets]['S_Cent_CoLat']
+#            south_lon[bookmark:bookmark + self.data_sets[sets]['South_Size'].size] = \
+#                self.data_sets[sets]['S_Cent_Lon']
+#
+#            hole_separation[bookmark:bookmark + self.data_sets[sets]['Harvey_Rotation'].size] = \
+#                self.centroid_separation(sets)
+#            set_time[bookmark:bookmark + self.data_sets[sets]['Harvey_Rotation'].size] = \
+#                self.data_sets[sets]['Harvey_Rotation']
+#            bookmark += self.data_sets[sets]['Harvey_Rotation'].size
+#
+#        new_order = np.argsort(set_time)
+#
+#        if time_only:
+#            return set_time[new_order]
+#        elif cent_series:
+#            return set_time[new_order], north_colat[new_order], north_lon[new_order], north_filts[new_order], \
+#                   south_colat[new_order], south_lon[new_order], south_filts[new_order], hole_separation[new_order]
+#        else:
+#            return set_time[new_order], north_pch[new_order], north_dpch[new_order], north_filts[new_order], \
+#                   south_pch[new_order], south_dpch[new_order], south_filts[new_order]
+#
+
+
+def haversine(lon1, lat1, lon2, lat2, degrees=True):
+    """
+    Calculate the great circle distance between two points
+    on a sphere (default in decimal degrees)
+    """
+
+    if degrees: # convert decimal degrees to radians
+        lon1, lat1, lon2, lat2 = np.deg2rad([lon1, lat1, lon2, lat2])
+
+    # haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+    c = 2 * np.arcsin(np.sqrt(a))
+    r = 1  # Normalized Radius - can change this to physical units later...
+
+    if degrees:
+        return np.rad2deg(c * r)
+    else:
+        return c * r
+
+
+def harrot2jd(hr, duplicates=True):
+    """
+
+    :param hr: Harvey Rotation Number
+                Harvey Rotations are 33 day rotations where hr = 0 ::= Jan 4, 1900
+    :return: astropy.time Time object
+    """
+
+    jd = (((hr - 1.) * 360.) / (360. / 33.)) + 2415023.5
+
+    # If duplicates = false and the time stamp repeats, add a minute to the later one - account for rounding errors.
+
+    if not duplicates:
+        for iteration, time_stamp in enumerate(jd):
+            if not np.sum(np.unique(jd, return_index=True)[1] == iteration):
+                jd[iteration] = time_stamp+(1./(24. * 60.))
+
+    return Time(jd, format='jd')
+
+
+def bootstrap(dataset, confidence=0.95, iterations=10000, sample_size=1.0, statistic=np.mean):
+    """
+    Bootstrap the confidence intervals for a given sample of a population
+    and a statistic.
+    Args:
+        dataset: A list of values, each a sample from an unknown population
+        confidence: The confidence value (a float between 0 and 1.0)
+        iterations: The number of iterations of resampling to perform
+        sample_size: The sample size for each of the resampled (0 to 1.0
+                     for 0 to 100% of the original data size)
+        statistic: The statistic to use. This must be a function that accepts
+                   a list of values and returns a single value.
+    Returns:
+        Returns the upper and lower values of the confidence interval.
+    """
+    stats = list()
+    n_size = int(len(dataset) * sample_size)
+
+    for _ in range(iterations):
+        # Sample (with replacement) from the given dataset
+        sample = resample(dataset, n_samples=n_size)
+        # Calculate user-defined statistic and store it
+        stat = statistic(sample)
+        stats.append(stat)
+
+    # Sort the array of per-sample statistics and cut off ends
+    ostats = sorted(stats)
+    lval = np.percentile(ostats, ((1 - confidence) / 2) * 100)
+    uval = np.percentile(ostats, (confidence + ((1 - confidence) / 2)) * 100)
+
+    return lval, uval
+
+
+def series_bootstrap(series, interval='1D', statistic=np.median, **kwargs):
+    ci = pd.DataFrame(index=series.index, columns=['lower', 'upper'])
+    groups = list()
+    lower = list()
+    upper = list()
+
+    for g, data in series.groupby(series.index.floor(interval)):
+        groups.append(g)
+
+        low, high = bootstrap(data.values, **kwargs)
+        if np.isfinite(low):
+            lower.append(low)
+        else:
+            lower.append(statistic(data.values))
+        if np.isfinite(high):
+            upper.append(high)
+        else:
+            upper.append(statistic(data.values))
+
+    for ii in range(len(groups)-2):
+        ci.loc[groups[ii]:groups[ii + 1], 'lower'] = lower[ii]
+        ci.loc[groups[ii]:groups[ii + 1], 'upper'] = upper[ii]
+
+    return ci
