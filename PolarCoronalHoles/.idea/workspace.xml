@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Bug fix in structure element calculation.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Adding bootstrap confidence intervals.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_series.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_series.py" afterDir="false" />
     </list>
@@ -43,7 +43,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
+            <state relative-caret-position="195">
               <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
               <folding>
                 <element signature="e#0#54#0" expanded="true" />
@@ -55,8 +55,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_series.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="18" column="90" lean-forward="true" selection-start-line="18" selection-start-column="90" selection-end-line="18" selection-end-column="90" />
+            <state relative-caret-position="1390">
+              <caret line="690" column="71" lean-forward="true" selection-start-line="690" selection-start-column="71" selection-end-line="691" selection-end-column="71" />
               <folding>
                 <element signature="e#1#19#0" expanded="true" />
               </folding>
@@ -115,6 +115,9 @@
       <find>filter</find>
       <find>Filter</find>
       <find>['Filter']</find>
+      <find>pch.pch_obj</find>
+      <find>Area</find>
+      <find>lat</find>
     </findStrings>
     <replaceStrings>
       <replace>mask_map.</replace>
@@ -125,6 +128,9 @@
       <replace>wave</replace>
       <replace>len(results.table)</replace>
       <replace>[head_loc]</replace>
+      <replace>self.pch_obj</replace>
+      <replace>Fit</replace>
+      <replace>lon</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -228,21 +234,7 @@
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
       <workItem from="1556732473438" duration="25965000" />
-      <workItem from="1557856673793" duration="4125000" />
-    </task>
-    <task id="LOCAL-00046" summary="Progress toward hole area">
-      <created>1523053416774</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1523053416774</updated>
-    </task>
-    <task id="LOCAL-00047" summary="Progress toward hole area">
-      <created>1525123117426</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1525123117426</updated>
+      <workItem from="1557856673793" duration="19445000" />
     </task>
     <task id="LOCAL-00048" summary="Progress toward hole area">
       <created>1525359952603</created>
@@ -573,11 +565,25 @@
       <option name="project" value="LOCAL" />
       <updated>1557433216292</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="Plotting revised for new table format.">
+      <created>1558023411989</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1558023411990</updated>
+    </task>
+    <task id="LOCAL-00096" summary="Adding bootstrap confidence intervals.">
+      <created>1558129420300</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1558129420300</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="30090000" />
+    <option name="totallyTimeSpent" value="45410000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1585" y="308" width="1479" height="1027" extended-state="0" />
@@ -610,8 +616,6 @@
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Center of Mass offset to better aid sine fitting routine." />
-    <MESSAGE value="Error handling for curve fitting routine." />
     <MESSAGE value="Adding in Harvey Longitude" />
     <MESSAGE value="Adapting Table to work with ecsv and hdf save formats." />
     <MESSAGE value="Adding save formats." />
@@ -635,7 +639,9 @@
     <MESSAGE value="Units bug fix." />
     <MESSAGE value="Rsun Bug fix for EUVI." />
     <MESSAGE value="Bug fix in structure element calculation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug fix in structure element calculation." />
+    <MESSAGE value="Plotting revised for new table format." />
+    <MESSAGE value="Adding bootstrap confidence intervals." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding bootstrap confidence intervals." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
@@ -644,16 +650,6 @@
           <caret line="16" selection-start-line="16" selection-end-line="16" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#54#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -689,10 +685,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="90" lean-forward="true" selection-start-line="18" selection-start-column="90" selection-end-line="18" selection-end-column="90" />
+        <state relative-caret-position="1390">
+          <caret line="690" column="71" lean-forward="true" selection-start-line="690" selection-start-column="71" selection-end-line="691" selection-end-column="71" />
           <folding>
             <element signature="e#1#19#0" expanded="true" />
           </folding>

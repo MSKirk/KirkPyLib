@@ -597,15 +597,95 @@ class PCH:
 
         return pchobj
 
-    def confidence_series(self):
+    def confidence_obj(self, confidence=0.95, interval='11D'):
 
-        c_obj = pd.DataFrame
+        c_obj = pd.DataFrame(index=self.pch_obj.resample(interval).mean().index, columns=['north_area_high', 'north_area_low', 'south_area_high',
+                                                                'south_area_low', 'north_fit_high', 'north_fit_low',
+                                                                'south_fit_high', 'south_fit_low', 'north_CentLat_high',
+                                                                'north_CentLat_low', 'south_CentLat_high',
+                                                                'south_CentLat_low', 'north_CentLon_high',
+                                                                'north_CentLon_low', 'south_CentLon_high',
+                                                                'south_CentLon_low'])
 
-        comb_area = pd.concat([self.pch_obj.Area[self.pch_obj.StartLat > 0], self.pch_obj.Area_max[self.pch_obj.StartLat > 0], self.pch_obj.Area_min[self.pch_obj.StartLat > 0]]).sort_index()
-        c_obj['north_area'] = series_bootstrap(comb_area, interval='11D', iterations=5000, confidence=0.95, statistic=np.nanmedian)
+        # ------- North Area ---------
+        comb = pd.concat([self.pch_obj.Area[self.pch_obj.StartLat > 0], self.pch_obj.Area_max[self.pch_obj.StartLat > 0], self.pch_obj.Area_min[self.pch_obj.StartLat > 0]]).sort_index()
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
-        comb_area = pd.concat([self.pch_obj.Area[self.pch_obj.StartLat < 0], self.pch_obj.Area_max[self.pch_obj.StartLat < 0], self.pch_obj.Area_min[self.pch_obj.StartLat < 0]]).sort_index()
-        c_obj['south_area'] = series_bootstrap(comb_area, interval='11D', iterations=5000, confidence=0.95, statistic=np.nanmedian)
+        ci.lower = ci.lower.fillna(value=comb)
+        ci.upper = ci.upper.fillna(value=comb)
+
+        c_obj['north_area_high'] = ci.upper.resample(interval).mean()
+        c_obj['north_area_low'] = ci.lower.resample(interval).mean()
+
+        # ------- South Area ---------
+        comb = pd.concat([self.pch_obj.Area[self.pch_obj.StartLat < 0], self.pch_obj.Area_max[self.pch_obj.StartLat < 0], self.pch_obj.Area_min[self.pch_obj.StartLat < 0]]).sort_index()
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
+
+        ci.lower = ci.lower.fillna(value=comb)
+        ci.upper = ci.upper.fillna(value=comb)
+
+        c_obj['south_area_high'] = ci.upper.resample(interval).mean()
+        c_obj['south_area_low'] = ci.lower.resample(interval).mean()
+
+        # ------- North Perimeter Fit ---------
+        comb = pd.concat([self.pch_obj.Fit[self.pch_obj.StartLat > 0], self.pch_obj.Fit_max[self.pch_obj.StartLat > 0], self.pch_obj.Fit_min[self.pch_obj.StartLat > 0]]).sort_index()
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
+
+        ci.lower = ci.lower.fillna(value=comb)
+        ci.upper = ci.upper.fillna(value=comb)
+
+        c_obj['north_fit_high'] = ci.upper.resample(interval).mean()
+        c_obj['north_fit_low'] = ci.lower.resample(interval).mean()
+
+        # ------- South Perimeter Fit ---------
+        comb = pd.concat([self.pch_obj.Fit[self.pch_obj.StartLat < 0], self.pch_obj.Fit_max[self.pch_obj.StartLat < 0], self.pch_obj.Fit_min[self.pch_obj.StartLat < 0]]).sort_index()
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
+
+        ci.lower = ci.lower.fillna(value=comb)
+        ci.upper = ci.upper.fillna(value=comb)
+
+        c_obj['south_fit_high'] = ci.upper.resample(interval).mean()
+        c_obj['south_fit_low'] = ci.lower.resample(interval).mean()
+
+        # ------- North Centroid Lat ---------
+
+        ci = series_bootstrap(self.pch_obj.Center_lat[self.pch_obj.StartLat > 0], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
+
+        ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lat[self.pch_obj.StartLat > 0])
+        ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lat[self.pch_obj.StartLat > 0])
+
+        c_obj['north_CentLat_high'] = ci.upper.resample(interval).mean()
+        c_obj['north_CentLat_low'] = ci.lower.resample(interval).mean()
+
+        # ------- South Centroid Lat---------
+        ci = series_bootstrap(self.pch_obj.Center_lat[self.pch_obj.StartLat < 0], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
+
+        ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lat[self.pch_obj.StartLat < 0])
+        ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lat[self.pch_obj.StartLat < 0])
+
+        c_obj['south_CentLat_high'] = ci.upper.resample(interval).mean()
+        c_obj['south_CentLat_low'] = ci.lower.resample(interval).mean()
+
+        # ------- North Centroid Lon ---------
+
+        ci = series_bootstrap(self.pch_obj.Center_lon[self.pch_obj.StartLon > 0], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
+
+        ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lon[self.pch_obj.StartLon > 0])
+        ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lon[self.pch_obj.StartLon > 0])
+
+        c_obj['north_CentLon_high'] = ci.upper.resample(interval).mean()
+        c_obj['north_CentLon_low'] = ci.lower.resample(interval).mean()
+
+        # ------- South Centroid Lon---------
+        ci = series_bootstrap(self.pch_obj.Center_lon[self.pch_obj.StartLon < 0], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
+
+        ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lon[self.pch_obj.StartLon < 0])
+        ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lon[self.pch_obj.StartLon < 0])
+
+        c_obj['south_CentLon_high'] = ci.upper.resample(interval).mean()
+        c_obj['south_CentLon_low'] = ci.lower.resample(interval).mean()
+
+        self.confidence = c_obj
 
 #    def stack_series(self, data_key):
 #        self.north_pch = np.stack((self.data_sets[data_key]['North_Size']-self.data_sets[data_key]['North_Spread'],
