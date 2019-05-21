@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Adding bootstrap confidence intervals.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Switching to the median as a statistic. Less sensitive to outliers.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_series.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_series.py" afterDir="false" />
     </list>
@@ -55,8 +55,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_series.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1390">
-              <caret line="690" column="71" lean-forward="true" selection-start-line="690" selection-start-column="71" selection-end-line="691" selection-end-column="71" />
+            <state relative-caret-position="624">
+              <caret line="718" lean-forward="true" selection-start-line="718" selection-end-line="718" />
               <folding>
                 <element signature="e#1#19#0" expanded="true" />
               </folding>
@@ -118,6 +118,11 @@
       <find>pch.pch_obj</find>
       <find>Area</find>
       <find>lat</find>
+      <find>.mean()</find>
+      <find>mean</find>
+      <find>self.pch_obj.StartLat &gt; 0</find>
+      <find>[self.pch_obj.StartLat &gt; 0]</find>
+      <find>[self.pch_obj.StartLon &gt; 0]</find>
     </findStrings>
     <replaceStrings>
       <replace>mask_map.</replace>
@@ -131,6 +136,8 @@
       <replace>self.pch_obj</replace>
       <replace>Fit</replace>
       <replace>lon</replace>
+      <replace>.median()</replace>
+      <replace>[self.northern]</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -234,21 +241,7 @@
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
       <workItem from="1556732473438" duration="25965000" />
-      <workItem from="1557856673793" duration="19445000" />
-    </task>
-    <task id="LOCAL-00048" summary="Progress toward hole area">
-      <created>1525359952603</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1525359952603</updated>
-    </task>
-    <task id="LOCAL-00049" summary="Implementing the hole area calculation.">
-      <created>1526330104106</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1526330104106</updated>
+      <workItem from="1557856673793" duration="29927000" />
     </task>
     <task id="LOCAL-00050" summary="Implementing the hole area calculation.">
       <created>1526663633086</created>
@@ -579,11 +572,25 @@
       <option name="project" value="LOCAL" />
       <updated>1558129420300</updated>
     </task>
-    <option name="localTasksCounter" value="97" />
+    <task id="LOCAL-00097" summary="Create a dataframe with bootstrapped confidence intervals.">
+      <created>1558382078752</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1558382078752</updated>
+    </task>
+    <task id="LOCAL-00098" summary="Switching to the median as a statistic. Less sensitive to outliers.">
+      <created>1558385389368</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1558385389368</updated>
+    </task>
+    <option name="localTasksCounter" value="99" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45410000" />
+    <option name="totallyTimeSpent" value="55892000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1585" y="308" width="1479" height="1027" extended-state="0" />
@@ -616,8 +623,6 @@
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding in Harvey Longitude" />
-    <MESSAGE value="Adapting Table to work with ecsv and hdf save formats." />
     <MESSAGE value="Adding save formats." />
     <MESSAGE value="Fixed memory leak." />
     <MESSAGE value="Fixed Saving bugs." />
@@ -641,7 +646,9 @@
     <MESSAGE value="Bug fix in structure element calculation." />
     <MESSAGE value="Plotting revised for new table format." />
     <MESSAGE value="Adding bootstrap confidence intervals." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding bootstrap confidence intervals." />
+    <MESSAGE value="Create a dataframe with bootstrapped confidence intervals." />
+    <MESSAGE value="Switching to the median as a statistic. Less sensitive to outliers." />
+    <option name="LAST_COMMIT_MESSAGE" value="Switching to the median as a statistic. Less sensitive to outliers." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
@@ -697,8 +704,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1390">
-          <caret line="690" column="71" lean-forward="true" selection-start-line="690" selection-start-column="71" selection-end-line="691" selection-end-column="71" />
+        <state relative-caret-position="624">
+          <caret line="718" lean-forward="true" selection-start-line="718" selection-end-line="718" />
           <folding>
             <element signature="e#1#19#0" expanded="true" />
           </folding>
