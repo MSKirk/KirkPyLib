@@ -709,7 +709,7 @@ class PCH:
 
         afrl_table['North Lat'] = self.pch_obj.Fit[northern].resample(interval).median()[errors.index[0]: errors.index[-1]]
         afrl_table['South Lat'] = self.pch_obj.Fit[southern].resample(interval).median()[errors.index[0]: errors.index[-1]]
-        afrl_table['North Lat CI Low'] = errors.north_fit_low.values, errors.north_fit_high.values
+        afrl_table['North Lat CI Low'] = errors.north_fit_low.values
         afrl_table['North Lat CI High'] = errors.north_fit_high.values
         afrl_table['South Lat CI Low'] = errors.south_fit_low.values
         afrl_table['South Lat CI High'] = errors.south_fit_high.values
