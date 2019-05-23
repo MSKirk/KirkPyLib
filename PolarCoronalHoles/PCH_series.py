@@ -604,7 +604,7 @@ class PCH:
 
         return pchobj
 
-    def confidence_obj(self, confidence=0.98, interval='11D', sample_size=0.05):
+    def confidence_obj(self, confidence=0.98, interval='11D'):
 
         c_obj = pd.DataFrame(index=self.pch_obj.resample(interval).median().index, columns=['north_area_high', 'north_area_low', 'south_area_high',
                                                                 'south_area_low', 'north_fit_high', 'north_fit_low',
@@ -616,7 +616,7 @@ class PCH:
 
         # ------- North Area ---------
         comb = pd.concat([self.pch_obj.Area[self.northern], self.pch_obj.Area_max[self.northern], self.pch_obj.Area_min[self.northern]]).sort_index()
-        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=comb)
         ci.upper = ci.upper.fillna(value=comb)
@@ -626,7 +626,7 @@ class PCH:
 
         # ------- South Area ---------
         comb = pd.concat([self.pch_obj.Area[self.southern], self.pch_obj.Area_max[self.southern], self.pch_obj.Area_min[self.southern]]).sort_index()
-        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=comb)
         ci.upper = ci.upper.fillna(value=comb)
@@ -636,7 +636,7 @@ class PCH:
 
         # ------- North Perimeter Fit ---------
         comb = pd.concat([self.pch_obj.Fit[self.northern], self.pch_obj.Fit_max[self.northern], self.pch_obj.Fit_min[self.northern]]).sort_index()
-        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=comb)
         ci.upper = ci.upper.fillna(value=comb)
@@ -646,7 +646,7 @@ class PCH:
 
         # ------- South Perimeter Fit ---------
         comb = pd.concat([self.pch_obj.Fit[self.southern], self.pch_obj.Fit_max[self.southern], self.pch_obj.Fit_min[self.southern]]).sort_index()
-        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(comb, interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=comb)
         ci.upper = ci.upper.fillna(value=comb)
@@ -656,7 +656,7 @@ class PCH:
 
         # ------- North Centroid Lat ---------
 
-        ci = series_bootstrap(self.pch_obj.Center_lat[self.northern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(self.pch_obj.Center_lat[self.northern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lat[self.northern])
         ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lat[self.northern])
@@ -665,7 +665,7 @@ class PCH:
         c_obj['north_CentLat_low'] = ci.lower.resample(interval).median()
 
         # ------- South Centroid Lat---------
-        ci = series_bootstrap(self.pch_obj.Center_lat[self.southern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(self.pch_obj.Center_lat[self.southern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lat[self.southern])
         ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lat[self.southern])
@@ -675,7 +675,7 @@ class PCH:
 
         # ------- North Centroid Lon ---------
 
-        ci = series_bootstrap(self.pch_obj.Center_lon[self.northern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(self.pch_obj.Center_lon[self.northern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lon[self.northern])
         ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lon[self.northern])
@@ -684,7 +684,7 @@ class PCH:
         c_obj['north_CentLon_low'] = ci.lower.resample(interval).median()
 
         # ------- South Centroid Lon---------
-        ci = series_bootstrap(self.pch_obj.Center_lon[self.southern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian, sample_size=sample_size)
+        ci = series_bootstrap(self.pch_obj.Center_lon[self.southern], interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian)
 
         ci.lower = ci.lower.fillna(value=self.pch_obj.Center_lon[self.southern])
         ci.upper = ci.upper.fillna(value=self.pch_obj.Center_lon[self.southern])
@@ -874,7 +874,7 @@ def harrot2jd(hr, duplicates=True):
     return Time(jd, format='jd')
 
 
-def bootstrap(dataset, confidence=0.95, iterations=10000, sample_size=1.0, statistic=np.mean):
+def bootstrap(dataset, confidence=0.95, iterations=10000, sample_size=None, statistic=np.median):
     """
     Bootstrap the confidence intervals for a given sample of a population
     and a statistic.
@@ -893,6 +893,8 @@ def bootstrap(dataset, confidence=0.95, iterations=10000, sample_size=1.0, stati
         Open Journal of Statistics, Vol.07 No.03(2017), Article ID:76758,17 pages, 10.4236/ojs.2017.73029
     """
     stats = list()
+    if not sample_size:
+        sample_size = 1 / np.sqrt(len(dataset))
     n_size = int(len(dataset) * sample_size)
 
     for _ in range(iterations):
@@ -919,7 +921,8 @@ def series_bootstrap(series, interval='1D', statistic=np.median, **kwargs):
     for g, data in series.groupby(series.index.floor(interval)):
         groups.append(g)
 
-        low, high = bootstrap(data.values, **kwargs)
+        low, high = bootstrap(data.values, statistic=statistic, **kwargs)
+
         if np.isfinite(low):
             lower.append(low)
         else:
