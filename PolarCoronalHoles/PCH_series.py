@@ -709,13 +709,18 @@ class PCH:
 
         afrl_table['North Lat'] = self.pch_obj.Fit[northern].resample(interval).median()[errors.index[0]: errors.index[-1]]
         afrl_table['South Lat'] = self.pch_obj.Fit[southern].resample(interval).median()[errors.index[0]: errors.index[-1]]
-        afrl_table['North Lat CI'] = list(zip(errors.north_fit_low.values, errors.north_fit_high.values))
-        afrl_table['South Lat CI'] = list(zip(errors.south_fit_low.values, errors.south_fit_high.values))
+        afrl_table['North Lat CI Low'] = errors.north_fit_low.values, errors.north_fit_high.values
+        afrl_table['North Lat CI High'] = errors.north_fit_high.values
+        afrl_table['South Lat CI Low'] = errors.south_fit_low.values
+        afrl_table['South Lat CI High'] = errors.south_fit_high.values
+
 
         afrl_table['North Area'] = self.pch_obj.Area[northern].resample(interval).median()[errors.index[0]: errors.index[-1]]
         afrl_table['South Area'] = self.pch_obj.Area[southern].resample(interval).median()[errors.index[0]: errors.index[-1]]
-        afrl_table['North Area CI'] = list(zip(errors.north_area_low.values, errors.north_area_high.values))
-        afrl_table['South Area CI'] = list(zip(errors.south_area_low.values, errors.south_area_high.values))
+        afrl_table['North Area CI Low'] = errors.north_area_low.values
+        afrl_table['North Area CI High'] = errors.north_area_high.values
+        afrl_table['South Area CI Low'] = errors.south_area_low.values
+        afrl_table['South Area CI High'] = errors.south_area_high.values
 
         write_file = os.path.join(os.path.abspath(save_dir), 'PolarCH_Table.ecsv')
 
