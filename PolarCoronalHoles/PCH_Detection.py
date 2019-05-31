@@ -77,7 +77,8 @@ def pch_mask(mask_map, factor=0.5):
         rsun_in_pix = rsun_pix(mask_map)
 
         # EUVI Wavelet adjustment
-        if mask_map.detector == 'EUVI':
+        # Give EIT some Love.
+        if mask_map.detector in ['EUVI', 'EIT']:
             if mask_map.wavelength > 211*u.AA:
                    mask_map.mask = exposure.equalize_hist(mask_map.data, mask=np.logical_not(PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.data.shape - np.flip(mask_map.wcs.wcs.crpix) -1)))
             else:
