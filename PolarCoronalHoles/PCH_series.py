@@ -4,13 +4,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import fnmatch
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 from astropy.table import Table
+import astropy.units as u
 import pandas as pd
 from gatspy import periodic
 from scipy import signal
 from sklearn.utils import resample
-
+import scipy.signal as sg
+from datetime import datetime
+from multiprocessing import Pool
 
 class PCH:
     def __init__(self, directory, interval='11D'):
@@ -354,7 +357,6 @@ class PCH:
 
         plt.savefig('/Users/mskirk/Desktop/PCH_Separation_periodogram.png')
 
-
     def N_Cent_periodogram(self):
         set_time, north_colat, north_lon, north_filts, south_colat, south_lon, south_filts, hole_separation = \
             self._assemble_pch_set(cent_series=True)
@@ -475,7 +477,7 @@ class PCH:
         set_time, north_colat, north_lon, north_filts, south_colat, south_lon, south_filts, hole_separation = \
             self._assemble_pch_set(cent_series=True)
 
-        jd_time = self.HarRot2JD(set_time)
+        jd_time = HarRot2JD(set_time)
 
         # Complete the LS for each data set, nyquist freq is 66 days
         periods = np.linspace(1, 900, 9000)
@@ -693,6 +695,23 @@ class PCH:
         c_obj['south_CentLon_low'] = ci.lower.resample(interval).median()
 
         self.confidence = c_obj
+
+    def confidence_obj_parallel(self, confidence=0.98, interval='11D'):
+
+        c_obj = pd.DataFrame(index=self.pch_obj.resample(interval).median().index, columns=['north_area_high', 'north_area_low', 'south_area_high',
+                                                                'south_area_low', 'north_fit_high', 'north_fit_low',
+                                                                'south_fit_high', 'south_fit_low', 'north_CentLat_high',
+                                                                'north_CentLat_low', 'south_CentLat_high',
+                                                                'south_CentLat_low', 'north_CentLon_high',
+                                                                'north_CentLon_low', 'south_CentLon_high',
+                                                                'south_CentLon_low'])
+
+        pool = Pool()
+
+        # params = [interval=interval, iterations=5000, confidence=confidence, statistic=np.nanmedian]
+
+        # n_area_args = [pd.concat([self.pch_obj.Area[self.northern], self.pch_obj.Area_max[self.northern], self.pch_obj.Area_min[self.northern]]).sort_index(), ]
+
 
     def make_afrl_table(self, save_dir='', interval='1D'):
 
@@ -942,3 +961,59 @@ def series_bootstrap(series, interval='1D', statistic=np.median, **kwargs):
         ci.loc[groups[ii]:groups[ii + 1], 'upper'] = upper[ii]
 
     return ci
+
+
+def read_wso_data(filename):
+    raw_wso = pd.read_csv(filename, sep='\s+', header=0)
+
+    wso = pd.DataFrame(index=pd.Series([datetime.strptime(dd, '%Y:%m:%d_%Hh:%Mm:%Ss') for dd in raw_wso.Date]))
+
+    wso['North'] = pd.to_numeric(raw_wso.North.str.replace('N', '')).values
+    wso['South'] = pd.to_numeric(raw_wso.South.str.replace('S', '')).values
+    wso['Average'] = pd.to_numeric(raw_wso.Avg.str.replace('Avg', '')).values
+    wso['NorthFilter'] = pd.to_numeric(raw_wso.N_filt.str.replace('Nf', '')).values
+    wso['SouthFilter'] = pd.to_numeric(raw_wso.S_filt.str.replace('Sf', '')).values
+    wso['AverageFilter'] = pd.to_numeric(raw_wso.Avg_filt.str.replace('Avgf', '')).values
+
+    # The data is already reported at a 10 Day cadence, this just tells pandas about it
+    return wso.resample('10D').mean()
+
+
+def year_butter_filter(series, period_low=0.82, period_high=1.1, filter_type='bandstop', Series=False, show_spectrum=False):
+
+    # peroids low and high are in years
+    # pd series must have a consistent frequency defined
+
+    fs = 1/TimeDelta(series.index.freq.delta).to(u.yr)
+
+    b, a = sg.butter(6, [period_low, period_high], btype=filter_type, fs=fs.value)
+
+    if show_spectrum:
+        f, Pxx_spec = signal.periodogram(sg.filtfilt(b, a, series.interpolate('linear')), fs.value, 'flattop', scaling='spectrum')
+        plt.semilogy(f, np.sqrt(Pxx_spec))
+        plt.show()
+
+    if Series:
+        return pd.Series(sg.filtfilt(b, a, series.interpolate('linear')), index=series.index)
+
+    return sg.filtfilt(b, a, series.interpolate('linear'))
+
+def low_butter_filter(series, period_low=0.82, filter_type='bandpass', Series=False, show_spectrum=False):
+
+    # low pass filter
+    # peroids low are in years
+    # pd series must have a consistent frequency defined
+
+    fs = 1/TimeDelta(series.index.freq.delta).to(u.yr)
+
+    b, a = sg.butter(6, period_low, btype=filter_type, fs=fs.value)
+
+    if show_spectrum:
+        f, Pxx_spec = signal.periodogram(sg.filtfilt(b, a, series.interpolate('linear')), fs.value, 'flattop', scaling='spectrum')
+        plt.semilogy(f, np.sqrt(Pxx_spec))
+        plt.show()
+
+    if Series:
+        return pd.Series(sg.filtfilt(b, a, series.interpolate('linear')), index=series.index)
+
+    return sg.filtfilt(b, a, series.interpolate('linear'))
