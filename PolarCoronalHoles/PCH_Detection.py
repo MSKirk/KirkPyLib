@@ -7,6 +7,7 @@ import PCH_Tools
 import astropy.units as u
 from skimage import exposure, morphology, measure
 from sunpy.coordinates.utils import GreatArc
+from sunpy.coordinates.ephemeris import get_horizons_coord
 from astropy.table import Table, join
 from astropy.time import Time
 from astropy.coordinates import Longitude
@@ -151,6 +152,16 @@ def pch_mask(mask_map, factor=0.5):
             regions[np.where(regions >= 1)] = 1
         mask_map.mask = np.logical_not(regions)
 
+    # Explicity replacing the ephemeris of SOHO maps (can add other observatories if needed)
+    if mask_map.observatory in ['SOHO']:
+        new_coords = get_horizons_coord(mask_map.observatory.replace(' ', '-'), mask_map.date)
+        mask_map.meta['HGLN_OBS'] = new_coords.lon.to('deg').value
+        mask_map.meta['HGLT_OBS'] = new_coords.lat.to('deg').value
+        mask_map.meta['DSUN_OBS'] = new_coords.radius.to('m').value
+
+        mask_map.meta.pop('hec_x')
+        mask_map.meta.pop('hec_y')
+        mask_map.meta.pop('hec_z')
 
 def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
     # hole_start and hole_end are tuples of (lat, lon)

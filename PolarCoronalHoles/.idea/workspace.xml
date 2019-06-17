@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Better statistics sampling.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Writing Table Fix.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCH_series.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_series.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,11 +16,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-6132">
-              <caret line="126" column="45" selection-start-line="126" selection-start-column="45" selection-end-line="126" selection-end-column="45" />
+            <state relative-caret-position="519">
+              <caret line="163" column="34" lean-forward="true" selection-start-line="163" selection-start-column="34" selection-end-line="163" selection-end-column="34" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -43,7 +43,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
+            <state relative-caret-position="105">
               <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
               <folding>
                 <element signature="e#0#54#0" expanded="true" />
@@ -52,14 +52,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_series.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="640">
-              <caret line="729" column="38" lean-forward="true" selection-start-line="729" selection-start-column="38" selection-end-line="729" selection-end-column="38" />
-              <folding>
-                <element signature="e#1#19#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="195">
+              <caret line="13" selection-start-line="13" selection-end-line="13" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -124,8 +121,10 @@
       <find>[self.pch_obj.StartLon &gt; 0]</find>
       <find>Fit</find>
       <find>mean</find>
-      <find>sample_size</find>
       <find>, sample_size=1/np.sqrt(comb.size))</find>
+      <find>fill</find>
+      <find>sample_size</find>
+      <find>time</find>
     </findStrings>
     <replaceStrings>
       <replace>mask_map.</replace>
@@ -156,14 +155,14 @@
         <option value="$PROJECT_DIR$/AIA_PCH_Data_Download.py" />
         <option value="$PROJECT_DIR$/PCH_Data_Download.py" />
         <option value="$PROJECT_DIR$/PCH_Tools.py" />
-        <option value="$PROJECT_DIR$/PCH_Detection.py" />
         <option value="$PROJECT_DIR$/PCH_series.py" />
+        <option value="$PROJECT_DIR$/PCH_Detection.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1585" />
-    <option name="y" value="308" />
+    <option name="x" value="21" />
+    <option name="y" value="23" />
     <option name="width" value="1479" />
     <option name="height" value="1027" />
   </component>
@@ -246,21 +245,9 @@
       <option name="presentableId" value="Default" />
       <updated>1515169210210</updated>
       <workItem from="1556732473438" duration="25965000" />
-      <workItem from="1557856673793" duration="33213000" />
-    </task>
-    <task id="LOCAL-00052" summary="Bug fix in pick_hole_extremes">
-      <created>1533744455686</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1533744455687</updated>
-    </task>
-    <task id="LOCAL-00053" summary="Bug fix in hole_area">
-      <created>1533763421515</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1533763421515</updated>
+      <workItem from="1557856673793" duration="47317000" />
+      <workItem from="1559329714536" duration="3424000" />
+      <workItem from="1560782588897" duration="2959000" />
     </task>
     <task id="LOCAL-00054" summary="Bug fix in hole_area">
       <created>1533764726898</created>
@@ -591,14 +578,28 @@
       <option name="project" value="LOCAL" />
       <updated>1558636465341</updated>
     </task>
-    <option name="localTasksCounter" value="101" />
+    <task id="LOCAL-00101" summary="Writing Table Fix.">
+      <created>1558637105381</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1558637105381</updated>
+    </task>
+    <task id="LOCAL-00102" summary="Writing Table Fix.">
+      <created>1558640817828</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1558640817828</updated>
+    </task>
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="59178000" />
+    <option name="totallyTimeSpent" value="79665000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1585" y="308" width="1479" height="1027" extended-state="0" />
+    <frame x="21" y="23" width="1479" height="1027" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.25" />
@@ -613,8 +614,8 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" weight="0.32919767" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info active="true" anchor="bottom" id="Event Log" order="9" side_tool="true" visible="true" weight="0.03208556" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.03208556" />
       <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -628,7 +629,6 @@
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed Saving bugs." />
     <MESSAGE value="Fixed filename bug" />
     <MESSAGE value="Fixed file check bug." />
     <MESSAGE value="Fixed bug where rsun_obs is not set." />
@@ -653,9 +653,20 @@
     <MESSAGE value="Switching to the median as a statistic. Less sensitive to outliers." />
     <MESSAGE value="Update CI calculation. Added table write for AFRL." />
     <MESSAGE value="Better statistics sampling." />
-    <option name="LAST_COMMIT_MESSAGE" value="Better statistics sampling." />
+    <MESSAGE value="Writing Table Fix." />
+    <option name="LAST_COMMIT_MESSAGE" value="Writing Table Fix." />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="519">
+          <caret line="163" column="34" lean-forward="true" selection-start-line="163" selection-start-column="34" selection-end-line="163" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -663,6 +674,23 @@
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_series.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" selection-start-line="13" selection-end-line="13" selection-end-column="25" />
         </state>
       </provider>
     </entry>
@@ -683,36 +711,6 @@
           <caret line="45" selection-start-line="45" selection-end-line="45" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6132">
-          <caret line="126" column="45" selection-start-line="126" selection-start-column="45" selection-end-line="126" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#54#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_series.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="729" column="38" lean-forward="true" selection-start-line="729" selection-start-column="38" selection-end-line="729" selection-end-column="38" />
-          <folding>
-            <element signature="e#1#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
