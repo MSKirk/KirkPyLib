@@ -1,19 +1,22 @@
-import sunpy
-from sunpy.map import Map 
-import numpy as np
 import os
+import numpy as np
+import warnings
 from pathlib import Path
-import PCH_Tools
-import astropy.units as u
 from skimage import exposure, morphology, measure
+
+import PCH_Tools
+
+import sunpy
 from sunpy.coordinates.utils import GreatArc
 from sunpy.coordinates.ephemeris import get_horizons_coord
+from sunpy.map import Map
+
+import astropy.units as u
 from astropy.table import Table, join
 from astropy.time import Time
 from astropy.coordinates import Longitude
 from astropy.io import ascii, fits
 from astropy.utils.exceptions import AstropyWarning
-import warnings
 
 '''
 Detection of polar coronal holes given a directory of images. 
@@ -99,11 +102,11 @@ def pch_mask(mask_map, factor=0.5):
                 factor = 0.20
         if mask_map.detector == 'EIT':
             if mask_map.wavelength == 195 * u.AA:
-                factor = 0.27
+                factor = 0.17
             if mask_map.wavelength == 171 * u.AA:
-                factor = 0.37
+                factor = 0.30
             if mask_map.wavelength == 304 * u.AA:
-                factor = 0.14
+                factor = 0.10
             if mask_map.wavelength == 284 * u.AA:
                 factor = 0.22
         if mask_map.detector == 'EUVI':
@@ -411,7 +414,6 @@ class PCH_Detection:
                     del pts
                 # Variable Cleanup
                 del solar_image
-
 
         self.point_detection.remove_row(np.where(self.point_detection['Date'] == Time('1900-01-04'))[0][0])
         self.add_harvey_coordinates()
