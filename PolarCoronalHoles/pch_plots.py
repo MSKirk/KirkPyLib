@@ -1,9 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from PolarCoronalHoles import PCH_Tools
+from PolarCoronalHoles import PCH_Tools, PCH_series
 import astropy.units as u
-import seaborn as sns
 import scipy.stats as stats
+import pandas as pd
+import PCH_series
+from matplotlib.colors import ListedColormap, BoundaryNorm
+from matplotlib.collections import LineCollection
+import matplotlib.dates as mdates
+from matplotlib import gridspec
+import seaborn as sns
+from astropy.time import Time
+from datetime import timedelta
+
 
 def TESS_2018_plot():
     ll = np.load('/Users/mskirk/data/PCH Project/Example_LatLon.npy')
@@ -76,4 +85,94 @@ def TESS_2018_plot():
         binned_lats[0:lens[jj], jj] = test_lats2[ar]
 
     ax = sns.tsplot(data=binned_lats, time=np.degrees(bin_edges[0:number_of_bins]), err_style='boot_traces', n_boot=800, color='m')
+
+
+def area_series_plot()
+
+    all_area = pd.read_pickle('/Users/mskirk/data/PCH_Project/all_area.pkl')
+    north = pd.concat([all_area.Area[all_area.Center_lat > 0], all_area.Area_max[all_area.Center_lat > 0],
+                       all_area.Area_min[all_area.Center_lat > 0]]).sort_index()
+    south = pd.concat([all_area.Area[all_area.Center_lat < 0], all_area.Area_max[all_area.Center_lat < 0],
+                       all_area.Area_min[all_area.Center_lat < 0]]).sort_index()
+
+    north_ci = PCH_series.series_bootstrap(north, interval='360D', delta=True, confidence=0.997).fillna(0)
+
+    n_div = (north_ci.upper - north_ci.lower)/2
+
+    south_ci = PCH_series.series_bootstrap(south, interval='360D', delta=True, confidence=0.997).fillna(0)
+
+    s_div = (south_ci.upper - south_ci.lower)/2
+
+    wso = PCH_series.read_wso_data('/Users/mskirk/data/PCH_Project/WSO_PolarField.txt')
+
+    sns.set(style="darkgrid")
+
+    fig = plt.figure(figsize=(8, 4))
+    outer_grid = gridspec.GridSpec(2, 1, wspace=0.0, hspace=0.0,height_ratios=[20, 1])
+    ax = fig.add_subplot(outer_grid[0])
+    plt.plot(north.resample('11D').median())
+    plt.fill_between(north_ci.resample('11D').median().index, (north -n_div).resample('11D').median(), (north + n_div).resample('11D').median(), alpha=0.5)
+    ax.set_title('Northern Polar Coronal Hole')
+    ax.set_ylabel('Fractional Area')
+    ax.set_ylim(0, 0.08)
+    ax.set_xlim(all_area.index[0] - timedelta(days=180), all_area.index[-1] + timedelta(days=180))
+    ax.set_xlabel('')
+    ax.set_xticklabels([])
+
+
+    ax1 = fig.add_subplot(outer_grid[1])
+    inxval = mdates.date2num(wso.index.to_pydatetime())
+    y = np.zeros_like(inxval)
+    points = np.array([inxval, y]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    cmap = ListedColormap(['r', 'y'])
+    norm = BoundaryNorm([wso.NorthFilter.min(), 0, wso.NorthFilter.max()], cmap.N)
+    lc = LineCollection(segments, cmap=cmap, norm=norm)
+    lc.set_array(wso.NorthFilter)
+    lc.set_linewidth(4)
+    line = ax1.add_collection(lc)
+    ax1.xaxis.set_major_locator(mdates.AutoDateLocator())
+    monthFmt = mdates.DateFormatter("%Y")
+    ax1.xaxis.set_major_formatter(monthFmt)
+    ax1.autoscale_view()
+    ax1.set_ylim(-0.1, 0.1)
+    ax1.axes.get_yaxis().set_visible(False)
+    ax1.set_aspect(1000)
+    t_min = np.floor(Time(all_area.index[0]).jd - 1721424.5 -180)
+    t_max = np.floor(Time(all_area.index[-1]).jd - 1721424.5 +180)
+    ax1.set_xlim(t_min, t_max)
+
+
+
+def confetti_plot():
+    comp = pch.pch_obj['2012-10-01':'2012-11-04']
+    comp = comp[comp.StartLat < 0]
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EIT171'], comp.StartLat[comp.Filter == 'EIT171'], '.', color='b')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EIT171'], comp.EndLat[comp.Filter == 'EIT171'], '.', color='b')
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'AIA171'], comp.StartLat[comp.Filter == 'AIA171'], '.', color='g')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'AIA171'], comp.EndLat[comp.Filter == 'AIA171'], '.', color='g')
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EUVI171'], comp.StartLat[comp.Filter == 'EUVI171'], '.', color='r')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EUVI171'], comp.EndLat[comp.Filter == 'EUVI171'], '.', color='r')
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'SWAP174'], comp.StartLat[comp.Filter == 'SWAP174'], '.', color='c')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'SWAP174'], comp.EndLat[comp.Filter == 'SWAP174'], '.', color='c')
+
+    comp = pch.pch_obj['2017-01-04':'2017-02-04']
+    comp = comp[comp.StartLat < 0]
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EIT171'], comp.StartLat[comp.Filter == 'EIT171'], '.', color='b')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EIT171'], comp.EndLat[comp.Filter == 'EIT171'], '.', color='b')
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'AIA171'], comp.StartLat[comp.Filter == 'AIA171'], '.', color='g')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'AIA171'], comp.EndLat[comp.Filter == 'AIA171'], '.', color='g')
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EUVI171'], comp.StartLat[comp.Filter == 'EUVI171'], '.', color='r')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EUVI171'], comp.EndLat[comp.Filter == 'EUVI171'], '.', color='r')
+
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'SWAP174'], comp.StartLat[comp.Filter == 'SWAP174'], '.', color='c')
+    plt.plot(comp.Harvey_Longitude[comp.Filter == 'SWAP174'], comp.EndLat[comp.Filter == 'SWAP174'], '.', color='c')
+
 

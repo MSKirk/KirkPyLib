@@ -15,6 +15,8 @@ import scipy.signal as sg
 from datetime import datetime
 from multiprocessing import Pool
 
+import PCH_Tools
+
 class PCH:
     def __init__(self, directory, interval='11D'):
 
@@ -32,6 +34,7 @@ class PCH:
         
         self.confidence_obj(confidence=0.99, interval=interval)
 
+        self.area_of_all_measures()
 
         plt.ion()
 
@@ -745,6 +748,65 @@ class PCH:
 
         afrl_table.write(write_file, format='ascii.ecsv')
 
+    def area_of_all_measures(self):
+        self.all_area = pd.DataFrame(index=self.pch_obj.index, columns=['Area', 'Area_min', 'Area_max', 'Fit', 'Fit_min',
+                                                                   'Fit_max', 'Center_lat', 'Center_lon'])
+
+        self.fits_area = pd.DataFrame(index=self.pch_obj.index, columns=['Area', 'Area_min', 'Area_max', 'Fit', 'Fit_min',
+                                                                   'Fit_max', 'Center_lat', 'Center_lon'])
+
+        # Adding in Area Calculation each point with one HR previous measurements for all wavelengths.
+        area = []
+        fit = []
+        center = []
+
+        fit_area = []
+        fit_fit = []
+        fit_center = []
+
+        for ii, h_rot in enumerate(self.pch_obj['Harvey_Rotation']):
+            if self.pch_obj.iloc[ii]['StartLat'] > 0:
+                northern = True
+            else:
+                northern = False
+            ar, ft, cm = generic_hole_area(self.pch_obj, h_rot, northern=northern)
+            f_ar, f_ft, f_cm = generic_hole_area(self.pch_obj, h_rot, northern=northern, use_fit=True)
+
+            area = area + [ar]
+            fit = fit + [ft]
+            center = center + [cm]
+
+            fit_area = fit_area + [f_ar]
+            fit_fit = fit_fit + [f_ft]
+            fit_center = fit_center + [f_cm]
+
+            print(ii)
+
+        center = np.vstack([arr[0:2] for arr in center])
+        fit_center = np.vstack([arr[0:2] for arr in fit_center])
+
+        self.all_area['Area'] = np.asarray(area)[:, 1]
+        self.all_area['Area_min'] = np.asarray(area)[:, 0]
+        self.all_area['Area_max'] = np.asarray(area)[:, 2]
+
+        self.all_area['Fit'] = np.asarray(fit)[:, 1] * u.deg
+        self.all_area['Fit_min'] = np.asarray(fit)[:, 0] * u.deg
+        self.all_area['Fit_max'] = np.asarray(fit)[:, 2] * u.deg
+
+        self.all_area['Center_lat'] = center[:, 1] * u.deg
+        self.all_area['Center_lon'] = center[:, 0] * u.deg
+
+        self.fits_area['Area'] = np.asarray(fit_area)[:, 1]
+        self.fits_area['Area_min'] = np.asarray(fit_area)[:, 0]
+        self.fits_area['Area_max'] = np.asarray(fit_area)[:, 2]
+
+        self.fits_area['Fit'] = np.asarray(fit_fit)[:, 1] * u.deg
+        self.fits_area['Fit_min'] = np.asarray(fit_fit)[:, 0] * u.deg
+        self.fits_area['Fit_max'] = np.asarray(fit_fit)[:, 2] * u.deg
+
+        self.fits_area['Center_lat'] = fit_center[:, 1] * u.deg
+        self.fits_area['Center_lon'] = fit_center[:, 0] * u.deg
+
 
 #    def stack_series(self, data_key):
 #        self.north_pch = np.stack((self.data_sets[data_key]['North_Size']-self.data_sets[data_key]['North_Spread'],
@@ -936,7 +998,7 @@ def bootstrap(dataset, confidence=0.95, iterations=10000, sample_size=None, stat
     return lval, uval
 
 
-def series_bootstrap(series, interval='1D', statistic=np.median, **kwargs):
+def series_bootstrap(series, interval='1D', statistic=np.median, delta=False, **kwargs):
     ci = pd.DataFrame(index=series.index, columns=['lower', 'upper'])
     groups = list()
     lower = list()
@@ -957,8 +1019,16 @@ def series_bootstrap(series, interval='1D', statistic=np.median, **kwargs):
             upper.append(statistic(data.values))
 
     for ii in range(len(groups)-2):
-        ci.loc[groups[ii]:groups[ii + 1], 'lower'] = lower[ii]
-        ci.loc[groups[ii]:groups[ii + 1], 'upper'] = upper[ii]
+        if delta:
+            ci.loc[groups[ii]:groups[ii + 1], 'upper'] = upper[ii] - series.resample(interval).median()[ii]
+
+            if lower[ii] <= 0:
+                ci.loc[groups[ii]:groups[ii + 1], 'lower'] = 0
+            else:
+                ci.loc[groups[ii]:groups[ii + 1], 'lower'] = lower[ii] - series.resample(interval).median()[ii]
+        else:
+            ci.loc[groups[ii]:groups[ii + 1], 'lower'] = lower[ii]
+            ci.loc[groups[ii]:groups[ii + 1], 'upper'] = upper[ii]
 
     return ci
 
@@ -998,6 +1068,7 @@ def year_butter_filter(series, period_low=0.82, period_high=1.1, filter_type='ba
 
     return sg.filtfilt(b, a, series.interpolate('linear'))
 
+
 def low_butter_filter(series, period_low=0.82, filter_type='bandpass', Series=False, show_spectrum=False):
 
     # low pass filter
@@ -1017,3 +1088,148 @@ def low_butter_filter(series, period_low=0.82, filter_type='bandpass', Series=Fa
         return pd.Series(sg.filtfilt(b, a, series.interpolate('linear')), index=series.index)
 
     return sg.filtfilt(b, a, series.interpolate('linear'))
+
+
+def generic_hole_area(detection_df, h_rotation_number, northern=True, use_fit=False):
+        # Returns the area as a fraction of the total solar surface area
+        # Returns the location of the perimeter fit for the given h_rotation_number
+
+        begin = np.min(np.where(detection_df['Harvey_Rotation'] > (h_rotation_number - 1)))
+        end = np.max(np.where(detection_df['Harvey_Rotation'] == h_rotation_number))
+
+        if use_fit:
+            if northern:
+                # A northern hole with Arclength Filter for eliminating small holes but not zeros
+                index_measurements = np.where((detection_df[begin:end]['Fit'] > 0) & np.logical_not(
+                    detection_df[begin:end]['ArcLength'] < 3.0))
+            else:
+                # A southern hole with Arclength Filter for eliminating small holes
+                index_measurements = np.where((detection_df[begin:end]['Fit'] < 0) & np.logical_not(
+                    detection_df[begin:end]['ArcLength'] < 3.0))
+
+            index_measurements = np.array(index_measurements).squeeze() + begin
+
+            # Filters for incomplete hole measurements: at least 10 points and half a h-rotation needs to be defined
+            if index_measurements.size < 10:
+                return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array(
+                    [np.nan, np.nan, np.nan])
+
+            elif detection_df['Harvey_Rotation'][index_measurements[-1]] - detection_df['Harvey_Rotation'][
+                index_measurements[0]] < 0.5:
+                return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array(
+                    [np.nan, np.nan, np.nan])
+
+            else:
+                lons = detection_df.iloc[index_measurements]['H_StartLon'].values * u.deg
+                lats = detection_df.iloc[index_measurements]['StartLat'].values * u.deg
+                errors = np.asarray(1 / detection_df.iloc[index_measurements]['Quality'])
+
+        else:
+            if northern:
+                # A northern hole with Arclength Filter for eliminating small holes but not zeros
+                index_measurements = np.where((detection_df[begin:end]['StartLat'] > 0) & np.logical_not(
+                    detection_df[begin:end]['ArcLength'] < 3.0))
+            else:
+                # A southern hole with Arclength Filter for eliminating small holes
+                index_measurements = np.where((detection_df[begin:end]['StartLat'] < 0) & np.logical_not(
+                    detection_df[begin:end]['ArcLength'] < 3.0))
+
+            index_measurements = np.array(index_measurements).squeeze() + begin
+
+            # Filters for incomplete hole measurements: at least 10 points and half a h-rotation needs to be defined
+            if index_measurements.size < 10:
+                return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
+
+            elif detection_df['Harvey_Rotation'][index_measurements[-1]] - detection_df['Harvey_Rotation'][index_measurements[0]] < 0.5:
+                return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
+
+            else:
+                lons = np.concatenate(np.vstack([detection_df.iloc[index_measurements]['H_StartLon'].values,
+                                                 detection_df.iloc[index_measurements]['H_EndLon'].values])) * u.deg
+                lats = np.concatenate(np.vstack([detection_df.iloc[index_measurements]['StartLat'].values,
+                                                 detection_df.iloc[index_measurements]['EndLat'].values])) * u.deg
+                errors = np.concatenate(np.vstack([np.asarray(1/detection_df.iloc[index_measurements]['Quality']),
+                                                   np.asarray(1/detection_df.iloc[index_measurements]['Quality'])]))
+
+        perimeter_length = np.zeros(6) * u.rad
+        fit_location = np.zeros(6) * u.rad
+        hole_area = np.zeros(6)
+
+        # Centroid offset for better fitting results
+        if northern:
+            offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) - lats]))
+        else:
+            offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
+
+        offset_cm = PCH_Tools.center_of_mass(offset_coords, mass=1/errors) * u.deg
+        offset_lons = np.mod(offset_coords[:, 0] * u.deg - offset_cm[0], 360* u.deg)
+        offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
+
+        for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
+            try:
+                hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons), np.deg2rad(offset_lats), degree=degrees,
+                                             sigma=errors)
+
+                # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
+                # And removing centroid offset
+                if northern:
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                    lamb_y = np.sin(
+                        (np.pi * 0.5) - hole_fit['fitfunc'](lamb_x.value) - np.deg2rad(offset_cm[1]).value) * u.rad
+
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                    fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(
+                        PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[
+                            0]).value) - np.deg2rad(offset_cm[1]).value) * u.deg
+                else:
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                    lamb_y = np.sin(
+                        hole_fit['fitfunc'](lamb_x.value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.rad
+
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                    fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(
+                        PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - (
+                                                              np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
+
+                perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
+
+                if northern:
+                    hole_area[ii] = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
+                else:
+                    hole_area[ii] = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
+
+            except RuntimeError:
+                hole_area[ii] = np.nan
+                perimeter_length[ii] = np.inf * u.rad
+                fit_location[ii] = np.nan
+
+        # allowing for a 5% perimeter deviation off of a circle
+        good_areas = hole_area[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
+        good_fits = fit_location[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
+
+        # A sphere is 4π steradians in surface area
+        if good_areas.size > 0:
+            percent_hole_area = (np.nanmin(good_areas) / (4 * np.pi), np.nanmean(good_areas) / (4 * np.pi), np.nanmax(good_areas) / (4 * np.pi))
+            # in degrees
+            hole_perimeter_location = (np.rad2deg(np.nanmin(good_fits)).value, np.rad2deg(np.nanmean(good_fits)).value, np.rad2deg(np.nanmax(good_fits)).value)
+        else:
+            percent_hole_area = (np.nan, np.nan, np.nan)
+            hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
+
+        # From co-lat to lat
+
+        if northern:
+            if offset_cm[1] < 0:
+                offset_cm[1] = (90 * u.deg) + offset_cm[1]
+                offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
+            else:
+                offset_cm[1] = (90 * u.deg) - offset_cm[1]
+        else:
+            if offset_cm[1] > 0:
+                offset_cm[1] = (-90 * u.deg) + offset_cm[1]
+            else:
+                offset_cm[1] = (-90 * u.deg) - offset_cm[1]
+                offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
+
+        # Tuples of shape (Min, Mean, Max)
+        return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)
