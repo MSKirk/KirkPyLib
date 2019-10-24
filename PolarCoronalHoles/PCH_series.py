@@ -1233,3 +1233,30 @@ def generic_hole_area(detection_df, h_rotation_number, northern=True, use_fit=Fa
 
         # Tuples of shape (Min, Mean, Max)
         return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)
+
+
+def pch_obj_recompile(pch_obj):
+    muck = pd.DataFrame(pd.concat([pch_obj.H_StartLon, pch_obj.H_EndLon]).sort_index(), columns=['Lon'])
+    muck['Lat'] = pd.concat([pch_obj.StartLat, pch_obj.EndLat]).sort_index()
+    muck['Harvey_Rotation'] = pd.concat([pch_obj.Harvey_Rotation, pch_obj.Harvey_Rotation]).sort_index()
+    muck['Wavelength'] = pd.concat([pch_obj.Filter, pch_obj.Filter]).sort_index()
+
+    for ii, h_rot in enumerate(muck['Harvey_Rotation']):
+        if muck.iloc[ii]['Lat'] > 0:
+            northern = True
+            one_hr = muck.loc[
+                (muck.Harvey_Rotation > h_rot - 1) & (muck.Harvey_Rotation <= h_rot) & (muck.Lat > 0)].sort_values(
+                by=['Lon'])
+
+        else:
+            northern = False
+            one_hr = muck.loc[
+                (muck.Harvey_Rotation > h_rot - 1) & (muck.Harvey_Rotation <= h_rot) & (muck.Lat < 0)].sort_values(
+                by=['Lon'])
+
+        # TODO: Resample by longitude bin
+        # TODO: Generate statistics for each bin (stdev, mean, median)
+        # TODO: Find area within each statistic using trapizod method.
+
+
+

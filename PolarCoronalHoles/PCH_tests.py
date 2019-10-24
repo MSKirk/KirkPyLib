@@ -1,10 +1,11 @@
-from PolarCoronalHoles import PCH_Tools, PCH_Detection
+from PolarCoronalHoles import PCH_Tools, PCH_Detection, PCH_stats
 from sunpy import map
 import sunpy.data.sample
 import numpy as np
 from skimage import measure
 from sunpy.coordinates.utils import GreatArc
 import matplotlib.pyplot as plt
+from astropy import units as u
 
 test_map = map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
@@ -14,7 +15,6 @@ def assertEquals(var1, var2):
         return True
     else:
         return False
-
 
 def test_rsun_pix():
     pixels = PCH_Detection.rsun_pix(test_map)
@@ -60,6 +60,12 @@ def test_pick_hole_extremes():
 
     plt.show()
 
+
+def test_areaint():
+    lats = (np.zeros(100)+45.) * u.deg
+    lons = (np.arange(0,360,3.6) + 0.1) * u.deg
+
+    np.isclose(PCH_stats.areaint(lats, lons).value, 1.84/(4*np.pi), atol=1e-4)
 
 def test_chole_area():
     PCH_Detection.pch_mask(test_map)

@@ -12,6 +12,7 @@ from matplotlib import gridspec
 import seaborn as sns
 from astropy.time import Time
 from datetime import timedelta
+import sunpy.coordinates
 
 
 def TESS_2018_plot():
@@ -87,7 +88,7 @@ def TESS_2018_plot():
     ax = sns.tsplot(data=binned_lats, time=np.degrees(bin_edges[0:number_of_bins]), err_style='boot_traces', n_boot=800, color='m')
 
 
-def area_series_plot()
+def area_series_plot():
 
     all_area = pd.read_pickle('/Users/mskirk/data/PCH_Project/all_area.pkl')
     north = pd.concat([all_area.Area[all_area.Center_lat > 0], all_area.Area_max[all_area.Center_lat > 0],
@@ -162,17 +163,62 @@ def confetti_plot():
 
     comp = pch.pch_obj['2017-01-04':'2017-02-04']
     comp = comp[comp.StartLat < 0]
+    one_rot = pd.concat([comp.StartLat,comp.EndLat])
+    fit_rot = pd.concat([comp.Fit,comp.Fit_min, comp.Fit_max])
 
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EIT171'], comp.StartLat[comp.Filter == 'EIT171'], '.', color='b')
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EIT171'], comp.EndLat[comp.Filter == 'EIT171'], '.', color='b')
+    fig = plt.figure(figsize=(18, 6))
+    ax = fig.add_subplot()
+    ax.set_title('Southern Polar Coronal Hole')
+    ax.set_ylabel('Latitude')
+    ax.set_ylim(-91, -49)
+    ax.set_xlim(comp.index[0] - timedelta(days=1), comp.index[-1] + timedelta(days=1))
+    plt.tight_layout()
 
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'AIA171'], comp.StartLat[comp.Filter == 'AIA171'], '.', color='g')
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'AIA171'], comp.EndLat[comp.Filter == 'AIA171'], '.', color='g')
+    plt.plot(comp.index[comp.Filter == 'EIT171'], comp.StartLat[comp.Filter == 'EIT171'], '.', color='b')
+    plt.plot(comp.index[comp.Filter == 'EIT171'], comp.EndLat[comp.Filter == 'EIT171'], '.', color='b')
 
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EUVI171'], comp.StartLat[comp.Filter == 'EUVI171'], '.', color='r')
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'EUVI171'], comp.EndLat[comp.Filter == 'EUVI171'], '.', color='r')
+    plt.plot(comp.index[comp.Filter == 'AIA171'], comp.StartLat[comp.Filter == 'AIA171'], '.', color='g')
+    plt.plot(comp.index[comp.Filter == 'AIA171'], comp.EndLat[comp.Filter == 'AIA171'], '.', color='g')
 
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'SWAP174'], comp.StartLat[comp.Filter == 'SWAP174'], '.', color='c')
-    plt.plot(comp.Harvey_Longitude[comp.Filter == 'SWAP174'], comp.EndLat[comp.Filter == 'SWAP174'], '.', color='c')
+    plt.plot(comp.index[comp.Filter == 'EUVI171'], comp.StartLat[comp.Filter == 'EUVI171'], '.', color='r')
+    plt.plot(comp.index[comp.Filter == 'EUVI171'], comp.EndLat[comp.Filter == 'EUVI171'], '.', color='r')
+
+    plt.plot(comp.index[comp.Filter == 'SWAP174'], comp.StartLat[comp.Filter == 'SWAP174'], '.', color='c')
+    plt.plot(comp.index[comp.Filter == 'SWAP174'], comp.EndLat[comp.Filter == 'SWAP174'], '.', color='c')
+
+    sns.lineplot(x=one_rot.index.round('0.25D'), y=one_rot, ci='sd', n_boot=1000, estimator='median')
+    sns.lineplot(x=one_rot.index.round('1D'), y=one_rot, ci='sd', n_boot=1000, estimator='median')
+    sns.lineplot(x=one_rot.index.round('11D'), y=one_rot, ci='sd', n_boot=1000, estimator='median')
+
+    sns.lineplot(x=fit_rot.index.round('0.25D'), y=fit_rot, ci='sd', n_boot=1000, estimator='median')
+    sns.lineplot(x=fit_rot.index.round('1D'), y=fit_rot, ci='sd', n_boot=1000, estimator='median')
+    sns.lineplot(x=fit_rot.index.round('11D'), y=fit_rot, ci='sd', n_boot=1000, estimator='median')
+
+
+pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_obj.pkl')
+
+
+def pole_plot_check(index):
+    ax = plt.subplot(111, projection='polar')
+    if pch_obj.StartLat[index] < 0:
+         ax.plot(np.repeat(np.deg2rad(pch_obj.Harvey_Longitude[index]),40), np.arange(-90,-50,1), '-') 
+         ax.plot(np.repeat(np.deg2rad(0),40), np.arange(-90,-50,1), '_')
+    else:
+         ax.plot(np.repeat(np.deg2rad(pch_obj.Harvey_Longitude[index]),40), np.arange(90,50,1), '-') 
+         ax.plot(np.repeat(np.deg2rad(0),40), np.arange(90,50,1), '_')
+    #diff = pch_obj.Harvey_Longitude[index]*u.deg - sunpy.coordinates.sun.L0(pch_obj.index[index])
+    ax.plot(np.deg2rad(pch_obj.StartLon[index]), pch_obj.StartLat[index], 'r.')
+    ax.plot(np.deg2rad(pch_obj.EndLon[index]), pch_obj.EndLat[index], 'g.')
+    ax.plot(np.deg2rad(pch_obj.H_StartLon[index]), pch_obj.StartLat[index], 'r*')
+    ax.plot(np.deg2rad(pch_obj.H_EndLon[index]), pch_obj.EndLat[index], 'g*')
+    print('Start [Lon,Lat] ['+np.str(pch_obj.StartLon[index])+','+np.str( pch_obj.StartLat[index])+']')
+    print('End [Lon,Lat] ['+np.str(pch_obj.EndLon[index])+','+np.str( pch_obj.EndLat[index])+']')
+    print('Harvey Start [Lon,Lat] ['+np.str(pch_obj.H_StartLon[index])+','+np.str( pch_obj.StartLat[index])+']')
+    print('Harvey End [Lon,Lat] ['+np.str(pch_obj.H_EndLon[index])+','+np.str( pch_obj.EndLat[index])+']')
+    # print('Correct Start [Lon,Lat] ['+np.str(pch_obj.StartLon[index]+diff.value)+','+np.str( pch_obj.StartLat[index])+']')
+    # print('Correct End [Lon,Lat] ['+np.str(pch_obj.EndLon[index]+diff.value)+','+np.str( pch_obj.EndLat[index])+']')
+    print('Harvey Lon '+np.str(pch_obj.Harvey_Longitude[index]))
+    print('Solar L0 '+np.str(sunpy.coordinates.sun.L0(pch_obj.index[index])))
+
 
 
