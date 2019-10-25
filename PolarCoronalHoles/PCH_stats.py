@@ -1,3 +1,4 @@
+from PolarCoronalHoles import PCH_Tools
 import astropy.stats.circstats as cs
 import matplotlib.pyplot as plt
 import astropy.units as u
@@ -10,6 +11,18 @@ def filter_select(pch_obj, filter):
 
 def one_hr_select(pch_obj, hr_start):
     return pch_obj.where((pch_obj.Harvey_Rotation >= hr_start) & (pch_obj.Harvey_Rotation < (hr_start+1.))).dropna(how='all')
+
+
+def sph_center_of_mass(lats, lons, **kwargs):
+
+    weights = kwargs.get('weights', 1)
+
+    rect_coords = PCH_Tools.coord_spher2rec(np.ones_like(lats.value), lats, lons)
+    rect_center = PCH_Tools.center_of_mass(np.transpose(np.array(rect_coords)), mass=weights)
+
+    sphere_center = PCH_Tools.coord_rec2spher(rect_center[0], rect_center[1], rect_center[2])
+
+    return sphere_center
 
 
 def circular_rebinning(pch_obj, binsize):
@@ -65,19 +78,26 @@ def areaint(lats, lons):
         northern = True
 
     # Get colatitude (a measure of surface distance as an angle) and
-    # azimuth of each point in segment from the pole
+    # azimuth of each point in segment from the center of mass.
 
-    if northern:
-        colat = np.array([distance(0 * u.deg, 90 * u.deg, longi, latit).to(u.deg).value for latit, longi in zip(lat,lon)]) * u.deg
-        az = np.array([azimuth(0 * u.deg, 90 * u.deg, longi, latit).to(u.deg).value for latit, longi in zip(lat,lon)]) * u.deg
-    else:
-        colat = np.array([distance(0 * u.deg, -90 * u.deg, longi, latit).to(u.deg).value for latit, longi in zip(lat,lon)]) * u.deg
-        az = np.array([azimuth(0 * u.deg, -90 * u.deg, longi, latit).to(u.deg).value for latit, longi in zip(lat,lon)]) * u.deg
+    _, center_lat, center_lon = sph_center_of_mass(lats, lons)
 
-    # Change sign of last az component to avoid backwards counting
-    az[-1] *= -1.
-    # Calcluate step sizes
+    # force centroid at the N or S pole
+    #if northern:
+    #    center_lat = 90 * u.deg
+    #else:
+    #   center_lat = -90 * u.deg
+    #center_lon = 0 * u.deg
+
+    colat = np.array([distance(center_lon.to(u.deg), center_lat.to(u.deg), longi, latit).to(u.deg).value
+                      for latit, longi in zip(lat,lon)]) * u.deg
+    az = np.array([azimuth(center_lon.to(u.deg), center_lat.to(u.deg), longi, latit).to(u.deg).value
+                   for latit, longi in zip(lat,lon)]) * u.deg
+
+    # Calculate step sizes, taking the complementary angle where needed
     daz = np.diff(az).to(u.rad)
+    daz[np.where(daz > 180 * u.deg)] -= 360. * u.deg
+    daz[np.where(daz < -180 * u.deg)] += 360. * u.deg
 
     # Determine average surface distance for each step
     deltas = np.diff(colat) / 2.
@@ -87,7 +107,7 @@ def areaint(lats, lons):
     integrands = (1 - np.cos(colats)) * daz
 
     # Integrate and return the answer as a fraction of the unit sphere.
-    # Note that the sum of the integrands will include a partor of 4pi.
+    # Note that the sum of the integrands will include a part of 4pi.
 
     return np.abs(np.sum(integrands)) / (4 * np.pi * u.rad)
 

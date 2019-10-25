@@ -336,8 +336,8 @@ def coord_rec2spher(xx, yy, zz):
     # SPACE NAVIGATION HANDBOOK  NAVPERS 92988 July 1, 1961
 
     rr = np.sqrt(xx ** 2 + yy ** 2 + zz ** 2)
-    beta = Latitude(np.arctan(zz / np.sqrt(xx ** 2 + yy ** 2)))
-    lamb = Longitude(np.arctan(yy / xx))
+    beta = Latitude(np.arctan(zz / np.sqrt(xx ** 2 + yy ** 2)) * u.rad)
+    lamb = Longitude(np.arctan(yy / xx) * u.rad)
 
     # Dist from Sun, Latitude, Longitude
     return [rr, beta, lamb]
