@@ -5,6 +5,7 @@ import astropy.units as u
 import pandas as pd
 import numpy as np
 
+
 def filter_select(pch_obj, filter):
     return pch_obj.where(pch_obj.Filter == filter).dropna(how='all')
 
@@ -80,7 +81,7 @@ def areaint(lats, lons):
     # Get colatitude (a measure of surface distance as an angle) and
     # azimuth of each point in segment from the center of mass.
 
-    _, center_lat, center_lon = sph_center_of_mass(lats, lons)
+    _, center_lat, center_lon = sph_center_of_mass(lat[:-1], lon[:-1])
 
     # force centroid at the N or S pole
     #if northern:
@@ -109,7 +110,7 @@ def areaint(lats, lons):
     # Integrate and return the answer as a fraction of the unit sphere.
     # Note that the sum of the integrands will include a part of 4pi.
 
-    return np.abs(np.sum(integrands)) / (4 * np.pi * u.rad)
+    return np.abs(np.nansum(integrands)) / (4 * np.pi * u.rad), center_lat, center_lon
 
 
 def distance(lon1, lat1, lon2, lat2):
@@ -151,3 +152,36 @@ def azimuth(lon1, lat1, lon2, lat2, ratio=1):
     #    bearing = (np.pi/2 * u.rad).to(lat1.unit)  # north pole starts
 
     return bearing
+
+
+def chole_stats(pch_obj, filter, binsize=10):
+
+    if filter not in pch_obj.Filter.unique():
+        print('Please specify a correct filter.')
+        return pd.DataFrame()
+
+    measurements = filter_select(pch_obj, filter)
+
+    hole_stats = pd.DataFrame(index=measurements.Harvey_Rotation.unique(), columns=['Harvey_Rotation',
+                                        'Date', 'N_mean_area', 'S_mean_area', 'N_min_area', 'S_min_area', 'N_max_area',
+                                        'S_max_area', 'N_center_lat', 'N_center_lon', 'S_center_lat', 'S_center_lon'])
+
+    for hr in measurements.Harvey_Rotation:
+        one_rot = one_hr_select(measurements, hr)
+
+        binned = circular_rebinning(one_rot, binsize=binsize)
+
+        hole_stats['N_mean_area'][hr], hole_stats['N_center_lat'][hr], hole_stats['N_center_lon'][hr] = areaint(binned.N_Lat_Mean, binned.N_Lon_Mean)
+        hole_stats['N_max_area'][hr], _, _ = areaint(binned.N_Lat_Mean - binned.N_Lat_Var * u.deg, binned.N_Lon_Mean)
+        hole_stats['N_min_area'][hr], _, _ = areaint(binned.N_Lat_Mean + binned.N_Lat_Var * u.deg, binned.N_Lon_Mean)
+        
+        hole_stats['S_mean_area'][hr], hole_stats['S_center_lat'][hr], hole_stats['S_center_lon'][hr] = areaint(binned.S_Lat_Mean, binned.S_Lon_Mean)
+        hole_stats['S_max_area'][hr], _, _ = areaint(binned.S_Lat_Mean - binned.S_Lat_Var * u.deg, binned.S_Lon_Mean)
+        hole_stats['S_min_area'][hr], _, _ = areaint(binned.S_Lat_Mean + binned.S_Lat_Var * u.deg, binned.S_Lon_Mean)
+
+        hole_stats['Date'][hr] = PCH_Tools.hrot2date(hr).iso
+        hole_stats['Harvey_Rotation'][hr] = hr
+
+    return hole_stats
+
+
