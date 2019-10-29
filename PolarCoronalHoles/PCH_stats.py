@@ -104,12 +104,12 @@ def areaint(lats, lons):
 
     assert lats.size == lons.size, 'List of latitudes and longitudes are different sizes.'
 
-    if isinstance(lats[0], u.Quantity):
-        lat = np.array([lat.value for lat in lats]+[lats[0].value])*u.deg
-        lon = np.array([lon.value for lon in lons]+[lons[0].value])*u.deg
+    if isinstance(lats.iloc[0], u.Quantity):
+        lat = np.array([lat.value for lat in lats]+[lats.iloc[0].value])*u.deg
+        lon = np.array([lon.value for lon in lons]+[lons.iloc[0].value])*u.deg
     else:
-        lat = np.append(lats, lats[0])*u.deg
-        lon = np.append(lons, lons[0])*u.deg
+        lat = np.append(lats, lats.iloc[0])*u.deg
+        lon = np.append(lons, lons.iloc[0])*u.deg
 
     if lat.max() > 0:
         northern = True
