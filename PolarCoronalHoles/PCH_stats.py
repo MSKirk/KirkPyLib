@@ -87,11 +87,11 @@ def circular_rebinning(pch_obj, binsize=10):
     northern = northern.fillna(value=values).fillna(method='ffill').fillna(method='bfill')
     southern = southern.fillna(value=values).fillna(method='ffill').fillna(method='bfill')
 
-    bin_stats = {'N_Lon_Mean': pd.Series(circmean([northern.H_EndLon_Mean.values, northern.H_StartLon_Mean.values], axis =0, low=0, high=360), index=northern.index),
+    bin_stats = {'N_Lon_Mean': pd.Series(circmean([northern.H_EndLon_Mean.values, northern.H_StartLon_Mean.values], axis=0, low=0, high=360), index=northern.index),
                  'N_Lon_Std': np.sqrt(northern.H_StartLon_Std**2 + northern.H_EndLon_Std**2),
-                 'N_Lat_Mean': pd.Series(circmean([northern.EndLat_Mean.values, northern.StartLat_Mean.values], axis =0, low=-90, high=90), index=northern.index),
+                 'N_Lat_Mean': pd.Series(circmean([northern.EndLat_Mean.values, northern.StartLat_Mean.values], axis=0, low=-90, high=90), index=northern.index),
                  'N_Lat_Std': np.sqrt(northern.StartLat_Std**2 + northern.EndLat_Std**2),
-                 'S_Lon_Mean': pd.Series(circmean([southern.H_EndLon_Mean.values, southern.H_StartLon_Mean.values], axis=0, low=0,high=360), index=southern.index),
+                 'S_Lon_Mean': pd.Series(circmean([southern.H_EndLon_Mean.values, southern.H_StartLon_Mean.values], axis=0, low=0, high=360), index=southern.index),
                  'S_Lon_Std': np.sqrt(southern.H_StartLon_Std ** 2 + southern.H_EndLon_Std ** 2),
                  'S_Lat_Mean': pd.Series(circmean([southern.EndLat_Mean.values, southern.StartLat_Mean.values], axis=0, low=-90, high=90), index=southern.index),
                  'S_Lat_Std': np.sqrt(southern.StartLat_Std ** 2 + southern.EndLat_Std ** 2)
@@ -127,9 +127,9 @@ def areaint(lats, lons):
     #center_lon = 0 * u.deg
 
     colat = np.array([distance(center_lon.to(u.deg), center_lat.to(u.deg), longi, latit).to(u.deg).value
-                      for latit, longi in zip(lat,lon)]) * u.deg
+                      for latit, longi in zip(lat, lon)]) * u.deg
     az = np.array([azimuth(center_lon.to(u.deg), center_lat.to(u.deg), longi, latit).to(u.deg).value
-                   for latit, longi in zip(lat,lon)]) * u.deg
+                   for latit, longi in zip(lat, lon)]) * u.deg
 
     # Calculate step sizes, taking the complementary angle where needed
     daz = np.diff(az).to(u.rad)
@@ -207,20 +207,20 @@ def chole_stats(pch_obj, wav_filter, binsize=10, sigma=1):
                                         'N_lat_mean', 'N_lat_std', 'N_lon_mean', 'N_lon_std', 'S_lat_mean', 'S_lat_std', 
                                                                                     'S_lon_mean', 'S_lon_std'])
 
-    for hr in measurements.Harvey_Rotation:
+    for hr in measurements.Harvey_Rotation.unique():
         one_rot = one_hr_select(measurements, hr)
 
         binned = circular_rebinning(one_rot, binsize=binsize)
 
         h_loc = np.argmin(np.abs((binned.index.values*binsize) - one_rot.Harvey_Longitude[0]))
-        hole_stats['N_lon_mean'][hr] = binned.N_Lon_Mean[h_loc] * u.deg
-        hole_stats['N_lon_std'][hr] = binned.N_Lon_Std[h_loc] * u.deg
-        hole_stats['N_lat_mean'][hr] = binned.N_Lat_Mean[h_loc] * u.deg
-        hole_stats['N_lat_std'][hr] = binned.N_Lat_Std[h_loc] * u.deg
-        hole_stats['S_lon_mean'][hr] = binned.S_Lon_Mean[h_loc] * u.deg
-        hole_stats['S_lon_std'][hr] = binned.S_Lon_Std[h_loc] * u.deg
-        hole_stats['S_lat_mean'][hr] = binned.S_Lat_Mean[h_loc] * u.deg
-        hole_stats['S_lat_std'][hr] = binned.S_Lat_Std[h_loc] * u.deg
+        hole_stats['N_lon_mean'][hr] = binned.N_Lon_Mean.iloc[h_loc] * u.deg
+        hole_stats['N_lon_std'][hr] = binned.N_Lon_Std.iloc[h_loc] * u.deg
+        hole_stats['N_lat_mean'][hr] = binned.N_Lat_Mean.iloc[h_loc] * u.deg
+        hole_stats['N_lat_std'][hr] = binned.N_Lat_Std.iloc[h_loc] * u.deg
+        hole_stats['S_lon_mean'][hr] = binned.S_Lon_Mean.iloc[h_loc] * u.deg
+        hole_stats['S_lon_std'][hr] = binned.S_Lon_Std.iloc[h_loc] * u.deg
+        hole_stats['S_lat_mean'][hr] = binned.S_Lat_Mean.iloc[h_loc] * u.deg
+        hole_stats['S_lat_std'][hr] = binned.S_Lat_Std.iloc[h_loc] * u.deg
 
         hole_stats['N_mean_area'][hr], hole_stats['N_center_lat'][hr], hole_stats['N_center_lon'][hr] = areaint(binned.N_Lat_Mean, binned.N_Lon_Mean)
         hole_stats['N_max_area'][hr], _, _ = areaint(binned.N_Lat_Mean * u.deg - (sigma * binned.N_Lat_Std * u.deg), binned.N_Lon_Mean * u.deg)

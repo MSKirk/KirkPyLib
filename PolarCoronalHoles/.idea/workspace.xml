@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Fetching new ephemeris from JPL Horizons for SOHO">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Pep8 Changes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PCH_stats.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_stats.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,83 +14,6 @@
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="736">
-              <caret line="108" column="29" lean-forward="true" selection-start-line="108" selection-start-column="29" selection-end-line="108" selection-end-column="29" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="16" selection-start-line="16" selection-end-line="16" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PCH_tests.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
-              <folding>
-                <element signature="e#0#54#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PCH_series.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="382">
-              <caret line="39" column="30" selection-start-line="39" selection-start-column="30" selection-end-line="39" selection-end-column="30" />
-              <folding>
-                <element signature="e#1#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4305">
-              <caret line="294" column="21" selection-start-line="294" selection-start-column="21" selection-end-line="294" selection-end-column="21" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <marker date="1557173402961" expanded="true" signature="13027:13032" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pch_plots.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="600">
-              <caret line="45" selection-start-line="45" selection-end-line="45" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -98,85 +21,11 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>map.</find>
-      <find>periodic</find>
-      <find>1</find>
-      <find>pts[0]</find>
-      <find>warning</find>
-      <find>Warning</find>
-      <find>FileName</find>
-      <find>try</find>
-      <find>waves</find>
-      <find>results.file_num</find>
-      <find>[0]</find>
-      <find>offset</find>
-      <find>filter</find>
-      <find>Filter</find>
-      <find>['Filter']</find>
-      <find>pch.pch_obj</find>
-      <find>Area</find>
-      <find>lat</find>
-      <find>.mean()</find>
-      <find>self.pch_obj.StartLat &gt; 0</find>
-      <find>[self.pch_obj.StartLat &gt; 0]</find>
-      <find>[self.pch_obj.StartLon &gt; 0]</find>
-      <find>Fit</find>
-      <find>mean</find>
-      <find>, sample_size=1/np.sqrt(comb.size))</find>
-      <find>fill</find>
-      <find>sample_size</find>
-      <find>time</find>
-      <find>quality</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>mask_map.</replace>
-      <replace>7</replace>
-      <replace>8</replace>
-      <replace>5</replace>
-      <replace>hole_start</replace>
-      <replace>wave</replace>
-      <replace>len(results.table)</replace>
-      <replace>[head_loc]</replace>
-      <replace>self.pch_obj</replace>
-      <replace>Fit</replace>
-      <replace>lon</replace>
-      <replace>.median()</replace>
-      <replace>[self.northern]</replace>
-      <replace>Area</replace>
-      <replace>)</replace>
-    </replaceStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/pch_plots.py" />
-        <option value="$PROJECT_DIR$/PCH_tests.py" />
-        <option value="$PROJECT_DIR$/AIA_PCH_Data_Download.py" />
-        <option value="$PROJECT_DIR$/PCH_Data_Download.py" />
-        <option value="$PROJECT_DIR$/PCH_Tools.py" />
-        <option value="$PROJECT_DIR$/PCH_series.py" />
-        <option value="$PROJECT_DIR$/PCH_Detection.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="21" />
-    <option name="y" value="23" />
-    <option name="width" value="1793" />
-    <option name="height" value="1380" />
-  </component>
+  <component name="ProjectId" id="1RvWUfwDFVUclYuPl42YSACh2nn" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes />
-  </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -252,14 +101,10 @@
       <workItem from="1557856673793" duration="47317000" />
       <workItem from="1559329714536" duration="3424000" />
       <workItem from="1560782588897" duration="5089000" />
-      <workItem from="1561036881998" duration="903000" />
-    </task>
-    <task id="LOCAL-00055" summary="Recalculating hole areas and updating fitting procedure.">
-      <created>1534356808910</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1534356808910</updated>
+      <workItem from="1561036881998" duration="1538000" />
+      <workItem from="1563465543537" duration="8960000" />
+      <workItem from="1563890186097" duration="20148000" />
+      <workItem from="1566496792159" duration="351000" />
     </task>
     <task id="LOCAL-00056" summary="Adding in a zero point detection.">
       <created>1534358693873</created>
@@ -597,44 +442,36 @@
       <option name="project" value="LOCAL" />
       <updated>1560803658480</updated>
     </task>
-    <option name="localTasksCounter" value="104" />
+    <task id="LOCAL-00104" summary="Tested and refined factors in EIT mask_map.">
+      <created>1561132452136</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1561132452136</updated>
+    </task>
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="82698000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="21" y="23" width="1793" height="1380" extended-state="0" />
-    <editor active="true" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.25" />
-      <window_info id="Structure" order="1" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info active="true" anchor="bottom" id="Event Log" order="9" side_tool="true" visible="true" weight="0.023291925" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.03208556" />
-      <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" order="12" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="SciView" order="4" />
-    </layout>
+    <option name="totallyTimeSpent" value="112792000" />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed file check bug." />
     <MESSAGE value="Fixed bug where rsun_obs is not set." />
     <MESSAGE value="Fixing image integrity criteria for AIA." />
     <MESSAGE value="Keep wavelength information in pch object." />
@@ -659,69 +496,7 @@
     <MESSAGE value="Better statistics sampling." />
     <MESSAGE value="Writing Table Fix." />
     <MESSAGE value="Fetching new ephemeris from JPL Horizons for SOHO" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fetching new ephemeris from JPL Horizons for SOHO" />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="16" selection-start-line="16" selection-end-line="16" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#54#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4305">
-          <caret line="294" column="21" selection-start-line="294" selection-start-column="21" selection-end-line="294" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <marker date="1557173402961" expanded="true" signature="13027:13032" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pch_plots.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="45" selection-start-line="45" selection-end-line="45" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_series.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
-          <caret line="39" column="30" selection-start-line="39" selection-start-column="30" selection-end-line="39" selection-end-column="30" />
-          <folding>
-            <element signature="e#1#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="736">
-          <caret line="108" column="29" lean-forward="true" selection-start-line="108" selection-start-column="29" selection-end-line="108" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <MESSAGE value="Tested and refined factors in EIT mask_map." />
+    <option name="LAST_COMMIT_MESSAGE" value="Tested and refined factors in EIT mask_map." />
   </component>
 </project>
