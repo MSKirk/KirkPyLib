@@ -1,5 +1,6 @@
 from PolarCoronalHoles import PCH_Tools
 import astropy.stats.circstats as cs
+from scipy.stats import circmean, circstd
 import matplotlib.pyplot as plt
 import astropy.units as u
 import pandas as pd
@@ -26,54 +27,89 @@ def sph_center_of_mass(lats, lons, **kwargs):
     return sphere_center
 
 
-def circular_rebinning(pch_obj, binsize):
-    # Bin size in degrees
+def circular_rebinning(pch_obj, binsize=10):
+    # Bin size in degrees; split into N and S
 
-    lon_bins = pd.DataFrame(index=np.arange(0, 360, binsize), columns=['N_Lon_Mean', 'N_Lon_Var', 'N_Lat_Mean', 'N_Lat_Var',
-                                                                       'S_Lon_Mean', 'S_Lon_Var', 'S_Lat_Mean', 'S_Lat_Var'])
+    north = pch_obj.where(pch_obj.StartLat > 0).dropna(how='all')
+    south = pch_obj.where(pch_obj.StartLat < 0).dropna(how='all')
 
-    for lon_bin in np.arange(0, 360, binsize):
-        # Northern Coordinates
-        start_bin = pch_obj.where((pch_obj.H_StartLon >= lon_bin) & (pch_obj.H_StartLon <= (lon_bin+binsize)) & (pch_obj.StartLat > 0)).dropna(how='all')
-        end_bin = pch_obj.where((pch_obj.H_EndLon >= lon_bin) & (pch_obj.H_EndLon <= (lon_bin+binsize)) & (pch_obj.StartLat > 0)).dropna(how='all')
+    # Aggregation Rules
+    n_startagg = {
+        'H_StartLon': {
+            'Mean': lambda x: circmean(x, low=0, high=360),
+            'Std': lambda x: circstd(x, low=0, high=360)},
+        'StartLat': {
+            'Mean': lambda x: circmean(x, low=-90, high=90),
+            'Std': lambda x: circstd(x, low=-90, high=90)}
+        }
+    n_endagg = {
+        'H_EndLon': {
+            'Mean': lambda x: circmean(x, low=0, high=360),
+            'Std': lambda x: circstd(x, low=0, high=360)},
+        'EndLat': {
+            'Mean': lambda x: circmean(x, low=-90, high=90),
+            'Std': lambda x: circstd(x, low=-90, high=90)}
+        }
+    s_endagg = {
+        'H_EndLon': {
+            'Mean': lambda x: circmean(x, low=0, high=360),
+            'Std': lambda x: circstd(x, low=0, high=360)},
+        'EndLat': {
+            'Mean': lambda x: circmean(x, low=-90, high=90),
+            'Std': lambda x: circstd(x, low=-90, high=90)}
+        }
+    s_startagg = {
+        'H_StartLon': {
+            'Mean': lambda x: circmean(x, low=0, high=360),
+            'Std': lambda x: circstd(x, low=0, high=360)},
+        'StartLat': {
+            'Mean': lambda x: circmean(x, low=-90, high=90),
+            'Std': lambda x: circstd(x, low=-90, high=90)}
+        }
 
-        lon_bins.N_Lon_Mean[lon_bin] = cs.circmean(np.concatenate([start_bin.H_StartLon.values, end_bin.H_EndLon.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
+    north_end = north.groupby(north['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(n_endagg)
+    north_end.columns = ["_".join(x) for x in north_end.columns.ravel()]
 
-        lon_bins.N_Lon_Var[lon_bin] = cs.circvar(np.concatenate([start_bin.H_StartLon.values, end_bin.H_EndLon.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
+    north_start = north.groupby(north['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(n_startagg)
+    north_start.columns = ["_".join(x) for x in north_start.columns.ravel()]
 
-        lon_bins.N_Lat_Mean[lon_bin] = cs.circmean(np.concatenate([start_bin.StartLat.values, end_bin.EndLat.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
+    south_end = south.groupby(south['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(s_endagg)
+    south_end.columns = ["_".join(x) for x in south_end.columns.ravel()]
 
-        lon_bins.N_Lat_Var[lon_bin] = cs.circvar(np.concatenate([start_bin.StartLat.values, end_bin.EndLat.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
+    south_start = south.groupby(south['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(s_startagg)
+    south_start.columns = ["_".join(x) for x in south_start.columns.ravel()]
 
-        # Southern Coordinates
-        start_bin = pch_obj.where((pch_obj.H_StartLon >= lon_bin) & (pch_obj.H_StartLon <= (lon_bin+binsize)) & (pch_obj.StartLat < 0)).dropna(how='all')
-        end_bin = pch_obj.where((pch_obj.H_EndLon >= lon_bin) & (pch_obj.H_EndLon <= (lon_bin+binsize)) & (pch_obj.StartLat < 0)).dropna(how='all')
+    northern = pd.concat([north_start, north_end], join='outer', axis=1)
+    southern = pd.concat([south_start, south_end], join='outer', axis=1)
+    
+    # Clean up of nan values
+    values = {'H_StartLon_Std': 0,  'StartLat_Std': 0,  'H_EndLon_Std': 0,  'EndLat_Std': 0}
+    northern = northern.fillna(value=values).fillna(method='ffill').fillna(method='bfill')
+    southern = southern.fillna(value=values).fillna(method='ffill').fillna(method='bfill')
 
-        lon_bins.S_Lon_Mean[lon_bin] = cs.circmean(np.concatenate([start_bin.H_StartLon.values, end_bin.H_EndLon.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
+    bin_stats = {'N_Lon_Mean': pd.Series(circmean([northern.H_EndLon_Mean.values, northern.H_StartLon_Mean.values], axis =0, low=0, high=360), index=northern.index),
+                 'N_Lon_Std': np.sqrt(northern.H_StartLon_Std**2 + northern.H_EndLon_Std**2),
+                 'N_Lat_Mean': pd.Series(circmean([northern.EndLat_Mean.values, northern.StartLat_Mean.values], axis =0, low=-90, high=90), index=northern.index),
+                 'N_Lat_Std': np.sqrt(northern.StartLat_Std**2 + northern.EndLat_Std**2),
+                 'S_Lon_Mean': pd.Series(circmean([southern.H_EndLon_Mean.values, southern.H_StartLon_Mean.values], axis=0, low=0,high=360), index=southern.index),
+                 'S_Lon_Std': np.sqrt(southern.H_StartLon_Std ** 2 + southern.H_EndLon_Std ** 2),
+                 'S_Lat_Mean': pd.Series(circmean([southern.EndLat_Mean.values, southern.StartLat_Mean.values], axis=0, low=-90, high=90), index=southern.index),
+                 'S_Lat_Std': np.sqrt(southern.StartLat_Std ** 2 + southern.EndLat_Std ** 2)
+                 }
 
-        lon_bins.S_Lon_Var[lon_bin] = cs.circvar(np.concatenate([start_bin.H_StartLon.values, end_bin.H_EndLon.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
-
-        lon_bins.S_Lat_Mean[lon_bin] = cs.circmean(np.concatenate([start_bin.StartLat.values, end_bin.EndLat.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
-
-        lon_bins.S_Lat_Var[lon_bin] = cs.circvar(np.concatenate([start_bin.StartLat.values, end_bin.EndLat.values]) * u.deg,
-                                            weights=np.concatenate([start_bin.Quality.values, end_bin.Quality.values]))
-
-    return lon_bins
+    return pd.DataFrame(data=bin_stats)
 
 
 def areaint(lats, lons):
 
     assert lats.size == lons.size, 'List of latitudes and longitudes are different sizes.'
 
-    lat = np.array([lat.value for lat in lats]+[lats[0].value])*u.deg
-    lon = np.array([lon.value for lon in lons]+[lons[0].value])*u.deg
+    if isinstance(lats[0], u.Quantity):
+        lat = np.array([lat.value for lat in lats]+[lats[0].value])*u.deg
+        lon = np.array([lon.value for lon in lons]+[lons[0].value])*u.deg
+    else:
+        lat = np.append(lats, lats[0])*u.deg
+        lon = np.append(lons, lons[0])*u.deg
 
     if lat.max() > 0:
         northern = True
@@ -154,33 +190,49 @@ def azimuth(lon1, lat1, lon2, lat2, ratio=1):
     return bearing
 
 
-def chole_stats(pch_obj, filter, binsize=10):
+def chole_stats(pch_obj, wav_filter, binsize=10, sigma=1):
+    # Sigma : number of standard deviations
+    # pch_obj : the entire detection object
+    # wav_filter : the mission filter, e.g. 'EIT171'
 
-    if filter not in pch_obj.Filter.unique():
+    if wav_filter not in pch_obj.Filter.unique():
         print('Please specify a correct filter.')
         return pd.DataFrame()
 
-    measurements = filter_select(pch_obj, filter)
+    measurements = filter_select(pch_obj, wav_filter)
 
     hole_stats = pd.DataFrame(index=measurements.Harvey_Rotation.unique(), columns=['Harvey_Rotation',
                                         'Date', 'N_mean_area', 'S_mean_area', 'N_min_area', 'S_min_area', 'N_max_area',
-                                        'S_max_area', 'N_center_lat', 'N_center_lon', 'S_center_lat', 'S_center_lon'])
+                                        'S_max_area', 'N_center_lat', 'N_center_lon', 'S_center_lat', 'S_center_lon',
+                                        'N_lat_mean', 'N_lat_std', 'N_lon_mean', 'N_lon_std', 'S_lat_mean', 'S_lat_std', 
+                                                                                    'S_lon_mean', 'S_lon_std'])
 
     for hr in measurements.Harvey_Rotation:
         one_rot = one_hr_select(measurements, hr)
 
         binned = circular_rebinning(one_rot, binsize=binsize)
 
+        h_loc = np.argmin(np.abs((binned.index.values*binsize) - one_rot.Harvey_Longitude[0]))
+        hole_stats['N_lon_mean'][hr] = binned.N_Lon_Mean[h_loc] * u.deg
+        hole_stats['N_lon_std'][hr] = binned.N_Lon_Std[h_loc] * u.deg
+        hole_stats['N_lat_mean'][hr] = binned.N_Lat_Mean[h_loc] * u.deg
+        hole_stats['N_lat_std'][hr] = binned.N_Lat_Std[h_loc] * u.deg
+        hole_stats['S_lon_mean'][hr] = binned.S_Lon_Mean[h_loc] * u.deg
+        hole_stats['S_lon_std'][hr] = binned.S_Lon_Std[h_loc] * u.deg
+        hole_stats['S_lat_mean'][hr] = binned.S_Lat_Mean[h_loc] * u.deg
+        hole_stats['S_lat_std'][hr] = binned.S_Lat_Std[h_loc] * u.deg
+
         hole_stats['N_mean_area'][hr], hole_stats['N_center_lat'][hr], hole_stats['N_center_lon'][hr] = areaint(binned.N_Lat_Mean, binned.N_Lon_Mean)
-        hole_stats['N_max_area'][hr], _, _ = areaint(binned.N_Lat_Mean - binned.N_Lat_Var * u.deg, binned.N_Lon_Mean)
-        hole_stats['N_min_area'][hr], _, _ = areaint(binned.N_Lat_Mean + binned.N_Lat_Var * u.deg, binned.N_Lon_Mean)
+        hole_stats['N_max_area'][hr], _, _ = areaint(binned.N_Lat_Mean * u.deg - (sigma * binned.N_Lat_Std * u.deg), binned.N_Lon_Mean * u.deg)
+        hole_stats['N_min_area'][hr], _, _ = areaint(binned.N_Lat_Mean * u.deg + (sigma * binned.N_Lat_Std * u.deg), binned.N_Lon_Mean * u.deg)
         
         hole_stats['S_mean_area'][hr], hole_stats['S_center_lat'][hr], hole_stats['S_center_lon'][hr] = areaint(binned.S_Lat_Mean, binned.S_Lon_Mean)
-        hole_stats['S_max_area'][hr], _, _ = areaint(binned.S_Lat_Mean - binned.S_Lat_Var * u.deg, binned.S_Lon_Mean)
-        hole_stats['S_min_area'][hr], _, _ = areaint(binned.S_Lat_Mean + binned.S_Lat_Var * u.deg, binned.S_Lon_Mean)
+        hole_stats['S_max_area'][hr], _, _ = areaint(binned.S_Lat_Mean * u.deg - (sigma * binned.S_Lat_Std * u.deg), binned.S_Lon_Mean * u.deg)
+        hole_stats['S_min_area'][hr], _, _ = areaint(binned.S_Lat_Mean * u.deg + (sigma * binned.S_Lat_Std * u.deg), binned.S_Lon_Mean * u.deg)
 
         hole_stats['Date'][hr] = PCH_Tools.hrot2date(hr).iso
         hole_stats['Harvey_Rotation'][hr] = hr
+        print(np.int(((hr-measurements.Harvey_Rotation[0])/(measurements.Harvey_Rotation[-1]-measurements.Harvey_Rotation[0]))*100.))
 
     return hole_stats
 
