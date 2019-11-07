@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from PolarCoronalHoles import PCH_Tools, PCH_series
 import astropy.units as u
 import scipy.stats as stats
 import pandas as pd
 import PCH_series
+import PCH_Tools
 from matplotlib.colors import ListedColormap, BoundaryNorm
 from matplotlib.collections import LineCollection
 import matplotlib.dates as mdates
