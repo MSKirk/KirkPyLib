@@ -222,11 +222,11 @@ def center_of_mass(coords, mass=1, distance=False):
         mass = np.ones_like(coords[:,0])
 
     if distance:
-        mass *= np.sqrt(np.sum(coords**2, axis=1))
+        mass *= np.sqrt(np.nansum(coords**2, axis=1))
 
     mm = np.transpose(np.tile(mass, (coords.shape[1], 1)))
 
-    return np.sum(coords * mm, axis=0) / np.sum(mass)
+    return np.nansum(coords * mm, axis=0) / np.nansum(mass)
 
 
 def hrot2date(hrot):
@@ -336,8 +336,8 @@ def coord_rec2spher(xx, yy, zz):
     # SPACE NAVIGATION HANDBOOK  NAVPERS 92988 July 1, 1961
 
     rr = np.sqrt(xx ** 2 + yy ** 2 + zz ** 2)
-    beta = Latitude(np.arctan(zz / np.sqrt(xx ** 2 + yy ** 2)))
-    lamb = Longitude(np.arctan(yy / xx))
+    beta = Latitude(np.arctan(zz / np.sqrt(xx ** 2 + yy ** 2)) * u.rad)
+    lamb = Longitude(np.arctan(yy / xx) * u.rad)
 
     # Dist from Sun, Latitude, Longitude
     return [rr, beta, lamb]
@@ -358,5 +358,5 @@ def curve_length(xx, yy):
 
     length_square = (xx - np.roll(xx, 1))**2 + (yy - np.roll(yy, 1))**2
 
-    return np.sum(np.sqrt(length_square[1:]))
+    return np.nansum(np.sqrt(length_square[1:]))
 
