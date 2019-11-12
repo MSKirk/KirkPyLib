@@ -113,7 +113,9 @@ def aggregation_rebinning(hole_stats, binsize=10):
             '': lambda x: np.sqrt(np.nansum(x**2))},
         'N_lat_mean': {
             '': lambda x: circmean(x, low=-90, high=90)},
-        'N_lat_std': {
+        'N_lat_lower': {
+            '': lambda x: np.sqrt(np.nansum(x ** 2))},
+        'N_lat_upper': {
             '': lambda x: np.sqrt(np.nansum(x ** 2))},
         'N_mean_area':{
             'agg': 'mean'},
@@ -126,7 +128,9 @@ def aggregation_rebinning(hole_stats, binsize=10):
             '': lambda x: np.sqrt(np.nansum(x ** 2))},
         'S_lat_mean': {
             '': lambda x: circmean(x, low=-90, high=90)},
-        'S_lat_std': {
+        'S_lat_lower': {
+            '': lambda x: np.sqrt(np.nansum(x ** 2))},
+        'S_lat_upper': {
             '': lambda x: np.sqrt(np.nansum(x ** 2))},
         'S_mean_area': {
             'agg': 'mean'},
@@ -140,7 +144,7 @@ def aggregation_rebinning(hole_stats, binsize=10):
 
     bin_stats = pd.concat([northern, southern], join='outer', axis=1)
 
-    values = {'S_lon_std': 0,  'N_lon_std': 0,  'S_lat_std': 0,  'N_lat_std': 0}
+    values = {'S_lon_std': 0,  'N_lon_std': 0,  'S_lat_lower': 0, 'S_lat_upper': 0, 'N_lat_lower': 0, 'N_lat_upper': 0}
     bin_stats = bin_stats.fillna(value=values).fillna(method='ffill').fillna(method='bfill')
 
     return bin_stats
@@ -250,8 +254,8 @@ def chole_stats(pch_obj, wav_filter, binsize=10, sigma=1):
     hole_stats = pd.DataFrame(index=measurements.Harvey_Rotation.unique(), columns=['Harvey_Rotation',
                                         'Date', 'N_mean_area', 'S_mean_area', 'N_min_area', 'S_min_area', 'N_max_area',
                                         'S_max_area', 'N_center_lat', 'N_center_lon', 'S_center_lat', 'S_center_lon',
-                                        'N_lat_mean', 'N_lat_std', 'N_lon_mean', 'N_lon_std', 'S_lat_mean', 'S_lat_std', 
-                                                                                    'S_lon_mean', 'S_lon_std'])
+                                        'N_lat_mean', 'N_lat_upper', 'N_lat_lower', 'N_lon_mean', 'N_lon_std',
+                                        'S_lat_mean', 'S_lat_lower', 'S_lat_upper', 'S_lon_mean', 'S_lon_std'])
 
     for hr in measurements.Harvey_Rotation.unique():
         one_rot = one_hr_select(measurements, hr)
@@ -262,19 +266,21 @@ def chole_stats(pch_obj, wav_filter, binsize=10, sigma=1):
         hole_stats['N_lon_mean'][hr] = binned.N_Lon_Mean.iloc[h_loc] * u.deg
         hole_stats['N_lon_std'][hr] = binned.N_Lon_Std.iloc[h_loc] * u.deg
         hole_stats['N_lat_mean'][hr] = binned.N_Lat_Mean.iloc[h_loc] * u.deg
-        hole_stats['N_lat_std'][hr] = binned.N_Lat_Std.iloc[h_loc] * u.deg
+        hole_stats['N_lat_upper'][hr] = ((binned.N_Lat_Mean.iloc[h_loc] + binned.N_Lat_Std.iloc[h_loc]).clip(50,90) - binned.N_Lat_Mean.iloc[h_loc]) * u.deg
+        hole_stats['N_lat_lower'][hr] = ((binned.N_Lat_Mean.iloc[h_loc] - binned.N_Lat_Std.iloc[h_loc]).clip(50,90) - binned.N_Lat_Mean.iloc[h_loc]) * u.deg
         hole_stats['S_lon_mean'][hr] = binned.S_Lon_Mean.iloc[h_loc] * u.deg
         hole_stats['S_lon_std'][hr] = binned.S_Lon_Std.iloc[h_loc] * u.deg
         hole_stats['S_lat_mean'][hr] = binned.S_Lat_Mean.iloc[h_loc] * u.deg
-        hole_stats['S_lat_std'][hr] = binned.S_Lat_Std.iloc[h_loc] * u.deg
+        hole_stats['S_lat_upper'][hr] = ((binned.S_Lat_Mean.iloc[h_loc] - binned.S_Lat_Std.iloc[h_loc]).clip(-90,-50) - binned.S_Lat_Mean.iloc[h_loc]) * u.deg
+        hole_stats['S_lat_lower'][hr] = ((binned.S_Lat_Mean.iloc[h_loc] + binned.S_Lat_Std.iloc[h_loc]).clip(-90,-50) - binned.S_Lat_Mean.iloc[h_loc]) * u.deg
 
         hole_stats['N_mean_area'][hr], hole_stats['N_center_lat'][hr], hole_stats['N_center_lon'][hr] = areaint(binned.N_Lat_Mean, binned.N_Lon_Mean)
-        hole_stats['N_max_area'][hr], _, _ = areaint(binned.N_Lat_Mean * u.deg - (sigma * binned.N_Lat_Std * u.deg), binned.N_Lon_Mean * u.deg)
-        hole_stats['N_min_area'][hr], _, _ = areaint(binned.N_Lat_Mean * u.deg + (sigma * binned.N_Lat_Std * u.deg), binned.N_Lon_Mean * u.deg)
+        hole_stats['N_max_area'][hr], _, _ = areaint((binned.N_Lat_Mean - (sigma * binned.N_Lat_Std)).clip(50,90) * u.deg, binned.N_Lon_Mean * u.deg)
+        hole_stats['N_min_area'][hr], _, _ = areaint((binned.N_Lat_Mean * u.deg + (sigma * binned.N_Lat_Std * u.deg)).clip(50,90) * u.deg, binned.N_Lon_Mean * u.deg)
         
         hole_stats['S_mean_area'][hr], hole_stats['S_center_lat'][hr], hole_stats['S_center_lon'][hr] = areaint(binned.S_Lat_Mean, binned.S_Lon_Mean)
-        hole_stats['S_max_area'][hr], _, _ = areaint(binned.S_Lat_Mean * u.deg - (sigma * binned.S_Lat_Std * u.deg), binned.S_Lon_Mean * u.deg)
-        hole_stats['S_min_area'][hr], _, _ = areaint(binned.S_Lat_Mean * u.deg + (sigma * binned.S_Lat_Std * u.deg), binned.S_Lon_Mean * u.deg)
+        hole_stats['S_max_area'][hr], _, _ = areaint((binned.S_Lat_Mean - (sigma * binned.S_Lat_Std)).clip(-90,-50) * u.deg, binned.S_Lon_Mean * u.deg)
+        hole_stats['S_min_area'][hr], _, _ = areaint((binned.S_Lat_Mean + (sigma * binned.S_Lat_Std)).clip(-90,-50) * u.deg, binned.S_Lon_Mean * u.deg)
 
         hole_stats['Date'][hr] = PCH_Tools.hrot2date(hr).iso
         hole_stats['Harvey_Rotation'][hr] = hr
@@ -292,9 +298,9 @@ def combine_stats(pch_dfs, sigma=1, binsize=10):
 
     hole_stats = pd.DataFrame(index=all_stats.Harvey_Rotation.unique(), columns=['Harvey_Rotation',
                             'Date', 'N_mean_area', 'S_mean_area', 'N_min_area','S_min_area', 'N_max_area','S_max_area',
-                            'N_center_lat','N_center_lon', 'S_center_lat','S_center_lon','N_lat_mean', 'N_lat_std',
-                            'N_lon_mean', 'N_lon_std','S_lat_mean', 'S_lat_std', 'S_lon_mean', 'S_lon_std',
-                                                                                 'N_mean_area_agg','S_mean_area_agg'])
+                            'N_center_lat','N_center_lon', 'S_center_lat','S_center_lon','N_lat_mean', 'N_lat_upper',
+                            'N_lat_lower', 'N_lon_mean', 'N_lon_std','S_lat_mean', 'S_lat_lower', 'S_lat_upper',
+                            'S_lon_mean', 'S_lon_std', 'N_mean_area_agg','S_mean_area_agg'])
 
     for hr in all_stats.Harvey_Rotation.unique():
         one_rot = one_hr_select(all_stats, hr)
@@ -305,27 +311,29 @@ def combine_stats(pch_dfs, sigma=1, binsize=10):
         hole_stats['N_lon_mean'][hr] = binned.N_lon_mean.iloc[h_loc] * u.deg
         hole_stats['N_lon_std'][hr] = binned.N_lon_std.iloc[h_loc] * u.deg
         hole_stats['N_lat_mean'][hr] = binned.N_lat_mean.iloc[h_loc] * u.deg
-        hole_stats['N_lat_std'][hr] = binned.N_lat_std.iloc[h_loc] * u.deg
+        hole_stats['N_lat_upper'][hr] = binned.N_lat_upper.iloc[h_loc] * u.deg
+        hole_stats['N_lat_lower'][hr] = binned.N_lat_lower.iloc[h_loc] * u.deg
         hole_stats['N_mean_area_agg'][hr] = binned.N_mean_areaagg.iloc[h_loc]
 
         hole_stats['S_lon_mean'][hr] = binned.S_lon_mean.iloc[h_loc] * u.deg
         hole_stats['S_lon_std'][hr] = binned.S_lon_std.iloc[h_loc] * u.deg
         hole_stats['S_lat_mean'][hr] = binned.S_lat_mean.iloc[h_loc] * u.deg
-        hole_stats['S_lat_std'][hr] = binned.S_lat_std.iloc[h_loc] * u.deg
+        hole_stats['S_lat_upper'][hr] = binned.S_lat_upper.iloc[h_loc] * u.deg
+        hole_stats['S_lat_lower'][hr] = binned.S_lat_lower.iloc[h_loc] * u.deg
         hole_stats['S_mean_area_agg'][hr] = binned.S_mean_areaagg.iloc[h_loc]
 
         hole_stats['N_mean_area'][hr], hole_stats['N_center_lat'][hr], hole_stats['N_center_lon'][hr] = areaint(
             binned.N_lat_mean, binned.N_lon_mean)
-        hole_stats['N_max_area'][hr], _, _ = areaint(binned.N_lat_mean * u.deg - (sigma * binned.N_lat_std * u.deg),
+        hole_stats['N_max_area'][hr], _, _ = areaint((binned.N_lat_mean + (sigma * binned.N_lat_upper)).clip(50,90) * u.deg,
                                                      binned.N_lon_mean * u.deg)
-        hole_stats['N_min_area'][hr], _, _ = areaint(binned.N_lat_mean * u.deg + (sigma * binned.N_lat_std * u.deg),
+        hole_stats['N_min_area'][hr], _, _ = areaint((binned.N_lat_mean + (sigma * binned.N_lat_lower)).clip(50,90) * u.deg,
                                                      binned.N_lon_mean * u.deg)
 
         hole_stats['S_mean_area'][hr], hole_stats['S_center_lat'][hr], hole_stats['S_center_lon'][hr] = areaint(
             binned.S_lat_mean, binned.S_lon_mean)
-        hole_stats['S_max_area'][hr], _, _ = areaint(binned.S_lat_mean * u.deg - (sigma * binned.S_lat_std * u.deg),
+        hole_stats['S_max_area'][hr], _, _ = areaint((binned.S_lat_mean + (sigma * binned.S_lat_upper)).clip(-90,-50) * u.deg,
                                                      binned.S_lon_mean * u.deg)
-        hole_stats['S_min_area'][hr], _, _ = areaint(binned.S_lat_mean * u.deg + (sigma * binned.S_lat_std * u.deg),
+        hole_stats['S_min_area'][hr], _, _ = areaint((binned.S_lat_mean + (sigma * binned.S_lat_lower)).clip(-90,-50) * u.deg,
                                                      binned.S_lon_mean * u.deg)
 
         hole_stats['Date'][hr] = PCH_Tools.hrot2date(hr).iso
