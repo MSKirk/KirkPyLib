@@ -346,7 +346,7 @@ def combine_stats(pch_dfs, sigma=1, binsize=10):
 
 
 def df_chole_stats(pch_df, binsize=10, sigma=1.0, wav_filter='AIA171'):
-    ## **** anything that is _calc is a more expensive opperation ***
+    # **** anything that is _calc is a more expensive opperation ***
 
     # Processing time
     tstart = time.time()
@@ -385,8 +385,8 @@ def df_chole_stats(pch_df, binsize=10, sigma=1.0, wav_filter='AIA171'):
     elapsed_time = time.time() - tstart
     print('Compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time/60))
     
-    return pd.DataFrame(dict(N_mean_area=N_mean_area, N_upper_area=N_upper_area, N_lower_area=N_lower_area, 
-                             S_mean_area=S_mean_area, S_upper_area=S_upper_area, S_lower_area=S_lower_area))
+    return pd.DataFrame(dict(N_mean_area=N_mean_area, N_upper_area=N_upper_area, N_lower_area=N_lower_area)), \
+           pd.DataFrame(dict(S_mean_area=S_mean_area, S_upper_area=S_upper_area, S_lower_area=S_lower_area))
 
 
 def df_pre_process(pch_df, northern=True, **kwargs):
