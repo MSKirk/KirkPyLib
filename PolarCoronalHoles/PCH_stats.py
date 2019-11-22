@@ -1,6 +1,7 @@
 from PolarCoronalHoles import PCH_Tools
 import astropy.stats.circstats as cs
 from scipy.stats import circmean, circstd
+import time
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.time import Time
@@ -344,6 +345,181 @@ def combine_stats(pch_dfs, sigma=1, binsize=10):
     return hole_stats
 
 
+def df_chole_stats(pch_df, binsize=10, sigma=1.0, wav_filter='AIA171'):
+    ## **** anything that is _calc is a more expensive opperation ***
+
+    # Processing time
+    tstart = time.time()
+
+    # Northern Mean, Upper, and Lower ---------------------------------------------------
+    N_df_mean, N_df_upper, N_df_lower = df_pre_process(pch_df, northern=True, wave_filter=wav_filter, sigma=sigma, binsize=binsize)
+
+    # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
+    N_df_mean = pd.concat([N_df_mean, df_CoM_calc(N_df_mean)], axis=1)
+    N_df_upper = pd.concat([N_df_upper, df_CoM_calc(N_df_upper)], axis=1)
+    N_df_lower = pd.concat([N_df_lower, df_CoM_calc(N_df_lower)], axis=1)
+
+    N_df_mean, N_df_upper, N_df_lower = df_colat_az( N_df_mean, N_df_upper, N_df_lower)
+
+    # Area Calculation  *** df_area_calc *** is the expensive function
+    N_mean_area = df_area_calc(N_df_mean[['Lon','colat_rad','az_rad']])
+    N_upper_area = df_area_calc(N_df_upper[['Lon','colat_rad','az_rad']])
+    N_lower_area = df_area_calc(N_df_lower[['Lon','colat_rad','az_rad']])
+
+    # Southern Mean, Upper, and Lower ---------------------------------------------------
+    S_df_mean, S_df_upper, S_df_lower = df_pre_process(pch_df, northern=False, wave_filter=wav_filter, sigma=sigma, binsize=binsize)
+
+    # Center of Mass Calculation  *** df_CoM_calc *** is the expensive function
+    S_df_mean = pd.concat([S_df_mean, df_CoM_calc(S_df_mean)], axis=1)
+    S_df_upper = pd.concat([S_df_upper, df_CoM_calc(S_df_upper)], axis=1)
+    S_df_lower = pd.concat([S_df_lower, df_CoM_calc(S_df_lower)], axis=1)
+
+    S_df_mean, S_df_upper, S_df_lower = df_colat_az( S_df_mean, S_df_upper, S_df_lower)
+
+    # Area Calculation  *** df_CoM_calc *** is the expensive function
+    S_mean_area = df_area_calc(S_df_mean[['Lon','colat_rad','az_rad']])
+    S_upper_area = df_area_calc(S_df_upper[['Lon','colat_rad','az_rad']])
+    S_lower_area = df_area_calc(S_df_lower[['Lon','colat_rad','az_rad']])
+    
+    # End Processing time
+    elapsed_time = time.time() - tstart
+    print('Compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time/60))
+    
+    return pd.DataFrame(dict(N_mean_area=N_mean_area, N_upper_area=N_upper_area, N_lower_area=N_lower_area, 
+                             S_mean_area=S_mean_area, S_upper_area=S_upper_area, S_lower_area=S_lower_area))
+
+
+def df_pre_process(pch_df, northern=True, **kwargs):
+    
+    pch_df['bin'] = np.round(pch_df.Lon/kwargs.get('binsize', 10))
+    
+    if northern:
+        df_mean = pch_df[(pch_df.Lat > 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling('33D', win_type='boxcar').mean().xs(kwargs.get('wave_filter'), level=1).reset_index().set_index(['DateTime']).sort_index()
+        df_std = pch_df[(pch_df.Lat > 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling('33D', win_type='boxcar').std().xs(kwargs.get('wave_filter'), level=1).reset_index().set_index(['DateTime']).sort_index()
+    else:
+        df_mean = pch_df[(pch_df.Lat < 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling('33D', win_type='boxcar').mean().xs(kwargs.get('wave_filter'), level=1).reset_index().set_index(['DateTime']).sort_index()
+        df_std = pch_df[(pch_df.Lat < 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling('33D', win_type='boxcar').std().xs(kwargs.get('wave_filter'), level=1).reset_index().set_index(['DateTime']).sort_index()
+
+    df_upper = df_mean + (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
+    df_upper.Lat[df_upper.Lat > 90] = 90
+    df_upper.Lat[df_upper.Lat < 50] = 50
+    df_upper.Lon[df_upper.Lat >= 360] -= 360
+    df_upper.Lon[df_upper.Lat <= 0] += 360
+
+    df_lower = df_mean - (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
+    df_lower.Lat[df_lower.Lat > 90] = 90
+    df_lower.Lat[df_lower.Lat < 50] = 50
+    df_lower.Lon[df_lower.Lat >= 360] -= 360
+    df_lower.Lon[df_lower.Lat <= 0] += 360
+
+    return df_mean, df_upper, df_lower
+
+
+def df_colat_az(df_mean, df_upper, df_lower):
+
+    # Define Colat and azimuth in radians
+    df_mean['colat_rad'] = df_colat(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    df_mean['az_rad'] = df_azimuth(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+
+    df_upper['colat_rad'] = df_colat(df_upper, ref_lat=df_upper.c_lat, ref_lon=df_upper.c_lon)
+    df_upper['az_rad'] = df_azimuth(df_upper, ref_lat=df_upper.c_lat, ref_lon=df_upper.c_lon)
+
+    df_lower['colat_rad'] = df_colat(df_lower, ref_lat=df_lower.c_lat, ref_lon=df_lower.c_lon)
+    df_lower['az_rad'] = df_azimuth(df_lower, ref_lat=df_lower.c_lat, ref_lon=df_lower.c_lon)
+
+    return df_mean, df_upper, df_lower
+
+
+def df_area_calc(df):
+    
+    df_series = df.reset_index().set_index(['DateTime']).sort_index()
+    df_series['idx'] = range(len(df_series))
+
+    return df_series.idx.rolling('33D').apply(lambda x: _area_apply(x, df_series), raw=True)
+
+
+def _area_apply(elems, mydf):
+
+    # From raphael
+    # elems is what's passed by the "x" variable of the lambda function
+    # it is a list of whatever indices will be in the '33D' window and that are used
+    # to reference the rows of the database (i.e. here the dataframe “mydf”)
+
+    df_series = mydf.iloc[elems]
+
+    daz = np.diff(df_series.sort_values(by=['Lon'])['az_rad'])
+    daz[np.where(daz > np.deg2rad(180))] -= np.deg2rad(360.)
+    daz[np.where(daz < np.deg2rad(-180))] += np.deg2rad(360.)
+    #
+    colat_sorted = df_series.sort_values(by=['Lon'])['colat_rad']
+    deltas = np.diff(colat_sorted) / 2.
+    colats = colat_sorted[0:-1]+deltas
+    integrands = (1 - np.cos(colats)) * daz
+
+    return np.abs(integrands.sum()) / (4 * np.pi)
+
+
+def df_CoM_calc(df):
+    df_series = df.reset_index().set_index(['DateTime']).sort_index()
+    df_series['idx'] = range(len(df_series))
+
+    com_df = pd.DataFrame()
+    com_df['c_lat'] = df_series.idx.rolling('33D').apply(lambda x: _center_lat_apply(x, df_series), raw=True)
+    com_df['c_lon'] = df_series.idx.rolling('33D').apply(lambda x: _center_lon_apply(x, df_series), raw=True)
+
+    return com_df
+
+
+def _center_lat_apply(elems, mydf, **kwargs):
+
+    df_series = mydf.iloc[elems]
+    weights = kwargs.get('weights', 1)
+    rr = 1
+
+    xx = rr * np.cos(np.deg2rad(df_series.Lat)) * np.cos(np.deg2rad(df_series.Lon))
+    yy = rr * np.cos(np.deg2rad(df_series.Lat)) * np.sin(np.deg2rad(df_series.Lon))
+    zz = rr * np.sin(np.deg2rad(df_series.Lat))
+
+    # xx_center technically is xx.sum()/np.sum(weights)
+
+    return np.arctan(zz.mean() / np.sqrt(xx.mean() ** 2 + yy.mean() ** 2))
+
+
+def _center_lon_apply(elems, mydf, **kwargs):
+
+    df_series = mydf.iloc[elems]
+    weights = kwargs.get('weights', 1)
+    rr = 1
+
+    xx = rr * np.cos(np.deg2rad(df_series.Lat)) * np.cos(np.deg2rad(df_series.Lon))
+    yy = rr * np.cos(np.deg2rad(df_series.Lat)) * np.sin(np.deg2rad(df_series.Lon))
+
+    # xx_center technically is xx.sum()/np.sum(weights)
+
+    return np.arctan(yy.mean() / xx.mean())
+
+
+def df_colat(df, ref_lat=np.deg2rad(90), ref_lon=np.deg2rad(0)):
+    # Returns in Radians
+
+    return np.arccos((np.sin(ref_lat) * np.sin(np.deg2rad(df.Lat))) + (np.cos(ref_lat) * np.cos(
+        np.deg2rad(df.Lon)) * np.cos(np.deg2rad(df.Lon)-ref_lon)))
+
+
+def df_azimuth(df, ref_lat=np.deg2rad(90), ref_lon=np.deg2rad(0)):
+    # Returns in Radians
+    # elipsoidal ratio
+    ratio = 1
+
+    ratio = ratio ** 2.
+    part1 = np.cos(np.deg2rad(df.Lat)) * np.sin(np.deg2rad(df.Lon) - ref_lon)
+    part2 = ratio * np.cos(ref_lat) * np.sin(np.deg2rad(df.Lat))
+    part3 = np.sin(ref_lat) * np.cos(np.deg2rad(df.Lat)) * np.cos(np.deg2rad(df.Lon) - ref_lon)
+    part4 = (1 - ratio) * np.sin(ref_lat) * np.cos(np.deg2rad(df.Lat)) * np.cos(ref_lat) / np.cos(np.deg2rad(df.Lat))
+
+    return np.arctan2(part1, part2 - part3 + part4)
+
+
 def remove_quantities(df):
     # Return a dataframe without quantiies
 
@@ -352,6 +528,14 @@ def remove_quantities(df):
             df[key] = np.array([itm.value for itm in df[key]])
 
     return df
+
+
+def test_run_area_calc(mydf):
+    tstart = time.time()
+    res = dfs.idx.rolling('33D').apply(lambda x: _area_apply_raphael(x, mydf))
+    elapsed_time = time.time() - tstart
+    print('Compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time/60))
+    return res
 
 
 def read_all_pch_df():
