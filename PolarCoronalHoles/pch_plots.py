@@ -88,21 +88,20 @@ def TESS_2018_plot():
     ax = sns.tsplot(data=binned_lats, time=np.degrees(bin_edges[0:number_of_bins]), err_style='boot_traces', n_boot=800, color='m')
 
 
-def area_series_plot():
+def area_series_plot(northern=True):
 
     all_area = pd.read_pickle('/Users/mskirk/data/PCH_Project/all_area.pkl')
-    north = pd.concat([all_area.Area[all_area.Center_lat > 0], all_area.Area_max[all_area.Center_lat > 0],
-                       all_area.Area_min[all_area.Center_lat > 0]]).sort_index()
-    south = pd.concat([all_area.Area[all_area.Center_lat < 0], all_area.Area_max[all_area.Center_lat < 0],
-                       all_area.Area_min[all_area.Center_lat < 0]]).sort_index()
+
+    if northern:
+        north = pd.concat([all_area.Area[all_area.Center_lat > 0], all_area.Area_max[all_area.Center_lat > 0],
+                           all_area.Area_min[all_area.Center_lat > 0]]).sort_index()
+    else:
+        north = pd.concat([all_area.Area[all_area.Center_lat < 0], all_area.Area_max[all_area.Center_lat < 0],
+                           all_area.Area_min[all_area.Center_lat < 0]]).sort_index()
 
     north_ci = PCH_series.series_bootstrap(north, interval='360D', delta=True, confidence=0.997).fillna(0)
 
     n_div = (north_ci.upper - north_ci.lower)/2
-
-    south_ci = PCH_series.series_bootstrap(south, interval='360D', delta=True, confidence=0.997).fillna(0)
-
-    s_div = (south_ci.upper - south_ci.lower)/2
 
     wso = PCH_series.read_wso_data('/Users/mskirk/data/PCH_Project/WSO_PolarField.txt')
 
@@ -112,14 +111,17 @@ def area_series_plot():
     outer_grid = gridspec.GridSpec(2, 1, wspace=0.0, hspace=0.0,height_ratios=[20, 1])
     ax = fig.add_subplot(outer_grid[0])
     plt.plot(north.resample('11D').median())
+    plt.tight_layout()
     plt.fill_between(north_ci.resample('11D').median().index, (north -n_div).resample('11D').median(), (north + n_div).resample('11D').median(), alpha=0.5)
-    ax.set_title('Northern Polar Coronal Hole')
+    if northern:
+        ax.set_title('Northern Polar Coronal Hole')
+    else:
+        ax.set_title('Southern Polar Coronal Hole')
     ax.set_ylabel('Fractional Area')
     ax.set_ylim(0, 0.08)
     ax.set_xlim(all_area.index[0] - timedelta(days=180), all_area.index[-1] + timedelta(days=180))
     ax.set_xlabel('')
     ax.set_xticklabels([])
-
 
     ax1 = fig.add_subplot(outer_grid[1])
     inxval = mdates.date2num(wso.index.to_pydatetime())
@@ -127,9 +129,16 @@ def area_series_plot():
     points = np.array([inxval, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     cmap = ListedColormap(['r', 'y'])
-    norm = BoundaryNorm([wso.NorthFilter.min(), 0, wso.NorthFilter.max()], cmap.N)
-    lc = LineCollection(segments, cmap=cmap, norm=norm)
-    lc.set_array(wso.NorthFilter)
+
+    if northern:
+        norm = BoundaryNorm([wso.NorthFilter.min(), 0, wso.NorthFilter.max()], cmap.N)
+        lc = LineCollection(segments, cmap=cmap, norm=norm)
+        lc.set_array(wso.NorthFilter)
+    else:
+        norm = BoundaryNorm([wso.SouthFilter.min(), 0, wso.SouthFilter.max()], cmap.N)
+        lc = LineCollection(segments, cmap=cmap, norm=norm)
+        lc.set_array(wso.SouthFilter)
+
     lc.set_linewidth(4)
     line = ax1.add_collection(lc)
     ax1.xaxis.set_major_locator(mdates.AutoDateLocator())
