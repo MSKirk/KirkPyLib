@@ -613,6 +613,7 @@ def _area_apply(elems, mydf):
     # to reference the rows of the database (i.e. here the dataframe “mydf”)
 
     df_series = mydf.iloc[elems]
+    print('Percent Complete: ', np.round((np.min(elems)*100.)/df_series.shape[0]))
 
     daz = np.diff(df_series.sort_values(by=['Lon'])['az_rad'])
     daz[np.where(daz > np.deg2rad(180))] -= np.deg2rad(360.)
