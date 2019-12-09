@@ -5,6 +5,7 @@ import scipy.stats as stats
 import pandas as pd
 import PCH_series
 import PCH_Tools
+import PCH_stats
 from matplotlib.colors import ListedColormap, BoundaryNorm
 from matplotlib.collections import LineCollection
 import matplotlib.dates as mdates
@@ -230,4 +231,75 @@ def pole_plot_check(index):
     print('Solar L0 '+np.str(sunpy.coordinates.sun.L0(pch_obj.index[index])))
 
 
+def area_comparison(pch_dic):
+    start_date = '2010-07-31'
+    end_date = '2010-09-02'
 
+    fig = plt.figure(figsize=(18, 6))
+    ax = fig.add_subplot()
+    ax.set_title('Southern Polar Coronal Hole')
+    ax.set_ylabel('Fractional Area')
+    ax.set_ylim(0, 0.07)
+    ax.set_xlim(Time(start_date).to_datetime() - timedelta(days=1), Time(end_date).to_datetime() + timedelta(days=1))
+    plt.tight_layout()
+
+    plt.plot(pch_dic['EIT171'][1].S_mean_area[start_date:end_date], '.')
+    plt.plot(pch_dic['AIA171'][1].S_mean_area[start_date:end_date], '.')
+    plt.plot(pch_dic['EUVI171'][1].S_mean_area[start_date:end_date], '.')
+    plt.plot(pch_dic['SWAP174'][1].S_mean_area[start_date:end_date], '.')
+
+    all_171 = pd.concat([pch_dic['EIT171'][1].S_mean_area[start_date:end_date].resample('0.5D').mean(),
+               pch_dic['AIA171'][1].S_mean_area[start_date:end_date].resample('0.5D').mean(),
+               pch_dic['EUVI171'][1].S_mean_area[start_date:end_date].resample('0.5D').mean(),
+               pch_dic['SWAP174'][1].S_mean_area[start_date:end_date].resample('0.5D').mean()]).sort_index()
+
+    sns.lineplot(x=all_171.index.round('0.5D'), y=all_171, ci='sd', n_boot=1000, estimator='median')
+
+    ax.set_ylabel('Fractional Area')
+
+
+def boundary_comparision(pch_obj):
+    EIT171 = PCH_stats.df_pre_process(pch_obj, northern=False, window_size='16.5D', wave_filter='EIT171')[0][start_date:end_date]
+    EUVI171 = PCH_stats.df_pre_process(pch_obj, northern=False, window_size='16.5D', wave_filter='EUVI171')[0][start_date:end_date]
+    AIA171 = PCH_stats.df_pre_process(pch_obj, northern=False, window_size='16.5D', wave_filter='AIA171')[0][start_date:end_date]
+    SWAP174 = PCH_stats.df_pre_process(pch_obj, northern=False, window_size='16.5D', wave_filter='SWAP174')[0][start_date:end_date]
+
+    eit171 = pd.Series(data=EIT171.Lat.values, index=EIT171.Lon.values).sort_index()
+    euvi171 = pd.Series(data=EUVI171.Lat.values, index=EUVI171.Lon.values).sort_index()
+    aia171 = pd.Series(data=AIA171.Lat.values, index=AIA171.Lon.values).sort_index()
+    swap174 = pd.Series(data=SWAP174.Lat.values, index=SWAP174.Lon.values).sort_index()
+
+    fig = plt.figure(figsize=(18, 6))
+    ax = fig.add_subplot()
+    ax.set_title('Southern Polar Coronal Hole')
+    ax.set_ylabel('Latitude')
+    ax.set_ylim(-90, -50)
+    ax.set_xlabel('Longitude')
+    ax.set_xlim(0,360)
+    plt.tight_layout()
+
+    plt.plot(eit171, '.')
+    plt.plot(euvi171, '.')
+    plt.plot(aia171, '.')
+    plt.plot(swap174, '.')
+
+    fig = plt.figure(figsize=(18, 6))
+    ax = fig.add_subplot()
+    ax.set_title('Southern Polar Coronal Hole')
+    ax.set_ylabel('Latitude')
+    ax.set_ylim(-90, -50)
+    ax.set_xlabel('Longitude')
+    ax.set_xlim(0,360)
+    plt.tight_layout()
+
+    plt.plot(EIT171.groupby('bin').median().Lon, EIT171.groupby('bin').median().Lat, '.')
+    plt.plot(EUVI171.groupby('bin').median().Lon, EUVI171.groupby('bin').median().Lat, '.')
+    plt.plot(AIA171.groupby('bin').median().Lon, AIA171.groupby('bin').median().Lat, '.')
+    plt.plot(SWAP174.groupby('bin').median().Lon, SWAP174.groupby('bin').median().Lat, '.')
+
+    all171 = pd.concat([EIT171.groupby('bin').median(),EUVI171.groupby('bin').median(),AIA171.groupby('bin').median(),
+                        SWAP174.groupby('bin').median()]).reset_index().set_index('bin').sort_index()
+
+    all171.index = all171.index*10
+
+    sns.lineplot(x=all171.index, y=all171.Lat, ci='sd', n_boot=1000, estimator='median')
