@@ -1,4 +1,4 @@
-from PolarCoronalHoles import PCH_Tools
+import PCH_Tools
 import astropy.stats.circstats as cs
 from scipy.stats import circmean, circstd
 import time
@@ -423,6 +423,30 @@ def df_chole_stats_hem(pch_df, binsize=10, sigma=1.0, wave_filter='AIA171', nort
                             lower_area.rename('S_lower_area'),
                             com_lower.rename(columns={'c_lat': 'S_lower_lat', 'c_lon': 'S_lower_lon'})], axis=1)
 
+    # # ---- Mean Only... to save time as well as upper and lower don't yield consistent results ----
+    # df_mean, _df_up, _df_lo = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
+    #                                          binsize=binsize, window_size=window_size)
+    #
+    # # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
+    # com_mean = df_CoM_calc(df_mean, window_size=window_size)
+    #
+    # df_mean = pd.concat([df_mean, com_mean], axis=1)
+    #
+    # df_mean['colat_rad'] = df_colat(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    # df_mean['az_rad'] = df_azimuth(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    #
+    # # Area Calculation  *** df_area_calc *** is the expensive function
+    # mean_area = df_area_calc(df_mean[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    #
+    # if northern:
+    #     df_hem = pd.concat([mean_area.rename('N_mean_area'),
+    #                         com_mean.rename(columns={'c_lat': 'N_mean_lat', 'c_lon': 'N_mean_lon'})], axis=1)
+    #
+    # else:
+    #     df_hem = pd.concat([mean_area.rename('S_mean_area'),
+    #                         com_mean.rename(columns={'c_lat': 'S_mean_lat', 'c_lon': 'S_mean_lon'})], axis=1)
+    # # End Mean Calc.
+
     elapsed_time = time.time() - tstart
     print('Compute time for {:s} - northern={:s} : {:1.0f} sec ({:1.1f} min)'.format(wave_filter, str(northern),
                                                                                      elapsed_time, elapsed_time / 60))
@@ -438,52 +462,82 @@ def df_concat_stats_hem(pch_df, binsize=10, sigma=1.0, northern=True, window_siz
 
     resampled_dfs = dict()
 
-    # Mean, Upper, and Lower ---------------------------------------------------
+    # # Mean, Upper, and Lower ---------------------------------------------------
+    # for wave_filter in pch_df.Filter.unique():
+    #     df_mean, df_upper, df_lower = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
+    #                                              binsize=binsize, window_size=window_size, resample=True)
+    #
+    #     resampled_dfs[wave_filter] = [df_mean, df_upper, df_lower]
+    #
+    # df_mean = pch_dict_concat(resampled_dfs, index=0).sort_index()
+    # df_mean.index = df_mean.index.rename('DateTime')
+    # df_upper = pch_dict_concat(resampled_dfs, index=1).sort_index()
+    # df_upper.index = df_upper.index.rename('DateTime')
+    # df_lower = pch_dict_concat(resampled_dfs, index=2).sort_index()
+    # df_lower.index = df_lower.index.rename('DateTime')
+    #
+    # # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
+    # com_mean = df_CoM_calc(df_mean, window_size=window_size)
+    # com_upper = df_CoM_calc(df_upper, window_size=window_size)
+    # com_lower = df_CoM_calc(df_lower, window_size=window_size)
+    #
+    # df_mean = pd.concat([df_mean, com_mean], axis=1)
+    # df_upper = pd.concat([df_upper, com_upper], axis=1)
+    # df_lower = pd.concat([df_lower, com_lower], axis=1)
+    #
+    # df_mean, df_upper, df_lower = df_colat_az(df_mean, df_upper, df_lower)
+    #
+    # # Area Calculation  *** df_area_calc *** is the expensive function
+    # mean_area = df_area_calc(df_mean[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    # upper_area = df_area_calc(df_upper[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    # lower_area = df_area_calc(df_lower[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    #
+    # if northern:
+    #     df_hem = pd.concat([mean_area.rename('N_mean_area'),
+    #                         com_mean.rename(columns={'c_lat': 'N_mean_lat', 'c_lon': 'N_mean_lon'}),
+    #                         upper_area.rename('N_upper_area'),
+    #                         com_upper.rename(columns={'c_lat': 'N_upper_lat', 'c_lon': 'N_upper_lon'}),
+    #                         lower_area.rename('N_lower_area'),
+    #                         com_lower.rename(columns={'c_lat': 'N_lower_lat', 'c_lon': 'N_lower_lon'})], axis=1)
+    #
+    # else:
+    #     df_hem = pd.concat([mean_area.rename('S_mean_area'),
+    #                         com_mean.rename(columns={'c_lat': 'S_mean_lat', 'c_lon': 'S_mean_lon'}),
+    #                         upper_area.rename('S_upper_area'),
+    #                         com_upper.rename(columns={'c_lat': 'S_upper_lat', 'c_lon': 'S_upper_lon'}),
+    #                         lower_area.rename('S_lower_area'),
+    #                         com_lower.rename(columns={'c_lat': 'S_lower_lat', 'c_lon': 'S_lower_lon'})], axis=1)
+
+    # # ---- Mean Only... to save time as well as upper and lower don't yield consistent results ----
     for wave_filter in pch_df.Filter.unique():
-        df_mean, df_upper, df_lower = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
+        df_mean, _df_up, _df_lo = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
                                                  binsize=binsize, window_size=window_size, resample=True)
 
-        resampled_dfs[wave_filter] = [df_mean, df_upper, df_lower]
+        resampled_dfs[wave_filter] = [df_mean]
 
     df_mean = pch_dict_concat(resampled_dfs, index=0).sort_index()
     df_mean.index = df_mean.index.rename('DateTime')
-    df_upper = pch_dict_concat(resampled_dfs, index=1).sort_index()
-    df_upper.index = df_upper.index.rename('DateTime')
-    df_lower = pch_dict_concat(resampled_dfs, index=2).sort_index()
-    df_lower.index = df_lower.index.rename('DateTime')
 
     # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
     com_mean = df_CoM_calc(df_mean, window_size=window_size)
-    com_upper = df_CoM_calc(df_upper, window_size=window_size)
-    com_lower = df_CoM_calc(df_lower, window_size=window_size)
 
     df_mean = pd.concat([df_mean, com_mean], axis=1)
-    df_upper = pd.concat([df_upper, com_upper], axis=1)
-    df_lower = pd.concat([df_lower, com_lower], axis=1)
 
-    df_mean, df_upper, df_lower = df_colat_az(df_mean, df_upper, df_lower)
+    df_mean['colat_rad'] = df_colat(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    df_mean['az_rad'] = df_azimuth(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
 
     # Area Calculation  *** df_area_calc *** is the expensive function
     mean_area = df_area_calc(df_mean[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
-    upper_area = df_area_calc(df_upper[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
-    lower_area = df_area_calc(df_lower[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
 
     if northern:
-        df_hem = pd.concat([mean_area.rename('N_mean_area'), 
-                            com_mean.rename(columns={'c_lat': 'N_mean_lat', 'c_lon': 'N_mean_lon'}),
-                            upper_area.rename('N_upper_area'),
-                            com_upper.rename(columns={'c_lat': 'N_upper_lat', 'c_lon': 'N_upper_lon'}),
-                            lower_area.rename('N_lower_area'),
-                            com_lower.rename(columns={'c_lat': 'N_lower_lat', 'c_lon': 'N_lower_lon'})], axis=1)
+        df_hem = pd.concat([mean_area.rename('N_mean_area'),
+                            com_mean.rename(columns={'c_lat': 'N_mean_lat', 'c_lon': 'N_mean_lon'})], axis=1)
 
     else:
-        df_hem = pd.concat([mean_area.rename('S_mean_area'), 
-                            com_mean.rename(columns={'c_lat': 'S_mean_lat', 'c_lon': 'S_mean_lon'}),
-                            upper_area.rename('S_upper_area'),
-                            com_upper.rename(columns={'c_lat': 'S_upper_lat', 'c_lon': 'S_upper_lon'}),
-                            lower_area.rename('S_lower_area'),
-                            com_lower.rename(columns={'c_lat': 'S_lower_lat', 'c_lon': 'S_lower_lon'})], axis=1)
-    
+        df_hem = pd.concat([mean_area.rename('S_mean_area'),
+                            com_mean.rename(columns={'c_lat': 'S_mean_lat', 'c_lon': 'S_mean_lon'})], axis=1)
+    # # End Mean Calc.
+
     elapsed_time = time.time() - tstart
     print('Compute time for northern={:s} : {:1.0f} sec ({:1.1f} min)'.format(str(northern), elapsed_time, elapsed_time / 60))
 
@@ -569,7 +623,6 @@ def df_pre_process(pch_df, northern=True, resample=False, **kwargs):
 
         df_std = df_std.groupby('bin').resample('1D').std()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(['DateTime']).sort_index()
 
-
     df_upper = df_mean + (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
     df_upper.Lat[df_upper.Lat > 90] = 90
     df_upper.Lat[df_upper.Lat < 50] = 50
@@ -613,7 +666,7 @@ def _area_apply(elems, mydf):
     # to reference the rows of the database (i.e. here the dataframe “mydf”)
 
     df_series = mydf.iloc[elems]
-    print('Percent Complete: ', np.round((np.min(elems)*100.)/df_series.shape[0]))
+    print('Percent Complete: ', np.round((np.min(elems)*100.)/mydf.shape[0]))
 
     daz = np.diff(df_series.sort_values(by=['Lon'])['az_rad'])
     daz[np.where(daz > np.deg2rad(180))] -= np.deg2rad(360.)

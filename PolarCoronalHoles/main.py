@@ -46,7 +46,8 @@ if __name__ == '__main__':
     wav_list = ['EIT171', 'EIT195', 'EIT304', 'EUVI171', 'EUVI195', 'EUVI304', 'AIA171', 'AIA193', 'AIA304', 'AIA211', 'SWAP174']
     params = prep_params(wav_list)
 
-    window_filter_list = ['1D', '3.3D', '16.5D', '33D']
+    #window_filter_list = ['1D', '3D', '16.5D', '33D']
+    window_filter_list = ['3D']
     params2 = prep_window_params(window_filter_list)
 
     tstart = time.time()
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     with Pool(nprocesses) as p:
         df_pool = p.map(run_stat, params)
 
-    nprocesses = 8
+    nprocesses = 4
     with Pool(nprocesses) as p:
         df_pool2 = p.map(run_concat_stat, params2)
 
