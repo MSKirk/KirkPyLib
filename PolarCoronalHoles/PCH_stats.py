@@ -389,7 +389,7 @@ def df_chole_stats_hem(pch_df, binsize=10, sigma=1.0, wave_filter='AIA171', nort
 
     # Northern Mean, Upper, and Lower ---------------------------------------------------
     df_mean, df_upper, df_lower = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
-                                                 binsize=binsize, window_size=window_size)
+                                                 binsize=binsize, window_size='33D')
 
     # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
     com_mean = df_CoM_calc(df_mean, window_size=window_size)
@@ -511,7 +511,7 @@ def df_concat_stats_hem(pch_df, binsize=10, sigma=1.0, northern=True, window_siz
     # # ---- Mean Only... to save time as well as upper and lower don't yield consistent results ----
     for wave_filter in pch_df.Filter.unique():
         df_mean, _df_up, _df_lo = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
-                                                 binsize=binsize, window_size=window_size, resample=True)
+                                                 binsize=binsize, window_size='33D', resample=True)
 
         resampled_dfs[wave_filter] = [df_mean]
 
@@ -600,7 +600,7 @@ def df_chole_stats(binsize=10, sigma=1.0, wav_filter='AIA171'):
 
 
 def df_pre_process(pch_df, northern=True, resample=False, **kwargs):
-    pch_df['bin'] = np.round(pch_df.Lon / kwargs.get('binsize', 10))
+    pch_df['bin'] = np.floor(pch_df.Lon / kwargs.get('binsize', 10))
 
     if northern:
         df_mean = pch_df[(pch_df.Lat > 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling(kwargs.get('window_size'),
