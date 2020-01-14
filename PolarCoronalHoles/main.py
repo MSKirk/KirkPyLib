@@ -36,7 +36,7 @@ if __name__ == '__main__':
     pch_df = pd.read_pickle(os.path.expanduser('/Users/mskirk/data/PCH_Project/pch_obj_concat.pkl'))
 
     def run_stat(dict_params):
-        hem_df = PCH_stats.df_chole_stats_hem(pch_df, binsize=10, sigma=1.0, wave_filter=dict_params['wav_filter'], northern=dict_params['northern'], window_size='8.25D')
+        hem_df = PCH_stats.df_chole_stats_hem(pch_df, binsize=10, sigma=1.0, wave_filter=dict_params['wav_filter'], northern=dict_params['northern'], window_size='11D')
         return hem_df
 
     def run_concat_stat(dict_params):
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     params = prep_params(wav_list)
 
     #window_filter_list = ['1D', '8.25D', '16.5D', '33D']
-    window_filter_list = ['8.25D']
+    window_filter_list = ['11D']
     params2 = prep_window_params(window_filter_list)
 
     tstart = time.time()

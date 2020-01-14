@@ -29,7 +29,7 @@ def sph_center_of_mass(lats, lons, **kwargs):
     return sphere_center
 
 
-def circular_rebinning(pch_obj, binsize=10):
+def circular_rebinning(pch_obj, binsize=5):
     # Bin size in degrees; split into N and S
 
     north = pch_obj.where(pch_obj.StartLat > 0).dropna(how='all')
@@ -110,7 +110,7 @@ def circular_rebinning(pch_obj, binsize=10):
     return pd.DataFrame(data=bin_stats)
 
 
-def aggregation_rebinning(hole_stats, binsize=10):
+def aggregation_rebinning(hole_stats, binsize=5):
     # Aggregate mission dataframes like those returned by chole_stats
 
     # Aggregation Rules
@@ -245,7 +245,7 @@ def azimuth(lon1, lat1, lon2, lat2, ratio=1):
     return bearing
 
 
-def chole_stats(pch_obj, wav_filter, binsize=10, sigma=1):
+def chole_stats(pch_obj, wav_filter, binsize=5, sigma=1):
     # Sigma : number of standard deviations
     # pch_obj : the entire detection object
     # wav_filter : the mission filter, e.g. 'EIT171'
@@ -316,7 +316,7 @@ def chole_stats(pch_obj, wav_filter, binsize=10, sigma=1):
     return hole_stats
 
 
-def combine_stats(pch_dfs, sigma=1, binsize=10):
+def combine_stats(pch_dfs, sigma=1, binsize=5):
     # pch_dfs = a list of dataframes to combine
 
     all_stats = pd.concat(pch_dfs).sort_index()
@@ -381,7 +381,7 @@ def combine_stats(pch_dfs, sigma=1, binsize=10):
     return hole_stats
 
 
-def df_chole_stats_hem(pch_df, binsize=10, sigma=1.0, wave_filter='AIA171', northern=True, window_size='33D'):
+def df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter='AIA171', northern=True, window_size='33D'):
     # **** anything that is _calc is a more expensive opperation ***
 
     # Processing time
@@ -454,7 +454,7 @@ def df_chole_stats_hem(pch_df, binsize=10, sigma=1.0, wave_filter='AIA171', nort
     return df_hem
 
 
-def df_concat_stats_hem(pch_df, binsize=10, sigma=1.0, northern=True, window_size='33D'):
+def df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=True, window_size='33D'):
     # **** anything that is _calc is a more expensive opperation ***
 
     # Processing time
@@ -544,7 +544,7 @@ def df_concat_stats_hem(pch_df, binsize=10, sigma=1.0, northern=True, window_siz
     return df_hem
 
 
-def mean_hole_coords(pch_df, date, binsize=10, window_size='33D', sigma=1, northern=True, fit_method='spline'):
+def mean_hole_coords(pch_df, date, binsize=5, window_size='33D', sigma=1, northern=True, fit_method='spline'):
     #date = date string or list of date strings
 
     # Processing time
@@ -587,7 +587,7 @@ def pch_dict_concat(pch_dict, index=0):
     return hem_df
 
 
-def df_chole_stats(binsize=10, sigma=1.0, wav_filter='AIA171'):
+def df_chole_stats(binsize=5, sigma=1.0, wav_filter='AIA171'):
     # **** anything with "***" is a more expensive opperation ***
     global pch_df
     # ***
@@ -600,11 +600,11 @@ def df_chole_stats(binsize=10, sigma=1.0, wav_filter='AIA171'):
 
 
 def df_pre_process(pch_df, northern=True, resample=False, **kwargs):
-    pch_df['bin'] = np.floor(pch_df.Lon / kwargs.get('binsize', 10))
+    pch_df['bin'] = np.floor(pch_df.Lon / kwargs.get('binsize', 5))
 
     if northern:
         df_mean = pch_df[(pch_df.Lat > 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling(kwargs.get('window_size'),
-                                                                                              win_type='boxcar').mean().xs(
+                                                                                              win_type='boxcar').median().xs(
             kwargs.get('wave_filter'), level=1).reset_index().set_index(['DateTime']).sort_index()
         df_std = pch_df[(pch_df.Lat > 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling(kwargs.get('window_size'),
                                                                                              win_type='boxcar').std().xs(
@@ -612,14 +612,14 @@ def df_pre_process(pch_df, northern=True, resample=False, **kwargs):
 
     else:
         df_mean = pch_df[(pch_df.Lat < 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling(kwargs.get('window_size'),
-                                                                                              win_type='boxcar').mean().xs(
+                                                                                              win_type='boxcar').median().xs(
             kwargs.get('wave_filter'), level=1).reset_index().set_index(['DateTime']).sort_index()
         df_std = pch_df[(pch_df.Lat < 0)].groupby(['bin', 'Filter'])[['Lat', 'Lon']].rolling(kwargs.get('window_size'),
                                                                                              win_type='boxcar').std().xs(
             kwargs.get('wave_filter'), level=1).reset_index().set_index(['DateTime']).sort_index()
 
     if resample:
-        df_mean = df_mean.groupby('bin').resample('1D').mean()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(['DateTime']).sort_index()
+        df_mean = df_mean.groupby('bin').resample('1D').median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(['DateTime']).sort_index()
 
         df_std = df_std.groupby('bin').resample('1D').std()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(['DateTime']).sort_index()
 

@@ -6,6 +6,7 @@ from skimage import measure
 from sunpy.coordinates.utils import GreatArc
 import matplotlib.pyplot as plt
 from astropy import units as u
+import pandas as pd
 
 test_map = map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
@@ -67,8 +68,98 @@ def test_areaint():
 
     np.isclose(PCH_stats.areaint(lats, lons).value, 1.84/(4*np.pi), atol=1e-4)
 
+
 def test_chole_area():
     PCH_Detection.pch_mask(test_map)
+
+
+def test_hole_area():
+    start_date = '2010-07-30'
+    end_date = '2010-09-02'
+
+    pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_obj.pkl')[start_date:end_date]
+
+    test_obj = pd.DataFrame()
+    test_obj['Lat'] = pd.concat([pch_obj.StartLat, pch_obj.EndLat])
+    test_obj['Lon'] = pd.concat([pch_obj.H_StartLon, pch_obj.H_EndLon])
+    test_obj['Filter'] = pd.concat([pch_obj.Filter, pch_obj.Filter])
+    test_obj['HRotation'] = pd.concat([pch_obj.Harvey_Rotation, pch_obj.Harvey_Rotation])
+
+    test_obj = test_obj.sort_index()
+    windowsize = '11D'
+    deg_bins = 5
+
+    mean_hole_area = PCH_series.generic_hole_area(pch_obj, pch_obj.Harvey_Rotation[-1], northern=False)[0][1]
+
+
+
+def test_preprocessing():
+    start_date = '2010-07-30'
+    end_date = '2010-09-02'
+
+    pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_obj.pkl')[start_date:end_date]
+
+    test_obj = pd.DataFrame()
+    test_obj['Lat'] = pd.concat([pch_obj.StartLat, pch_obj.EndLat])
+    test_obj['Lon'] = pd.concat([pch_obj.H_StartLon, pch_obj.H_EndLon])
+    test_obj['Filter'] = pd.concat([pch_obj.Filter, pch_obj.Filter])
+    test_obj['HRotation'] = pd.concat([pch_obj.Harvey_Rotation, pch_obj.Harvey_Rotation])
+
+    test_obj = test_obj.sort_index()
+
+    windowsize = '11D'
+    deg_bins = 5
+
+    EIT171 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='EIT171', binsize=deg_bins)[0]
+    EUVI171 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='EUVI171', binsize=deg_bins)[0]
+    AIA171 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='AIA171', binsize=deg_bins)[0]
+    SWAP174 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='SWAP174', binsize=deg_bins)[0]
+
+    eit171_p = pd.Series(data=EIT171.Lat.values, index=EIT171.Lon.values).sort_index()
+    euvi171_p = pd.Series(data=EUVI171.Lat.values, index=EUVI171.Lon.values).sort_index()
+    aia171_p = pd.Series(data=AIA171.Lat.values, index=AIA171.Lon.values).sort_index()
+    swap174_p = pd.Series(data=SWAP174.Lat.values, index=SWAP174.Lon.values).sort_index()
+
+    EIT171 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='EIT171', resample=True, binsize=deg_bins)[0]
+    EUVI171 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='EUVI171', resample=True, binsize=deg_bins)[0]
+    AIA171 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='AIA171', resample=True, binsize=deg_bins)[0]
+    SWAP174 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='SWAP174', resample=True, binsize=deg_bins)[0]
+
+    eit171_r = pd.Series(data=EIT171.Lat.values, index=EIT171.Lon.values).sort_index()
+    euvi171_r = pd.Series(data=EUVI171.Lat.values, index=EUVI171.Lon.values).sort_index()
+    aia171_r = pd.Series(data=AIA171.Lat.values, index=AIA171.Lon.values).sort_index()
+    swap174_r = pd.Series(data=SWAP174.Lat.values, index=SWAP174.Lon.values).sort_index()
+
+    EIT171 = test_obj[(test_obj.Filter == 'EIT171') & (test_obj.Lat < 0)]
+    EUVI171 = test_obj[(test_obj.Filter == 'EUVI171') & (test_obj.Lat < 0)]
+    AIA171 = test_obj[(test_obj.Filter == 'AIA171') & (test_obj.Lat < 0)]
+    SWAP174 = test_obj[(test_obj.Filter == 'SWAP174') & (test_obj.Lat < 0)]
+
+    eit171 = pd.Series(data=EIT171.Lat.values, index=EIT171.Lon.values).sort_index()
+    euvi171 = pd.Series(data=EUVI171.Lat.values, index=EUVI171.Lon.values).sort_index()
+    aia171 = pd.Series(data=AIA171.Lat.values, index=AIA171.Lon.values).sort_index()
+    swap174 = pd.Series(data=SWAP174.Lat.values, index=SWAP174.Lon.values).sort_index()
+
+    plt.subplot(4,1,1)
+    plt.plot(eit171, '.')
+    plt.plot(eit171_p)
+    plt.plot(eit171_r, 'g')
+
+    plt.subplot(4,1,2)
+    plt.plot(euvi171, '.')
+    plt.plot(euvi171_p)
+    plt.plot(euvi171_r, 'g')
+
+    plt.subplot(4,1,3)
+    plt.plot(aia171, '.')
+    plt.plot(aia171_p)
+    plt.plot(aia171_r, 'g')
+
+    plt.subplot(4,1,4)
+    plt.plot(swap174, '.')
+    plt.plot(swap174_p)
+    plt.plot(swap174_r, 'g')
+    plt.tight_layout()
 
 
 
