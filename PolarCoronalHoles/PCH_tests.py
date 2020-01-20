@@ -75,9 +75,10 @@ def test_chole_area():
 
 def test_hole_area():
     start_date = '2010-07-30'
-    end_date = '2010-09-02'
+    end_date = '2010-10-04'
 
-    pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_obj.pkl')[start_date:end_date]
+    pch_obj = pd.read_pickle('/Users/mskirk/OneDrive - NASA/PCH_data/pch_obj.pkl')[start_date:end_date]
+    pch_obj = pch_obj[pch_obj.StartLat <0]
 
     test_obj = pd.DataFrame()
     test_obj['Lat'] = pd.concat([pch_obj.StartLat, pch_obj.EndLat])
@@ -89,15 +90,18 @@ def test_hole_area():
     windowsize = '11D'
     deg_bins = 5
 
-    mean_hole_area = PCH_series.generic_hole_area(pch_obj, pch_obj.Harvey_Rotation[-1], northern=False)[0][1]
+    mean_hole_area = []
+    for hr in pch_obj.Harvey_Rotation[int(pch_obj.shape[0]/2):]:
+        mean_hole_area += [PCH_series.generic_hole_area(pch_obj, hr, northern=False)[0][1]]
 
-
+    mean_area_series = pd.Series(data=mean_hole_area, index= pch_obj.index[int(pch_obj.shape[0]/2):])
+    test_obj2 = PCH_stats.df_concat_stats_hem(test_obj, binsize=5, sigma=1.0, northern=False, window_size='11D')
 
 def test_preprocessing():
     start_date = '2010-07-30'
     end_date = '2010-09-02'
 
-    pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_obj.pkl')[start_date:end_date]
+    pch_obj = pd.read_pickle('/Users/mskirk/OneDrive - NASA/PCH_data/pch_obj.pkl')[start_date:end_date]
 
     test_obj = pd.DataFrame()
     test_obj['Lat'] = pd.concat([pch_obj.StartLat, pch_obj.EndLat])

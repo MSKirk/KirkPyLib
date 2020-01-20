@@ -511,12 +511,14 @@ def df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=True, window_size
     # # ---- Mean Only... to save time as well as upper and lower don't yield consistent results ----
     for wave_filter in pch_df.Filter.unique():
         df_mean, _df_up, _df_lo = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
-                                                 binsize=binsize, window_size='33D', resample=True)
+                                                 binsize=binsize, window_size='11D', resample=True)
 
         resampled_dfs[wave_filter] = [df_mean]
 
     df_mean = pch_dict_concat(resampled_dfs, index=0).sort_index()
     df_mean.index = df_mean.index.rename('DateTime')
+    df_mean = df_mean.groupby('bin').resample('11D').median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(
+        ['DateTime']).sort_index()
 
     # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
     com_mean = df_CoM_calc(df_mean, window_size=window_size)
