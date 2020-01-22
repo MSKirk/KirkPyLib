@@ -1,4 +1,4 @@
-from PolarCoronalHoles import PCH_Tools, PCH_Detection, PCH_stats
+from PolarCoronalHoles import PCH_Tools, PCH_Detection, PCH_stats, PCH_series
 from sunpy import map
 import sunpy.data.sample
 import numpy as np
