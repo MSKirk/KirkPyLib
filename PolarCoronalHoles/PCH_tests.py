@@ -97,6 +97,88 @@ def test_hole_area():
     mean_area_series = pd.Series(data=mean_hole_area, index= pch_obj.index[int(pch_obj.shape[0]/2):])
     test_obj2 = PCH_stats.df_concat_stats_hem(test_obj, binsize=5, sigma=1.0, northern=False, window_size='11D')
 
+    plt.plot(mean_hole_area)
+    plt.plot(test_obj2.S_mean_area)
+
+
+def test_area_algorithms():
+
+    lons = np.arange(0,360,1)
+    lats = (np.random.randint(10, size=360) + 70)
+
+    old = old_area(lats*u.deg, lons*u.deg)[1]
+
+    s_lats = pd.Series(lats)
+    s_lons = pd.Series(lons)
+
+    new = PCH_stats.areaint(s_lats, s_lons)[0].value
+
+    np.testing.assert_approx_equal(old,new,significant=3,err_msg='Actual = Old; Desired = New',verbose=True)
+
+
+def old_area(lats, lons, northern=True):
+    h_rotation_number = 0
+    offset_cm = np.array([0,0])*u.deg
+
+    perimeter_length = np.zeros(6) * u.rad
+    fit_location = np.zeros(6) * u.rad
+    hole_area = np.zeros(6)
+
+    for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
+        try:
+            hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=degrees)
+
+            # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
+            # And removing centroid offset
+            if northern:
+                lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                lamb_y = np.sin(
+                    (np.pi * 0.5) - hole_fit['fitfunc'](lamb_x.value) - np.deg2rad(offset_cm[1]).value) * u.rad
+
+                lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(
+                    PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[
+                        0]).value) - np.deg2rad(offset_cm[1]).value) * u.deg
+            else:
+                lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                lamb_y = np.sin(
+                    hole_fit['fitfunc'](lamb_x.value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.rad
+
+                lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(
+                    PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - (
+                                                      np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
+
+            perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
+
+            if northern:
+                hole_area[ii] = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
+            else:
+                hole_area[ii] = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
+
+        except RuntimeError:
+            hole_area[ii] = np.nan
+            perimeter_length[ii] = np.inf * u.rad
+            fit_location[ii] = np.nan
+
+    # allowing for a 5% perimeter deviation off of a circle
+    good_areas = hole_area[np.where((perimeter_length / (2 * np.pi * u.rad)) - 1 < 0.05)]
+    good_fits = fit_location[np.where((perimeter_length / (2 * np.pi * u.rad)) - 1 < 0.05)]
+
+    # A sphere is 4π steradians in surface area
+    if good_areas.size > 0:
+        percent_hole_area = (
+        np.nanmin(good_areas) / (4 * np.pi), np.nanmean(good_areas) / (4 * np.pi), np.nanmax(good_areas) / (4 * np.pi))
+        # in degrees
+        hole_perimeter_location = (np.rad2deg(np.nanmin(good_fits)).value, np.rad2deg(np.nanmean(good_fits)).value,
+                                   np.rad2deg(np.nanmax(good_fits)).value)
+    else:
+        percent_hole_area = (np.nan, np.nan, np.nan)
+        hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
+
+    return percent_hole_area
+
+
 def test_preprocessing():
     start_date = '2010-07-30'
     end_date = '2010-09-02'
