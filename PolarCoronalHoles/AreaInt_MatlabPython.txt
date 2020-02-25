@@ -1,0 +1,19 @@
+# AreaInt Test
+
+# Python
+import numpy as np
+from PolarCoronalHoles import PCH_stats
+import astropy.units as u
+
+lats = np.concatenate([np.arange(-90,91,1), np.arange(89, -90, -1)]) *u.deg
+lons=np.concatenate([np.zeros(181), 30*np.ones(179)]) *u.deg
+
+; matlab 
+
+lats = [-90:1:90,89:-1:-89]';
+lons = [zeros(1,181), 30*ones(1,179)]';
+area = areaint(lats,lons)
+
+
+;----
+

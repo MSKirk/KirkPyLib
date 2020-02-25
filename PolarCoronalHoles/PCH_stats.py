@@ -741,7 +741,11 @@ def df_CoM_calc(df, window_size='33D'):
 
     com_df = pd.DataFrame()
     com_df['c_lat'] = df_series.idx.rolling(window_size).apply(lambda x: _center_lat_apply(x, (xx, yy, zz)), raw=True)
+
     com_df['c_lon'] = df_series.idx.rolling(window_size).apply(lambda x: _center_lon_apply(x, (xx, yy, zz)), raw=True)
+
+    com_df.c_lon[com_df.c_lon < 0] += 2*np.pi
+    com_df.c_lon[com_df.c_lon > 2*np.pi] -= 2*np.pi
 
     return com_df
 
@@ -762,7 +766,7 @@ def df_colat(df, ref_lat=np.deg2rad(90), ref_lon=np.deg2rad(0)):
     # Returns in Radians
 
     return np.arccos((np.sin(ref_lat) * np.sin(np.deg2rad(df.Lat))) + (np.cos(ref_lat) * np.cos(
-        np.deg2rad(df.Lon)) * np.cos(np.deg2rad(df.Lon) - ref_lon)))
+        np.deg2rad(df.Lat)) * np.cos(np.deg2rad(df.Lon) - ref_lon)))
 
 
 def df_azimuth(df, ref_lat=np.deg2rad(90), ref_lon=np.deg2rad(0)):
