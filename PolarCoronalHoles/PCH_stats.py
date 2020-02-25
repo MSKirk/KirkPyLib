@@ -525,11 +525,11 @@ def df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=True, window_size
 
     df_mean = pd.concat([df_mean, com_mean], axis=1)
 
-    df_mean['colat_rad'] = df_colat(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
-    df_mean['az_rad'] = df_azimuth(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    #df_mean['colat_rad'] = df_colat(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    #df_mean['az_rad'] = df_azimuth(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
 
     # Area Calculation  *** df_area_calc *** is the expensive function
-    mean_area = df_area_calc(df_mean[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    mean_area = df_area_calc(df_mean[['Lat','Lon','c_lat','c_lon']], window_size=window_size)
 
     if northern:
         df_hem = pd.concat([mean_area.rename('N_mean_area'),
@@ -654,11 +654,11 @@ def df_colat_az(df_mean, df_upper, df_lower):
     return df_mean, df_upper, df_lower
 
 
-def df_area_calc(df, window_size='33D'):
+def df_area_calc(df, window_size='11D'):
     df_series = df.reset_index().set_index(['DateTime']).sort_index()
     df_series['idx'] = range(len(df_series))
 
-    return df_series.idx.rolling(window_size).apply(lambda x: _area_apply(x, df_series), raw=True)
+    return df_series.idx.rolling(window_size).apply(lambda x: _area_apply2(x, df_series), raw=True)
 
 
 def _area_apply(elems, mydf):
@@ -681,6 +681,29 @@ def _area_apply(elems, mydf):
 
     return np.abs(integrands.sum()) / (4 * np.pi)
 
+
+def _area_apply2(elems, mydf):
+    # Modified to calculate colat and azimuth internally (needs Lat, Lon, c_lat, c_lon, idx)
+    # elems is what's passed by the "x" variable of the lambda function
+    # it is a list of whatever indices will be in the '33D' window and that are used
+    # to reference the rows of the database (i.e. here the dataframe “mydf”)
+
+    df_series = mydf.iloc[elems]
+    print('Percent Complete: ', "{:3.1f}".format(np.round((np.min(elems)*1000.)/mydf.shape[0])*0.1))
+
+    df_series['az_rad'] = df_azimuth(df_series, ref_lat=df_series.c_lat.iloc[0], ref_lon=df_series.c_lon.iloc[0])
+    df_series['colat_rad'] = df_colat(df_series, ref_lat=df_series.c_lat.iloc[0], ref_lon=df_series.c_lon.iloc[0])
+
+    daz = np.diff(df_series.sort_values(by=['Lon'])['az_rad'])
+    daz[np.where(daz > np.deg2rad(180))] -= np.deg2rad(360.)
+    daz[np.where(daz < np.deg2rad(-180))] += np.deg2rad(360.)
+    #
+    colat_sorted = df_series.sort_values(by=['Lon'])['colat_rad']
+    deltas = np.diff(colat_sorted) / 2.
+    colats = colat_sorted[0:-1] + deltas
+    integrands = (1 - np.cos(colats)) * daz
+
+    return np.abs(integrands.sum()) / (4 * np.pi)
 
 def df_CoM_calc_mike(df, window_size='33D'):
     df_series = df.reset_index().set_index(['DateTime']).sort_index()
