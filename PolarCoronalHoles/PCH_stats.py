@@ -3,6 +3,7 @@ import astropy.stats.circstats as cs
 from scipy.stats import circmean, circstd
 import time
 import matplotlib.pyplot as plt
+from astropy.coordinates import Longitude, Latitude
 import astropy.units as u
 from astropy.time import Time
 import pandas as pd
@@ -175,6 +176,12 @@ def areaint(lats, lons):
     # azimuth of each point in segment from the center of mass.
 
     _, center_lat, center_lon = sph_center_of_mass(lat[:-1], lon[:-1])
+
+    if np.isnan(center_lat.value):
+        center_lat = Latitude(0, unit=u.rad)
+
+    if np.isnan(center_lon.value):
+        center_lon = Longitude(0, unit=u.rad)
 
     # force centroid at the N or S pole
     # if northern:
@@ -403,9 +410,9 @@ def df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter='AIA171', north
     df_mean, df_upper, df_lower = df_colat_az(df_mean, df_upper, df_lower)
 
     # Area Calculation  *** df_area_calc *** is the expensive function
-    mean_area = df_area_calc(df_mean[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
-    upper_area = df_area_calc(df_upper[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
-    lower_area = df_area_calc(df_lower[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    mean_area = df_area_calc(df_mean[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
+    upper_area = df_area_calc(df_upper[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
+    lower_area = df_area_calc(df_lower[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
 
     if northern:
         df_hem = pd.concat([mean_area.rename('N_mean_area'),
@@ -511,13 +518,13 @@ def df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=True, window_size
     # # ---- Mean Only... to save time as well as upper and lower don't yield consistent results ----
     for wave_filter in pch_df.Filter.unique():
         df_mean, _df_up, _df_lo = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
-                                                 binsize=binsize, window_size='11D', resample=True)
+                                                 binsize=binsize, window_size=window_size, resample=True)
 
         resampled_dfs[wave_filter] = [df_mean]
 
     df_mean = pch_dict_concat(resampled_dfs, index=0).sort_index()
     df_mean.index = df_mean.index.rename('DateTime')
-    df_mean = df_mean.groupby('bin').resample('11D').median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(
+    df_mean = df_mean.groupby('bin').resample(window_size).median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(
         ['DateTime']).sort_index()
 
     # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
@@ -704,6 +711,7 @@ def _area_apply2(elems, mydf):
     integrands = (1 - np.cos(colats)) * daz
 
     return np.abs(integrands.sum()) / (4 * np.pi)
+
 
 def df_CoM_calc_mike(df, window_size='33D'):
     df_series = df.reset_index().set_index(['DateTime']).sort_index()

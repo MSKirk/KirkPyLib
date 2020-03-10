@@ -251,6 +251,38 @@ def test_preprocessing():
     plt.tight_layout()
 
 
+def test_concat_resampling():
+    start_date = '2010-08-29'
+    end_date = '2010-10-01'
+
+    pch_obj = pd.read_pickle('/Users/mskirk/OneDrive - NASA/PCH_data/pch_obj.pkl')[start_date:end_date]
+
+    test_obj = pd.DataFrame()
+    test_obj['Lat'] = pd.concat([pch_obj.StartLat, pch_obj.EndLat])
+    test_obj['Lon'] = pd.concat([pch_obj.H_StartLon, pch_obj.H_EndLon])
+    test_obj['Filter'] = pd.concat([pch_obj.Filter, pch_obj.Filter])
+    test_obj['HRotation'] = pd.concat([pch_obj.Harvey_Rotation, pch_obj.Harvey_Rotation])
+
+    test_obj = test_obj.sort_index()
+
+    window_size = '11D'
+    binsize = 5
+    resampled_dfs = dict()
+    northern = False
+    sigma = 1
+
+    for wave_filter in test_obj.Filter.unique():
+        df_mean, _df_up, _df_lo = PCH_stats.df_pre_process(test_obj, northern=northern, wave_filter=wave_filter, sigma=sigma,
+                                                 binsize=binsize, window_size=window_size, resample=True)
+
+        resampled_dfs[wave_filter] = [df_mean]
+
+    df_mean = PCH_stats.pch_dict_concat(resampled_dfs, index=0).sort_index()
+    df_mean.index = df_mean.index.rename('DateTime')
+    df_mean = df_mean.groupby('bin').resample(window_size).median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(
+        ['DateTime']).sort_index()
+    
+
 def series_area_calc(euv_series):
     # EUV Series with index= lon, data = lat
 
