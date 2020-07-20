@@ -17,6 +17,7 @@ def assertEquals(var1, var2):
     else:
         return False
 
+
 def test_rsun_pix():
     pixels = PCH_Detection.rsun_pix(test_map)
 
@@ -63,10 +64,11 @@ def test_pick_hole_extremes():
 
 
 def test_areaint():
-    lats = (np.zeros(100)+45.) * u.deg
-    lons = (np.arange(0,360,3.6) + 0.1) * u.deg
+    # Test for a square 1/12 of a sphere
+    lats = pd.Series(np.concatenate([np.arange(-90, 91, 1), np.arange(89, -90, -1)]))
+    lons = pd.Series(np.concatenate([np.zeros(181), 30 * np.ones(179)]))
 
-    np.isclose(PCH_stats.areaint(lats, lons).value, 1.84/(4*np.pi), atol=1e-4)
+    np.isclose(PCH_stats.areaint(lats, lons)[0].value, 1/12., atol=1e-4)
 
 
 def test_chole_area():
@@ -95,9 +97,10 @@ def test_hole_area():
         mean_hole_area += [PCH_series.generic_hole_area(pch_obj, hr, northern=False)[0][1]]
 
     mean_area_series = pd.Series(data=mean_hole_area, index= pch_obj.index[int(pch_obj.shape[0]/2):])
-    test_obj2 = PCH_stats.df_concat_stats_hem(test_obj, binsize=5, sigma=1.0, northern=False, window_size='11D')
+    test_obj2 = PCH_stats.df_pre_process(test_obj, northern=False, window_size=windowsize, wave_filter='EIT171', binsize=deg_bins)[0]
+    #test_obj2 = PCH_stats.df_concat_stats_hem(test_obj, binsize=5, sigma=1.0, northern=False, window_size='11D')
 
-    plt.plot(mean_hole_area)
+    plt.plot(mean_area_series)
     plt.plot(test_obj2.S_mean_area)
 
 
@@ -180,8 +183,8 @@ def old_area(lats, lons, northern=True):
 
 
 def test_preprocessing():
-    start_date = '2010-07-30'
-    end_date = '2010-09-02'
+    start_date = '2010-08-29'
+    end_date = '2010-10-01'
 
     pch_obj = pd.read_pickle('/Users/mskirk/OneDrive - NASA/PCH_data/pch_obj.pkl')[start_date:end_date]
 
@@ -248,30 +251,70 @@ def test_preprocessing():
     plt.tight_layout()
 
 
+def test_concat_resampling():
+    start_date = '2010-08-29'
+    end_date = '2010-10-01'
 
+    pch_obj = pd.read_pickle('/Users/mskirk/OneDrive - NASA/PCH_data/pch_obj.pkl')[start_date:end_date]
 
-if northern:
-    offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) - lats]))
-else:
-    offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
+    test_obj = pd.DataFrame()
+    test_obj['Lat'] = pd.concat([pch_obj.StartLat, pch_obj.EndLat])
+    test_obj['Lon'] = pd.concat([pch_obj.H_StartLon, pch_obj.H_EndLon])
+    test_obj['Filter'] = pd.concat([pch_obj.Filter, pch_obj.Filter])
+    test_obj['HRotation'] = pd.concat([pch_obj.Harvey_Rotation, pch_obj.Harvey_Rotation])
 
-offset = PCH_Tools.center_of_mass(offset_coords, mass=1 / errors)
-offset_lons = offset_coords[:, 0] - offset[0]
-offset_lats = offset_coords[:, 1] - offset[1]
+    test_obj = test_obj.sort_index()
 
-hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=6, sigma=errors)
-co_hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_coords[:,0])*u.rad, np.deg2rad(offset_coords[:,1])*u.rad, degree=6, sigma=errors)
-offset_hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons)*u.rad, np.deg2rad(offset_lats)*u.rad, degree=6, sigma=errors)
+    window_size = '11D'
+    binsize = 5
+    resampled_dfs = dict()
+    northern = False
+    sigma = 1
 
+    for wave_filter in test_obj.Filter.unique():
+        df_mean, _df_up, _df_lo = PCH_stats.df_pre_process(test_obj, northern=northern, wave_filter=wave_filter, sigma=sigma,
+                                                 binsize=binsize, window_size=window_size, resample=True)
 
-fit_yy =  hole_fit['fitfunc'](np.deg2rad(lons).value)
-co_fit_yy = co_hole_fit['fitfunc'](np.deg2rad(offset_coords[:,0]))
-offset_fit_yy = offset_hole_fit['fitfunc'](np.deg2rad(offset_lons))
+        resampled_dfs[wave_filter] = [df_mean]
 
+    df_mean = PCH_stats.pch_dict_concat(resampled_dfs, index=0).sort_index()
+    df_mean.index = df_mean.index.rename('DateTime')
+    df_mean = df_mean.groupby('bin').resample(window_size).median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(
+        ['DateTime']).sort_index()
+    
 
-plt.plot(np.deg2rad(lons).value, fit_yy - np.deg2rad(lats).value, '.')
-plt.plot(np.deg2rad(offset_coords[:,0]), co_fit_yy - np.deg2rad(offset_coords[:,1]), '.')
-plt.plot(np.deg2rad(offset_lons), offset_fit_yy - np.deg2rad(offset_lats), '.')
+def series_area_calc(euv_series):
+    # EUV Series with index= lon, data = lat
 
-plt.plot(np.deg2rad(lons).value, fit_yy, '.')
-plt.plot(np.deg2rad(offset_lons+np.deg2rad(offset[0])), offset_fit_yy - (np.pi *0.5)+ np.deg2rad(offset[1]), '.')
+    lats = pd.Series(euv_series.values)
+    lons = pd.Series(euv_series.index.values)
+
+    area = PCH_stats.areaint(lats, lons)
+
+    return area[0].value
+
+# if northern:
+#     offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) - lats]))
+# else:
+#     offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
+#
+# offset = PCH_Tools.center_of_mass(offset_coords, mass=1 / errors)
+# offset_lons = offset_coords[:, 0] - offset[0]
+# offset_lats = offset_coords[:, 1] - offset[1]
+#
+# hole_fit = PCH_Tools.trigfit(np.deg2rad(lons), np.deg2rad(lats), degree=6, sigma=errors)
+# co_hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_coords[:,0])*u.rad, np.deg2rad(offset_coords[:,1])*u.rad, degree=6, sigma=errors)
+# offset_hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons)*u.rad, np.deg2rad(offset_lats)*u.rad, degree=6, sigma=errors)
+#
+#
+# fit_yy =  hole_fit['fitfunc'](np.deg2rad(lons).value)
+# co_fit_yy = co_hole_fit['fitfunc'](np.deg2rad(offset_coords[:,0]))
+# offset_fit_yy = offset_hole_fit['fitfunc'](np.deg2rad(offset_lons))
+#
+#
+# plt.plot(np.deg2rad(lons).value, fit_yy - np.deg2rad(lats).value, '.')
+# plt.plot(np.deg2rad(offset_coords[:,0]), co_fit_yy - np.deg2rad(offset_coords[:,1]), '.')
+# plt.plot(np.deg2rad(offset_lons), offset_fit_yy - np.deg2rad(offset_lats), '.')
+#
+# plt.plot(np.deg2rad(lons).value, fit_yy, '.')
+# plt.plot(np.deg2rad(offset_lons+np.deg2rad(offset[0])), offset_fit_yy - (np.pi *0.5)+ np.deg2rad(offset[1]), '.')

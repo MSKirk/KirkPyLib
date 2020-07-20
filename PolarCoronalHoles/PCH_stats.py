@@ -3,6 +3,7 @@ import astropy.stats.circstats as cs
 from scipy.stats import circmean, circstd
 import time
 import matplotlib.pyplot as plt
+from astropy.coordinates import Longitude, Latitude
 import astropy.units as u
 from astropy.time import Time
 import pandas as pd
@@ -175,6 +176,12 @@ def areaint(lats, lons):
     # azimuth of each point in segment from the center of mass.
 
     _, center_lat, center_lon = sph_center_of_mass(lat[:-1], lon[:-1])
+
+    if np.isnan(center_lat.value):
+        center_lat = Latitude(0, unit=u.rad)
+
+    if np.isnan(center_lon.value):
+        center_lon = Longitude(0, unit=u.rad)
 
     # force centroid at the N or S pole
     # if northern:
@@ -403,9 +410,9 @@ def df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter='AIA171', north
     df_mean, df_upper, df_lower = df_colat_az(df_mean, df_upper, df_lower)
 
     # Area Calculation  *** df_area_calc *** is the expensive function
-    mean_area = df_area_calc(df_mean[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
-    upper_area = df_area_calc(df_upper[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
-    lower_area = df_area_calc(df_lower[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    mean_area = df_area_calc(df_mean[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
+    upper_area = df_area_calc(df_upper[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
+    lower_area = df_area_calc(df_lower[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
 
     if northern:
         df_hem = pd.concat([mean_area.rename('N_mean_area'),
@@ -511,13 +518,13 @@ def df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=True, window_size
     # # ---- Mean Only... to save time as well as upper and lower don't yield consistent results ----
     for wave_filter in pch_df.Filter.unique():
         df_mean, _df_up, _df_lo = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
-                                                 binsize=binsize, window_size='11D', resample=True)
+                                                 binsize=binsize, window_size=window_size, resample=True)
 
         resampled_dfs[wave_filter] = [df_mean]
 
     df_mean = pch_dict_concat(resampled_dfs, index=0).sort_index()
     df_mean.index = df_mean.index.rename('DateTime')
-    df_mean = df_mean.groupby('bin').resample('11D').median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(
+    df_mean = df_mean.groupby('bin').resample(window_size).median()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(
         ['DateTime']).sort_index()
 
     # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
@@ -525,11 +532,11 @@ def df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=True, window_size
 
     df_mean = pd.concat([df_mean, com_mean], axis=1)
 
-    df_mean['colat_rad'] = df_colat(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
-    df_mean['az_rad'] = df_azimuth(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    #df_mean['colat_rad'] = df_colat(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
+    #df_mean['az_rad'] = df_azimuth(df_mean, ref_lat=df_mean.c_lat, ref_lon=df_mean.c_lon)
 
     # Area Calculation  *** df_area_calc *** is the expensive function
-    mean_area = df_area_calc(df_mean[['Lon', 'colat_rad', 'az_rad']], window_size=window_size)
+    mean_area = df_area_calc(df_mean[['Lat','Lon','c_lat','c_lon']], window_size=window_size)
 
     if northern:
         df_hem = pd.concat([mean_area.rename('N_mean_area'),
@@ -654,11 +661,11 @@ def df_colat_az(df_mean, df_upper, df_lower):
     return df_mean, df_upper, df_lower
 
 
-def df_area_calc(df, window_size='33D'):
+def df_area_calc(df, window_size='11D'):
     df_series = df.reset_index().set_index(['DateTime']).sort_index()
     df_series['idx'] = range(len(df_series))
 
-    return df_series.idx.rolling(window_size).apply(lambda x: _area_apply(x, df_series), raw=True)
+    return df_series.idx.rolling(window_size).apply(lambda x: _area_apply2(x, df_series), raw=True)
 
 
 def _area_apply(elems, mydf):
@@ -669,6 +676,30 @@ def _area_apply(elems, mydf):
 
     df_series = mydf.iloc[elems]
     print('Percent Complete: ', "{:3.1f}".format(np.round((np.min(elems)*1000.)/mydf.shape[0])*0.1))
+
+    daz = np.diff(df_series.sort_values(by=['Lon'])['az_rad'])
+    daz[np.where(daz > np.deg2rad(180))] -= np.deg2rad(360.)
+    daz[np.where(daz < np.deg2rad(-180))] += np.deg2rad(360.)
+    #
+    colat_sorted = df_series.sort_values(by=['Lon'])['colat_rad']
+    deltas = np.diff(colat_sorted) / 2.
+    colats = colat_sorted[0:-1] + deltas
+    integrands = (1 - np.cos(colats)) * daz
+
+    return np.abs(integrands.sum()) / (4 * np.pi)
+
+
+def _area_apply2(elems, mydf):
+    # Modified to calculate colat and azimuth internally (needs Lat, Lon, c_lat, c_lon, idx)
+    # elems is what's passed by the "x" variable of the lambda function
+    # it is a list of whatever indices will be in the '33D' window and that are used
+    # to reference the rows of the database (i.e. here the dataframe “mydf”)
+
+    df_series = mydf.iloc[elems]
+    print('Percent Complete: ', "{:3.1f}".format(np.round((np.min(elems)*1000.)/mydf.shape[0])*0.1))
+
+    df_series['az_rad'] = df_azimuth(df_series, ref_lat=df_series.c_lat.iloc[0], ref_lon=df_series.c_lon.iloc[0])
+    df_series['colat_rad'] = df_colat(df_series, ref_lat=df_series.c_lat.iloc[0], ref_lon=df_series.c_lon.iloc[0])
 
     daz = np.diff(df_series.sort_values(by=['Lon'])['az_rad'])
     daz[np.where(daz > np.deg2rad(180))] -= np.deg2rad(360.)
@@ -741,7 +772,11 @@ def df_CoM_calc(df, window_size='33D'):
 
     com_df = pd.DataFrame()
     com_df['c_lat'] = df_series.idx.rolling(window_size).apply(lambda x: _center_lat_apply(x, (xx, yy, zz)), raw=True)
+
     com_df['c_lon'] = df_series.idx.rolling(window_size).apply(lambda x: _center_lon_apply(x, (xx, yy, zz)), raw=True)
+
+    com_df.c_lon[com_df.c_lon < 0] += 2*np.pi
+    com_df.c_lon[com_df.c_lon > 2*np.pi] -= 2*np.pi
 
     return com_df
 
@@ -762,7 +797,7 @@ def df_colat(df, ref_lat=np.deg2rad(90), ref_lon=np.deg2rad(0)):
     # Returns in Radians
 
     return np.arccos((np.sin(ref_lat) * np.sin(np.deg2rad(df.Lat))) + (np.cos(ref_lat) * np.cos(
-        np.deg2rad(df.Lon)) * np.cos(np.deg2rad(df.Lon) - ref_lon)))
+        np.deg2rad(df.Lat)) * np.cos(np.deg2rad(df.Lon) - ref_lon)))
 
 
 def df_azimuth(df, ref_lat=np.deg2rad(90), ref_lon=np.deg2rad(0)):
