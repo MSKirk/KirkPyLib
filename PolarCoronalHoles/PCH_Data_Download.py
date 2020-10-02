@@ -1,12 +1,12 @@
 import astropy.units as u
-from sunpy.net import Fido, jsoc, attrs as a
+from sunpy.net import Fido, attrs as a
 from sunpy.time import parse_time
 import datetime
 from dateutil.rrule import rrule, MONTHLY
 import os
 import numpy as np
 import fnmatch
-from time import sleep
+from parfive import Downloader
 
 from bs4 import BeautifulSoup
 from urllib import request, parse
@@ -17,7 +17,7 @@ def aia_pch_data_download(savepath='', waves=[171, 193, 211, 304]):
     blank_results = Fido.search(a.jsoc.Time('2030/1/1', '2030/1/2'), a.jsoc.Series('aia.lev1_euv_12s'))
 
     base = parse_time('2019/01/01 00:00:00')
-    ending = parse_time('2020/09/01 00:00:00')
+    ending = parse_time('2020/10/01 00:00:00')
 
     date_list = [dt for dt in rrule(MONTHLY, dtstart=base.to_datetime(), until=ending.to_datetime())]
 
@@ -76,17 +76,19 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
     # Crawl through and scrape the EUVI wavelet images
 
     url_head = 'http://sd-www.jhuapl.edu/secchi/wavelets/fits/'
-    start_date = parse_time(start_date)
-    end_date = parse_time(end_date)
+    start_date = parse_time(start_date).to_datetime()
+    end_date = parse_time(end_date).to_datetime()
 
     resp = request.urlopen(url_head)
-    soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+    soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'), features="lxml")
     subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]        
     
     substime=[datetime.datetime.strptime(s, '%Y%m/') for s in subs]
     gooddate = [s >= (start_date - datetime.timedelta(days=start_date.day-1)) and (s <= end_date) for s in substime]
     
     url_subdir1 = [parse.urljoin(url_head, sub_dir) for sub_dir, gd in zip(subs,gooddate) if gd]
+
+    dl = Downloader()
 
     if not rootpath:
         save_dir = os.path.abspath(os.path.curdir)
@@ -96,14 +98,14 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
     #  crawling until a full list has been generated
     for subdir1 in url_subdir1:
         resp = request.urlopen(subdir1)
-        soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+        soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'), features="lxml")
         subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]
     
         url_subdir2 = [parse.urljoin(subdir1, sub_dir) for sub_dir in subs]
 
         for subdir2 in url_subdir2:
             resp = request.urlopen(subdir2)
-            soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+            soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'), features="lxml")
             subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('/')]
     
             url_subdir3 = [parse.urljoin(subdir2, sub_dir) for sub_dir in subs]
@@ -111,14 +113,15 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
             for subdir3 in url_subdir3:
                 subs = []
                 resp = request.urlopen(subdir3)
-                soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'))
+                soup = BeautifulSoup(resp, from_encoding=resp.info().get_param('charset'), features="lxml")
                 subs = [link.text for link in soup.find_all('a', href=True) if link.text.endswith('.fts.gz')]
 
                 if len(subs) > 1:
                     image_url = [parse.urljoin(subdir3, sub_dir) for sub_dir in subs]
-                    save_path = [os.path.join(save_dir, subdir3.split('fits/')[1], path) for path in subs]
+                    # save_path = [os.path.join(save_dir, subdir3.split('fits/')[1], path) for path in subs]
+                    save_path = [os.path.join(save_dir, subdir3.split('fits/')[1]) for path in subs]
 
-                    image_times = [datetime_from_euvi_filename(filepath) for filepath in save_path]
+                    image_times = [datetime_from_euvi_filename(path) for path in subs]
 
                     # grab every 4 hours
                     dt = list(np.logical_not([np.mod((time - image_times[0]).seconds, 14400) for time in image_times]))
@@ -138,9 +141,10 @@ def euvi_pch_data_download(rootpath='', start_date='2007/05/01', end_date='2019/
                     # download each image
                     for good_image, image_loc, image_destination in zip(goodness, image_url, save_path):
                         if good_image:
-                            request.urlretrieve(image_loc, image_destination)
+                            dl.enqueue_file(image_loc, path=image_destination)
+                            files = dl.download()
 
-                    print('Downloaded EUVI ' + wavelength_from_euvi_filename(save_path[0]) + 'images for ' +
+                    print('Downloaded EUVI ' + wavelength_from_euvi_filename(files[0]) + 'images for ' +
                           image_times[0].strftime('%Y-%m-%d'))
                 else:
                     print('Too few images detected in: ', subdir3)
@@ -150,7 +154,7 @@ def datetime_from_euvi_filename(filepath):
     basename = os.path.basename(filepath)[0:15]
     file_time_str = basename[:4] + '-' + basename[4:6] + '-' + basename[6:8] + 'T' + basename[9:11] + ':' + \
                     basename[11:13] + ':' + basename[13:15]
-    file_datetime = parse_time(file_time_str)
+    file_datetime = parse_time(file_time_str).to_datetime()
     return file_datetime
 
 
