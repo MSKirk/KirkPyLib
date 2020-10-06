@@ -8,9 +8,13 @@ from astropy.io import fits
 from sunpy.map import Map
 import numpy as np
 import cv2
+import warnings
+from astropy.utils.exceptions import AstropyDeprecationWarning
 
 
 def aia_prepping_script(image_files, save_files, verbose=False):
+    warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
+
     fits_files = glob.glob(os.path.join(os.path.abspath(image_files), '**/*.fits'), recursive=True)
     eff_area = aia_area()
 
@@ -29,19 +33,22 @@ def aia_prepping_script(image_files, save_files, verbose=False):
         cal_map = calibrate.meta.fix_observer_location(cal_map)
         cal_map = calibrate.meta.update_pointing(cal_map, pointing_table=pointing_table)
 
-        cal_map = calibrate.prep.normalize_exposure(cal_map)
-
-        cal_map = aiaprep(cal_map)
-
-        temp_data = cal_map.data / eff_area.effective_area_ratio(cal_map.fits_header['WAVELNTH'] * u.angstrom,
-                                                      parse_time(cal_map.fits_header['DATE-OBS']).to_datetime())
-        cal_map.data[:] = temp_data[:]
-
         try:
-            cal_map.save(os.path.join(savepath, os.path.basename(image).replace('lev1', 'lev15')), overwrite=True,
-                         hdu_type=fits.CompImageHDU)
-        except:
-            print('FITS image write error... Skipping file.')
+            cal_map = calibrate.prep.normalize_exposure(cal_map)
+
+            cal_map = aiaprep(cal_map)
+
+            temp_data = cal_map.data / eff_area.effective_area_ratio(cal_map.fits_header['WAVELNTH'] * u.angstrom,
+                                                          parse_time(cal_map.fits_header['DATE-OBS']).to_datetime())
+            cal_map.data[:] = temp_data[:]
+
+            try:
+                cal_map.save(os.path.join(savepath, os.path.basename(image).replace('lev1', 'lev15')), overwrite=True,
+                             hdu_type=fits.CompImageHDU)
+            except:
+                print('FITS image write error... Skipping file.')
+        except ValueError:
+            print('AIA Image has no integration time. Skipping...')
 
 
 def scale_rotate(image, angle=0, scale_factor=1, reference_pixel=None):
