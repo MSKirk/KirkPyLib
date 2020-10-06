@@ -12,7 +12,7 @@ import warnings
 from astropy.utils.exceptions import AstropyDeprecationWarning
 
 
-def aia_prepping_script(image_files, save_files, verbose=False):
+def aia_prepping_script(image_files, save_files, verbose=False, as_npz=False):
     warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
 
     fits_files = glob.glob(os.path.join(os.path.abspath(image_files), '**/*.fits'), recursive=True)
@@ -27,6 +27,7 @@ def aia_prepping_script(image_files, save_files, verbose=False):
 
         savepath = os.path.join(os.path.abspath(save_files), os.path.dirname(image.split(image_files)[1])[1:])
         os.makedirs(savepath, exist_ok=True)
+        savename = os.path.join(savepath, os.path.basename(image).replace('lev1', 'lev15'))
 
         cal_map = Map(image)
 
@@ -35,24 +36,27 @@ def aia_prepping_script(image_files, save_files, verbose=False):
 
         try:
             cal_map = calibrate.prep.normalize_exposure(cal_map)
-
-            cal_map = aiaprep(cal_map)
-
-            temp_data = cal_map.data / eff_area.effective_area_ratio(cal_map.fits_header['WAVELNTH'] * u.angstrom,
-                                                          parse_time(cal_map.fits_header['DATE-OBS']).to_datetime())
-            cal_map.data[:] = temp_data[:]
-
-            savename = os.path.join(savepath, os.path.basename(image).replace('lev1', 'lev15'))
-            try:
-                cal_map.save(savename, overwrite=True, hdu_type=fits.CompImageHDU)
-            except:
-                print(f'FITS image write error... Skipping: {savename}')
-
         except ValueError:
             print(f'AIA Image has no integration time. Skipping: {savename}')
             if os.path.exists(savename):
                 os.remove(savename)
                 print('Cleaning up bad files...')
+
+        cal_map = aiaprep(cal_map)
+
+        temp_data = cal_map.data / eff_area.effective_area_ratio(cal_map.fits_header['WAVELNTH'] * u.angstrom,
+                                                          parse_time(cal_map.fits_header['DATE-OBS']).to_datetime())
+        cal_map.data[:] = temp_data[:]
+
+        if as_npz:
+            np.savez_compressed(savename.replace('.fits', '.npz'), cal_map.data)
+        else:
+            try:
+                cal_map.save(savename, overwrite=True, hdu_type=fits.CompImageHDU)
+            except:
+                print(f'FITS image write error... Skipping: {savename}')
+
+
 
 
 def scale_rotate(image, angle=0, scale_factor=1, reference_pixel=None):
