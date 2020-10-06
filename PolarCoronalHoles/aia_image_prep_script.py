@@ -42,13 +42,18 @@ def aia_prepping_script(image_files, save_files, verbose=False):
                                                           parse_time(cal_map.fits_header['DATE-OBS']).to_datetime())
             cal_map.data[:] = temp_data[:]
 
+            savename = os.path.join(savepath, os.path.basename(image).replace('lev1', 'lev15'))
             try:
-                cal_map.save(os.path.join(savepath, os.path.basename(image).replace('lev1', 'lev15')), overwrite=True,
-                             hdu_type=fits.CompImageHDU)
+                cal_map.save(savename, overwrite=True, hdu_type=fits.CompImageHDU)
             except:
-                print('FITS image write error... Skipping file.')
+                print(f'FITS image write error... Skipping: {savename}')
         except ValueError:
-            print('AIA Image has no integration time. Skipping...')
+            print(f'AIA Image has no integration time. Skipping: {savename}')
+            if os.path.exists(savename):
+                os.remove(savename)
+                print('Cleaning up bad files...')
+
+
 
 
 def scale_rotate(image, angle=0, scale_factor=1, reference_pixel=None):

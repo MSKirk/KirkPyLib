@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Updating to use parfive and Sunpy v2.x">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Catching warnings and adding exceptions.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/aia_image_prep_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/aia_image_prep_script.py" afterDir="false" />
     </list>
@@ -16,15 +16,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" selection-start-line="6" selection-end-line="6" selection-end-column="51" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -90,8 +81,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/aia_image_prep_script.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="470">
-              <caret line="37" column="38" lean-forward="true" selection-start-line="37" selection-start-column="38" selection-end-line="37" selection-end-column="38" />
+            <state relative-caret-position="541">
+              <caret line="50" column="77" lean-forward="true" selection-start-line="50" selection-start-column="77" selection-end-line="50" selection-end-column="77" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -100,9 +91,20 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../aia/aia/AIA_Response.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <folding>
+                <element signature="e#1#20#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5235">
+            <state relative-caret-position="259">
               <caret line="367" selection-start-line="367" selection-end-line="367" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -275,21 +277,7 @@
       <workItem from="1597851404942" duration="2495000" />
       <workItem from="1598381964810" duration="9425000" />
       <workItem from="1598549120552" duration="2990000" />
-      <workItem from="1601482197023" duration="21458000" />
-    </task>
-    <task id="LOCAL-00059" summary="Error fix.">
-      <created>1534367695715</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1534367695715</updated>
-    </task>
-    <task id="LOCAL-00060" summary="Center of Mass offset to better aid sine fitting routine.">
-      <created>1535058670741</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1535058670742</updated>
+      <workItem from="1601482197023" duration="23258000" />
     </task>
     <task id="LOCAL-00061" summary="Center of Mass offset to better aid sine fitting routine.">
       <created>1535059213346</created>
@@ -620,11 +608,25 @@
       <option name="project" value="LOCAL" />
       <updated>1601671746553</updated>
     </task>
-    <option name="localTasksCounter" value="108" />
+    <task id="LOCAL-00108" summary="Using aiapy 0.3 and adapting AIA Reloaded for sunpy maps.">
+      <created>1602010638258</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1602010638258</updated>
+    </task>
+    <task id="LOCAL-00109" summary="Catching warnings and adding exceptions.">
+      <created>1602011466581</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1602011466582</updated>
+    </task>
+    <option name="localTasksCounter" value="110" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="169807000" />
+    <option name="totallyTimeSpent" value="171607000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2600" y="208" width="1793" height="1057" extended-state="0" />
@@ -690,8 +692,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="AIA Download script edits." />
-    <MESSAGE value="Restructured data download to deal with the VSO/FIDO issues." />
     <MESSAGE value="Added print statements on soft error." />
     <MESSAGE value="Forced JSOC source." />
     <MESSAGE value="Forced JSOC source" />
@@ -715,7 +715,9 @@
     <MESSAGE value="Indexing correction for h_loc." />
     <MESSAGE value="Updating coronal data hole fetching script to Sunpy 2.x" />
     <MESSAGE value="Updating to use parfive and Sunpy v2.x" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updating to use parfive and Sunpy v2.x" />
+    <MESSAGE value="Using aiapy 0.3 and adapting AIA Reloaded for sunpy maps." />
+    <MESSAGE value="Catching warnings and adding exceptions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Catching warnings and adding exceptions." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_Plots.ipynb">
@@ -779,16 +781,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5235">
-          <caret line="367" selection-start-line="367" selection-end-line="367" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hackweek.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1530">
@@ -802,16 +794,6 @@
     <entry file="file://$PROJECT_DIR$/AreaInt_MatlabPython.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1081">
-          <caret line="16" column="103" selection-start-line="16" selection-start-column="103" selection-end-line="16" selection-end-column="103" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../AIA-reloaded/calibration.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="275">
@@ -822,10 +804,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../../aia/aia/AIA_Response.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#1#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="259">
+          <caret line="367" selection-start-line="367" selection-end-line="367" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1081">
+          <caret line="16" column="103" selection-start-line="16" selection-start-column="103" selection-end-line="16" selection-end-column="103" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/aia_image_prep_script.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="470">
-          <caret line="37" column="38" lean-forward="true" selection-start-line="37" selection-start-column="38" selection-end-line="37" selection-end-column="38" />
+        <state relative-caret-position="541">
+          <caret line="50" column="77" lean-forward="true" selection-start-line="50" selection-start-column="77" selection-end-line="50" selection-end-column="77" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
