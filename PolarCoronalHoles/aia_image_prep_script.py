@@ -47,13 +47,12 @@ def aia_prepping_script(image_files, save_files, verbose=False):
                 cal_map.save(savename, overwrite=True, hdu_type=fits.CompImageHDU)
             except:
                 print(f'FITS image write error... Skipping: {savename}')
+
         except ValueError:
             print(f'AIA Image has no integration time. Skipping: {savename}')
             if os.path.exists(savename):
                 os.remove(savename)
                 print('Cleaning up bad files...')
-
-
 
 
 def scale_rotate(image, angle=0, scale_factor=1, reference_pixel=None):
