@@ -107,7 +107,7 @@ def scale_rotate(image, angle=0, scale_factor=1, reference_pixel=None):
     return rotated_image
 
 
-def aiaprep(smap, cropsize=4096, pointing_table=''):
+def aiaprep(smap, cropsize=4096):
     # Adapted from AIA-reloaded to use sunpy maps
 
     header = smap.fits_header
