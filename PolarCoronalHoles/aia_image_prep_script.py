@@ -38,6 +38,19 @@ def aia_prepping_script(image_files, save_files, verbose=False, as_npz=False):
 
             try:
                 cal_map = calibrate.prep.normalize_exposure(cal_map)
+                cal_map = aiaprep(cal_map)
+
+                temp_data = cal_map.data / eff_area.effective_area_ratio(cal_map.fits_header['WAVELNTH'] * u.angstrom,
+                                                            parse_time(cal_map.fits_header['DATE-OBS']).to_datetime())
+                cal_map.data[:] = temp_data[:]
+                if as_npz:
+                    np.savez_compressed(savename.replace('.fits', '.npz'), cal_map.data)
+                else:
+                    try:
+                        cal_map.save(savename, overwrite=True, hdu_type=fits.CompImageHDU)
+                    except:
+                        bad_files + [savename]
+                        print(f'FITS image write error... Skipping: {savename}')
             except ValueError:
                 print(f'AIA Image has no integration time. Skipping: {image}')
                 try:
@@ -47,24 +60,11 @@ def aia_prepping_script(image_files, save_files, verbose=False, as_npz=False):
                 except OSError:
                     pass
 
-            cal_map = aiaprep(cal_map)
-
-            temp_data = cal_map.data / eff_area.effective_area_ratio(cal_map.fits_header['WAVELNTH'] * u.angstrom,
-                                                              parse_time(cal_map.fits_header['DATE-OBS']).to_datetime())
-            cal_map.data[:] = temp_data[:]
         except ValueError:
             print(f'{image} is not valid. Flagging for follow up.')
             bad_files + [savename]
             os.rename(image, image.replace('aia.', 'CHECK.aia.'))
 
-        if as_npz:
-            np.savez_compressed(savename.replace('.fits', '.npz'), cal_map.data)
-        else:
-            try:
-                cal_map.save(savename, overwrite=True, hdu_type=fits.CompImageHDU)
-            except:
-                bad_files + [savename]
-                print(f'FITS image write error... Skipping: {savename}')
     return bad_files
 
 
