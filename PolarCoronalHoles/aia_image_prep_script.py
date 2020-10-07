@@ -68,7 +68,6 @@ def aia_prepping_script(image_files, save_files, verbose=False, as_npz=False):
     return bad_files
 
 
-
 def scale_rotate(image, angle=0, scale_factor=1, reference_pixel=None):
     """
     Perform scaled rotation with opencv. About 20 times faster than with Sunpy & scikit/skimage warp methods.
