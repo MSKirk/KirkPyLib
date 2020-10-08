@@ -1,4 +1,5 @@
 import astropy.units as u
+from astropy.io import fits
 from sunpy.net import Fido, attrs as a
 from sunpy.time import parse_time
 import datetime
@@ -10,9 +11,14 @@ from parfive import Downloader
 
 from bs4 import BeautifulSoup
 from urllib import request, parse
+from astropy.utils.exceptions import AstropyDeprecationWarning, ErfaWarning
+from astropy.io.fits.verify import VerifyWarning
+import warnings
 
 
 def aia_pch_data_download(savepath='', waves=[171, 193, 211, 304]):
+    warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
+    warnings.simplefilter('ignore', category=ErfaWarning)
 
     blank_results = Fido.search(a.jsoc.Time('2030/1/1', '2030/1/2'), a.jsoc.Series('aia.lev1_euv_12s'))
 
@@ -50,9 +56,18 @@ def aia_pch_data_download(savepath='', waves=[171, 193, 211, 304]):
                 num_missing = len(downloaded_file.errors)
                 retry_count = 0
 
+                print('Validating Downloads...')
+                partial = [try_fits_file(qfile) for qfile in downloaded_file.data]
+                num_missing += np.sum(partial)
+
                 while num_missing > 0:
                     downloaded_file = Fido.fetch(results, path=save_path + '/{file}')
                     num_missing = len(downloaded_file.errors)
+
+                    print('Validating Downloads...')
+                    partial = [try_fits_file(qfile) for qfile in downloaded_file.data]
+                    num_missing += np.sum(partial)
+
                     retry_count += 1
                     print(f'Retry number {retry_count} to catch errors... ')
 
@@ -63,6 +78,12 @@ def aia_pch_data_download(savepath='', waves=[171, 193, 211, 304]):
 
             if results.file_num == len(fnmatch.filter(os.listdir(save_path), '*.image_lev1.fits')):
                 print('Download between '+date_list[ii].strftime('%Y/%m/%d')+' and ' + date_list[ii+1].strftime('%Y/%m/%d') + ' successful')
+
+                print('Removing spikes files...')
+                for s in downloaded_file.data:
+                    if "spikes" in s:
+                        os.remove(s)
+
             else:
                 print('Expected '+np.str(results.file_num)+' files.')
                 print('Got '+np.str(len(fnmatch.filter(os.listdir(save_path), '*.image_lev1.fits')))+' files.')
@@ -160,5 +181,35 @@ def datetime_from_euvi_filename(filepath):
 
 def wavelength_from_euvi_filename(filepath):
     return os.path.basename(filepath)[16:19]
+
+
+class CheckFitsFile:
+    def __init__(self, filepath):
+            self.fname = filepath
+            self.qfile = open(filepath)
+            self.eof = self.qfile.seek(0, os.SEEK_END)
+
+    def is_end_binary(self):
+        textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
+        is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
+
+        return is_binary_string(open(self.fname, 'rb').read(self.eof))
+
+
+def try_fits_file(filename):
+    try:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("ignore", category=VerifyWarning)
+            fits.open(filename).verify()
+            if len(w) > 0:
+                print('Fits read warning')
+                raise ValueError
+        return 0
+    except(OSError, ValueError):
+        print('Removing bad fits file...')
+        os.remove(filename)
+        return 1
+
+
 
 

@@ -60,7 +60,7 @@ def aia_prepping_script(image_files, save_files, verbose=False, as_npz=False):
                 except OSError:
                     pass
 
-        except ValueError:
+        except(ValueError, OSError):
             print(f'{image} is not valid. Flagging for follow up.')
             bad_files + [savename]
             os.rename(image, image.replace('aia.', 'CHECK.aia.'))
