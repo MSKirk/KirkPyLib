@@ -49,20 +49,20 @@ def aia_prepping_script(image_files, save_files, verbose=False, as_npz=False):
                     try:
                         cal_map.save(savename, overwrite=True, hdu_type=fits.CompImageHDU)
                     except:
-                        bad_files + [savename]
+                        bad_files += [image]
                         print(f'FITS image write error... Skipping: {savename}')
             except ValueError:
                 print(f'AIA Image has no integration time. Skipping: {image}')
                 try:
                     os.remove(os.path.abspath(savename))
                     print('Cleaning up bad files...')
-                    bad_files + [savename]
+                    bad_files += [image]
                 except OSError:
                     pass
 
         except(ValueError, OSError):
             print(f'{image} is not valid. Flagging for follow up.')
-            bad_files + [savename]
+            bad_files += [image]
             os.rename(image, image.replace('aia.', 'CHECK.aia.'))
 
     return bad_files
