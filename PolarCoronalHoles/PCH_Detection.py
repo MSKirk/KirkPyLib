@@ -16,7 +16,7 @@ from astropy.table import Table, join
 from astropy.time import Time
 from astropy.coordinates import Longitude
 from astropy.io import ascii, fits
-from astropy.utils.exceptions import AstropyWarning
+from astropy.utils.exceptions import AstropyWarning, AstropyDeprecationWarning
 
 '''
 Detection of polar coronal holes given a directory of images. 
@@ -74,7 +74,7 @@ def pch_mask(mask_map, factor=0.5):
         # Range Clipping
         mask_map.data[mask_map.data > 10000] = 10000
 
-        mask_map.data[mask_map.data < 0] = 0
+        mask_map.data[mask_map.data < 1] = 1
 
         mask_map.data[:] = mask_map.data[:] - mask_map.data.min()
 
@@ -316,6 +316,14 @@ def file_integrity_check(infile):
             hdu1[head_loc].header['CTYPE2'] = 'HPLT-TAN'
             hdu1.writeto(file_path, overwrite=True)
 
+        if 'CUNIT1' not in hdu1[head_loc].header:
+            hdu1[head_loc].header['CUNIT1'] = 'arcsec'
+            hdu1.writeto(file_path, overwrite=True)
+
+        if 'CUNIT2' not in hdu1[head_loc].header:
+            hdu1[head_loc].header['CUNIT2'] = 'arcsec'
+            hdu1.writeto(file_path, overwrite=True)
+
         if 'NAXIS3' in hdu1[head_loc].header:
             warnings.warn('Bad File Detected')
             return False
@@ -363,6 +371,7 @@ def file_integrity_check(infile):
 
 
 class PCH_Detection:
+    warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
 
     def __init__(self, image_dir):
 
@@ -601,3 +610,153 @@ class PCH_Detection:
             self.point_detection.write(write_file+'.fits', format='fits', overwrite=True)
         else:
             ascii.write(self.point_detection, write_file + '.csv', format='ecsv', overwrite=True)
+
+
+def run_detection(image_file):
+    pts = Table([[0], [0], [0], [0], [0], [0], [''], [Time('1900-01-04')]],
+                            names=(
+                            'StartLat', 'StartLon', 'EndLat', 'EndLon', 'ArcLength', 'Quality', 'FileName', 'Date'),
+                            meta={'name': 'PCH_Detections'})
+
+    if file_integrity_check(image_file):
+        solar_image = sunpy.map.Map(image_file)
+
+        print(image_file)
+
+        if image_integrity_check(solar_image):
+
+            # Resample AIA images to lower resolution for better processing times
+            if solar_image.dimensions[0] > 2049. * u.pixel:
+                dimensions = u.Quantity([2048, 2048], u.pixel)
+                solar_image = solar_image.resample(dimensions)
+
+            pch_mask(solar_image)
+            pts = pch_mark(solar_image)
+
+            print(pts)
+
+            if len(pts) > 0:
+                pts['FileName'] = [os.path.basename(image_file)] * len(pts)
+                pts['Date'] = [Time(solar_image.date)] * len(pts)
+
+        # Variable Cleanup
+        del solar_image
+
+    return pts
+
+
+def hole_area(point_detection, h_rotation_number, northern=True):
+    # Returns the area as a fraction of the total solar surface area
+    # Returns the location of the perimeter fit for the given h_rotation_number
+
+    begin = np.min(np.where(point_detection['Harvey_Rotation'] > (h_rotation_number - 1)))
+    end = np.max(np.where(point_detection['Harvey_Rotation'] == h_rotation_number))
+
+    if northern:
+        # A northern hole with Arclength Filter for eliminating small holes but not zeros
+        index_measurements = np.where((point_detection[begin:end]['StartLat'] > 0) & np.logical_not(
+            point_detection[begin:end]['ArcLength'] < 3.0))
+    else:
+        # A southern hole with Arclength Filter for eliminating small holes
+        index_measurements = np.where((point_detection[begin:end]['StartLat'] < 0) & np.logical_not(
+            point_detection[begin:end]['ArcLength'] < 3.0))
+
+    index_measurements += begin
+
+    # Filters for incomplete hole measurements: at least 10 points and half a harvey rotation needs to be defined
+    if len(index_measurements[0]) < 10:
+        return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
+
+    elif point_detection['Harvey_Rotation'][index_measurements[0][-1]] - point_detection['Harvey_Rotation'][index_measurements[0][0]] < 0.5:
+        return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
+
+    else:
+        lons = np.concatenate(np.vstack([point_detection[index_measurements]['H_StartLon'].data.data,
+                                         point_detection[index_measurements]['H_EndLon'].data.data])) * u.deg
+        lats = np.concatenate(np.vstack([point_detection[index_measurements]['StartLat'].data.data,
+                                         point_detection[index_measurements]['EndLat'].data.data])) * u.deg
+        errors = np.concatenate(np.vstack([np.asarray(1/point_detection[index_measurements]['Quality']),
+                                           np.asarray(1/point_detection[index_measurements]['Quality'])]))
+
+        perimeter_length = np.zeros(6) * u.rad
+        fit_location = np.zeros(6) * u.rad
+        hole_area = np.zeros(6)
+
+        # Centroid offset for better fitting results
+        if northern:
+            offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) - lats]))
+        else:
+            offset_coords = np.transpose(np.asarray([lons, (90 * u.deg) + lats]))
+
+        offset_cm = PCH_Tools.center_of_mass(offset_coords, mass=1/errors) * u.deg
+        offset_lons = np.mod(offset_coords[:, 0] * u.deg - offset_cm[0], 360* u.deg)
+        offset_lats = offset_coords[:, 1] * u.deg - offset_cm[1]
+
+        for ii, degrees in enumerate([4, 5, 6, 7, 8, 9]):
+            try:
+                hole_fit = PCH_Tools.trigfit(np.deg2rad(offset_lons), np.deg2rad(offset_lats), degree=degrees,
+                                             sigma=errors)
+
+                # Lambert cylindrical equal-area projection to find the area using the composite trapezoidal rule
+                # And removing centroid offset
+                if northern:
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                    lamb_y = np.sin(
+                        (np.pi * 0.5) - hole_fit['fitfunc'](lamb_x.value) - np.deg2rad(offset_cm[1]).value) * u.rad
+
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                    fit_location[ii] = np.rad2deg((np.pi * 0.5) - hole_fit['fitfunc'](np.deg2rad(
+                        PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[
+                            0]).value) - np.deg2rad(offset_cm[1]).value) * u.deg
+                else:
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg)
+                    lamb_y = np.sin(
+                        hole_fit['fitfunc'](lamb_x.value) - (np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.rad
+
+                    lamb_x = np.deg2rad(np.arange(0, 360, 0.01) * u.deg + offset_cm[0])
+                    fit_location[ii] = np.rad2deg(hole_fit['fitfunc'](np.deg2rad(
+                        PCH_Tools.get_harvey_lon(PCH_Tools.hrot2date(h_rotation_number)) - offset_cm[0]).value) - (
+                                                              np.pi * 0.5) + np.deg2rad(offset_cm[1]).value) * u.deg
+
+                perimeter_length[ii] = PCH_Tools.curve_length(lamb_x, lamb_y)
+
+                if northern:
+                    hole_area[ii] = (2 * np.pi) - np.trapz(lamb_y, x=lamb_x).value
+                else:
+                    hole_area[ii] = (2 * np.pi) + np.trapz(lamb_y, x=lamb_x).value
+
+            except RuntimeError:
+                hole_area[ii] = np.nan
+                perimeter_length[ii] = np.inf * u.rad
+                fit_location[ii] = np.nan
+
+        # allowing for a 5% perimeter deviation off of a circle
+        good_areas = hole_area[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
+        good_fits = fit_location[np.where((perimeter_length / (2*np.pi*u.rad)) -1 < 0.05)]
+
+        # A sphere is 4π steradians in surface area
+        if good_areas.size > 0:
+            percent_hole_area = (np.nanmin(good_areas) / (4 * np.pi), np.nanmean(good_areas) / (4 * np.pi), np.nanmax(good_areas) / (4 * np.pi))
+            # in degrees
+            hole_perimeter_location = (np.rad2deg(np.nanmin(good_fits)).value, np.rad2deg(np.nanmean(good_fits)).value, np.rad2deg(np.nanmax(good_fits)).value)
+        else:
+            percent_hole_area = (np.nan, np.nan, np.nan)
+            hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
+
+        # From co-lat to lat
+
+        if northern:
+            if offset_cm[1] < 0:
+                offset_cm[1] = (90 * u.deg) + offset_cm[1]
+                offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
+            else:
+                offset_cm[1] = (90 * u.deg) - offset_cm[1]
+        else:
+            if offset_cm[1] > 0:
+                offset_cm[1] = (-90 * u.deg) + offset_cm[1]
+            else:
+                offset_cm[1] = (-90 * u.deg) - offset_cm[1]
+                offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
+
+        # Tuples of shape (Min, Mean, Max)
+        return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)
