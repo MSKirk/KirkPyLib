@@ -11,6 +11,10 @@ from astropy.io import ascii
 from PCH_Detection import run_detection, hole_area
 import PCH_Tools
 
+
+# Uncomment which dataset to run
+# >> python main_detection.py
+
 if __name__ == '__main__':
     warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
 
@@ -30,7 +34,7 @@ if __name__ == '__main__':
     #all_files = all_files[0:500]
 
     tstart = time.time()
-    nprocesses = 22
+    nprocesses = 26 # IO Bound
     with Pool(nprocesses) as p:
         pts_pool = p.map(run_detection, all_files)
 
