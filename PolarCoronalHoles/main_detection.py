@@ -56,6 +56,7 @@ if __name__ == '__main__':
                                                     + np.array(point_detections['StartLon'])) * u.deg)
     point_detections['H_EndLon'] = Longitude((np.squeeze(np.asarray(point_detections['Harvey_Longitude']))
                                                   + np.array(point_detections['EndLon'])) * u.deg)
+    point_detections.sort('Harvey_Rotation')
 
     area = []
     fit = []

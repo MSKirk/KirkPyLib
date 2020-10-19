@@ -290,7 +290,7 @@ def image_integrity_check(inmap):
         good_image = False
 
     if not good_image:
-        warnings.warn('Bad Image Detected')
+        warnings.warn('Not Expected Level or Quality')
 
     return good_image
 
@@ -314,59 +314,57 @@ def file_integrity_check(infile):
 
         if 'CTYPE2' not in hdu1[head_loc].header:
             hdu1[head_loc].header['CTYPE2'] = 'HPLT-TAN'
-            hdu1.writeto(file_path, overwrite=True)
 
         if 'CUNIT1' not in hdu1[head_loc].header:
             hdu1[head_loc].header['CUNIT1'] = 'arcsec'
-            hdu1.writeto(file_path, overwrite=True)
 
         if 'CUNIT2' not in hdu1[head_loc].header:
             hdu1[head_loc].header['CUNIT2'] = 'arcsec'
             hdu1.writeto(file_path, overwrite=True)
 
         if 'NAXIS3' in hdu1[head_loc].header:
-            warnings.warn('Bad File Detected')
+            warnings.warn('NAXIS greater than 2')
             return False
 
         try:
             type(hdu1[head_loc].header['CRVAL1'])
         except KeyError:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CRVAL1 Specified')
             return False
         if type(hdu1[head_loc].header['CRVAL1']) != float:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CRVAL1 Specified')
             return False
 
         try:
             type(hdu1[head_loc].header['CRVAL2'])
         except KeyError:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CRVAL2 Specified')
             return False
         if type(hdu1[head_loc].header['CRVAL2']) != float:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CRVAL2 Specified')
             return False
 
         try:
             type(hdu1[head_loc].header['CDELT1'])
         except KeyError:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CDELT1 Detected')
             return False
         if type(hdu1[head_loc].header['CDELT1']) != float:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CDELT1 Detected')
             return False
 
         try:
             type(hdu1[head_loc].header['CDELT2'])
         except KeyError:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CDELT2 Detected')
             return False
         if type(hdu1[head_loc].header['CDELT2']) != float:
-            warnings.warn('Bad File Detected')
+            warnings.warn('No CDELT2 Detected')
             return False
         else:
             return True
     else:
-        warnings.warn('Bad File Detected')
+        warnings.warn('Not a fits file')
         return False
 
 
