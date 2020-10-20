@@ -138,8 +138,11 @@ def pch_mask(mask_map, factor=0.5):
         mask_map.mask = morphology.opening(mask_map.mask * PCH_Tools.annulus_mask(mask_map.data.shape, (0,0), rsun_in_pix, center=mask_map.data.shape - np.flip(mask_map.wcs.wcs.crpix)-1), selem=structelem)
 
         # Extracting holes...
-        thresh = PCH_Tools.hist_percent(mask_map.mask[np.nonzero(mask_map.mask)], factor, number_of_bins=1000)
-        mask_map.mask = np.where(mask_map.mask >= thresh, mask_map.mask, 0)
+        try:
+            thresh = PCH_Tools.hist_percent(mask_map.mask[np.nonzero(mask_map.mask)], factor, number_of_bins=1000)
+            mask_map.mask = np.where(mask_map.mask >= thresh, mask_map.mask, 0)
+        except ValueError:
+            mask_map.mask = np.ones_like(mask_map.mask)
 
         # Extracting annulus
         mask_map.mask[PCH_Tools.annulus_mask(mask_map.data.shape, rsun_in_pix*0.965, rsun_in_pix*0.995, center=mask_map.data.shape - np.flip(mask_map.wcs.wcs.crpix-1)) == False] = np.nan
@@ -165,6 +168,7 @@ def pch_mask(mask_map, factor=0.5):
         mask_map.meta.pop('hec_x')
         mask_map.meta.pop('hec_y')
         mask_map.meta.pop('hec_z')
+
 
 def pch_quality(masked_map, hole_start, hole_end, n_hole_pixels):
     # hole_start and hole_end are tuples of (lat, lon)
@@ -326,23 +330,23 @@ def file_integrity_check(infile):
             warnings.warn('NAXIS greater than 2')
             return False
 
-        try:
-            type(hdu1[head_loc].header['CRVAL1'])
-        except KeyError:
-            warnings.warn('No CRVAL1 Specified')
-            return False
-        if type(hdu1[head_loc].header['CRVAL1']) != float:
-            warnings.warn('No CRVAL1 Specified')
-            return False
+        #try:
+        #    type(hdu1[head_loc].header['CRVAL1'])
+        #except KeyError:
+        #    warnings.warn('No CRVAL1 Specified')
+        #    return False
+        #if type(hdu1[head_loc].header['CRVAL1']) != float:
+        #    warnings.warn('No CRVAL1 Specified')
+        #    return False
 
-        try:
-            type(hdu1[head_loc].header['CRVAL2'])
-        except KeyError:
-            warnings.warn('No CRVAL2 Specified')
-            return False
-        if type(hdu1[head_loc].header['CRVAL2']) != float:
-            warnings.warn('No CRVAL2 Specified')
-            return False
+        #try:
+        #    type(hdu1[head_loc].header['CRVAL2'])
+        #except KeyError:
+        #    warnings.warn('No CRVAL2 Specified')
+        #    return False
+        #if type(hdu1[head_loc].header['CRVAL2']) != float:
+        #    warnings.warn('No CRVAL2 Specified')
+        #    return False
 
         try:
             type(hdu1[head_loc].header['CDELT1'])
