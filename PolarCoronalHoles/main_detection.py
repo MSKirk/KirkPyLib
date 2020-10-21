@@ -3,49 +3,42 @@ from multiprocessing import Pool
 import warnings
 import numpy as np
 from astropy.utils.exceptions import AstropyDeprecationWarning
-from astropy.table import vstack
+from astropy.table import vstack, Table, join
 from astropy.time import Time
 import astropy.units as u
 from astropy.coordinates import Longitude
 from astropy.io import ascii
-from PCH_Detection import run_detection, hole_area
+from PCH_Detection import run_detection, hole_area_parallel
 import PCH_Tools
 
 
 # Uncomment which dataset to run
 # >> python main_detection.py
 
-if __name__ == '__main__':
-    warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
-
-    # AIA
-    #all_files = list(set([os.path.dirname(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/*/*/*")]))
-
-    # EUVI
-    #all_files = list(set([os.path.dirname(p) for p in glob.glob("/Volumes/CoronalHole/EUVI/*/*")]))
-
-    # SWAP
-    all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/SWAP/*/*/*")]))
-
-    # EIT
-    #all_files = list(set([os.path.dirname(p) for p in glob.glob("/Volumes/CoronalHole/EIT_lev1/*/*")]))
-
-    all_files.sort()
-    #all_files = all_files[0:500]
+def detect_hole(all_files):
 
     tstart = time.time()
-    nprocesses = 26 # IO Bound
+    nprocesses = 26  # IO Bound
     with Pool(nprocesses) as p:
         pts_pool = p.map(run_detection, all_files)
 
     # concat detections
-    point_detections = vstack(pts_pool)
-    
+    point_detections = Table(vstack(pts_pool))
+
     # Clean up
     try:
-        point_detections.remove_row(np.where(point_detections['Date'] == Time('1900-01-04'))[0][0])
+        point_detections.remove_rows(np.where(point_detections['Date'] == Time('1900-01-04'))[0])
     except IndexError:
         pass
+
+    elapsed_time = time.time() - tstart
+    print('Hole detection compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+
+    return point_detections
+
+
+def calc_area(point_detections):
+    tstart = time.time()
 
     # Add Harvey Rotation
     point_detections['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in
@@ -58,35 +51,25 @@ if __name__ == '__main__':
                                                   + np.array(point_detections['EndLon'])) * u.deg)
     point_detections.sort('Harvey_Rotation')
 
-    area = []
-    fit = []
-    center = []
-    for ii, h_rot in enumerate(point_detections['Harvey_Rotation']):
-        if point_detections[ii]['StartLat'] > 0:
-            northern = True
-        else:
-            northern = False
-        ar, ft, cm = hole_area(point_detections, h_rot, northern=northern)
-        area = area + [ar]
-        fit = fit + [ft]
-        center = center + [cm]
-    center = np.vstack([arr[0:2] for arr in center])
-    
-    point_detections['Area'] = np.asarray(area)[:, 1]
-    point_detections['Area_min'] = np.asarray(area)[:, 0]
-    point_detections['Area_max'] = np.asarray(area)[:, 2]
+    nprocesses = 26
 
-    point_detections['Fit'] = np.asarray(fit)[:, 1] * u.deg
-    point_detections['Fit_min'] = np.asarray(fit)[:, 0] * u.deg
-    point_detections['Fit_max'] = np.asarray(fit)[:, 2] * u.deg
+    with Pool(nprocesses) as p:
+        area_dict_pool = hole_area_parallel(point_detections, range(len(point_detections['Harvey_Rotation'])))
 
-    point_detections['Center_lat'] = center[:, 1] * u.deg
-    point_detections['Center_lon'] = center[:, 0] * u.deg
+    area_table = pool_to_table(area_dict_pool)
+    area_table.sort('Index')
 
+    elapsed_time = time.time() - tstart
+    print('Hole area compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+
+    return join(point_detections, area_table)
+
+
+def save_table(all_files, point_detections):
     all_ints = ['AIA', 'SWAP', 'EUVI', 'EIT']
     all_waves = ['171', '193', '195', '211', '304', 'STACKED']
 
-    ints_string = [ints for ints in all_ints if ints in point_detections['FileName'][0].upper()][0]
+    ints_string = [ints for ints in all_ints if ints in all_files[0].upper()][0]
 
     wave_string = [wv for wv in all_waves if wv in all_files[0].upper()][0]
     if wave_string == 'STACKED':
@@ -98,5 +81,53 @@ if __name__ == '__main__':
 
     ascii.write(point_detections, save_filename, format='ecsv', overwrite=True)
 
-    elapsed_time = time.time() - tstart
-    print('Compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+
+def pool_to_table(area_dict_pool):
+    area_table = Table([[pts_dic['Index'] for pts_dic in area_dict_pool],
+                        [pts_dic['area'][1] for pts_dic in area_dict_pool]], names=('Index', 'Area'))
+
+    area_table.add_column([pts_dic['area'][0] for pts_dic in area_dict_pool], name='Area_min')
+    area_table.add_column([pts_dic['area'][2] for pts_dic in area_dict_pool], name='Area_max')
+
+    area_table.add_column([pts_dic['fit'][1] * u.deg for pts_dic in area_dict_pool], name='Fit')
+    area_table.add_column([pts_dic['fit'][0] * u.deg for pts_dic in area_dict_pool], name='Fit_min')
+    area_table.add_column([pts_dic['fit'][2] * u.deg for pts_dic in area_dict_pool], name='Fit_max')
+
+    area_table.add_column([pts_dic['center'][1] for pts_dic in area_dict_pool], name='Center_lat')
+    area_table.add_column([pts_dic['center'][0] for pts_dic in area_dict_pool], name='Center_lon')
+
+    return area_table
+
+
+if __name__ == '__main__':
+    warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
+
+    #AIA_dirs = [list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/171/*/*")])),
+    #          list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/193/*/*")]))
+    #          list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/211/*/*")]))
+    #          list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/304/*/*")]))]
+
+    # AIA
+    #all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/*/*/*")]))
+
+    # EUVI
+    all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/EUVI/195*/*")]))
+
+    # SWAP
+    #all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/SWAP/*/*/*")]))
+
+    # EIT
+    #all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/EIT_lev1/*/*")]))
+
+    #for
+    all_files.sort()
+    all_files = all_files[0:1000]
+
+    point_detections = detect_hole(all_files)
+    point_detections.add_column(np.arange(len(point_detections)), name='Index')
+
+    point_detections = calc_area(point_detections)
+
+    save_table(all_files, point_detections)
+
+    # calc_area(point_detections, np.arange(len(point_detections)))
