@@ -17,7 +17,6 @@ import PCH_Tools
 
 def detect_hole(all_files):
 
-    tstart = time.time()
     nprocesses = 26  # IO Bound
     with Pool(nprocesses) as p:
         pts_pool = p.map(run_detection, all_files)
@@ -26,13 +25,7 @@ def detect_hole(all_files):
     point_detections = Table(vstack(pts_pool))
 
     # Clean up
-    try:
-        point_detections.remove_rows(np.where(point_detections['Date'] == Time('1900-01-04'))[0])
-    except IndexError:
-        pass
-
-    elapsed_time = time.time() - tstart
-    print('Hole detection compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+    point_detections.remove_rows(np.where(point_detections['Date'] <= Time('1950-01-04'))[0])
 
     return point_detections
 
@@ -53,8 +46,12 @@ def calc_area(point_detections):
 
     nprocesses = 26
 
+    def run_hole_area(index):
+        area_dict = hole_area_parallel(point_detections, index)
+        return area_dict
+
     with Pool(nprocesses) as p:
-        area_dict_pool = hole_area_parallel(point_detections, range(len(point_detections['Harvey_Rotation'])))
+        area_dict_pool = p.map(run_hole_area, list(np.arange(len(point_detections['Harvey_Rotation']))))
 
     area_table = pool_to_table(area_dict_pool)
     area_table.sort('Index')
@@ -63,6 +60,21 @@ def calc_area(point_detections):
     print('Hole area compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
 
     return join(point_detections, area_table)
+
+
+def add_harvey(point_detections):
+    # Add Harvey Rotation
+    point_detections['Harvey_Rotation'] = [PCH_Tools.date2hrot(date, fractional=True) for date in
+                                               point_detections['Date']]
+    point_detections['Harvey_Longitude'] = np.squeeze(
+        [PCH_Tools.get_harvey_lon(date) for date in point_detections['Date']])
+    point_detections['H_StartLon'] = Longitude((np.squeeze(np.asarray(point_detections['Harvey_Longitude']))
+                                                    + np.array(point_detections['StartLon'])) * u.deg)
+    point_detections['H_EndLon'] = Longitude((np.squeeze(np.asarray(point_detections['Harvey_Longitude']))
+                                                  + np.array(point_detections['EndLon'])) * u.deg)
+    point_detections.sort('Harvey_Rotation')
+
+    return point_detections
 
 
 def save_table(all_files, point_detections):
@@ -102,32 +114,46 @@ def pool_to_table(area_dict_pool):
 if __name__ == '__main__':
     warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
 
-    #AIA_dirs = [list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/171/*/*")])),
-    #          list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/193/*/*")]))
-    #          list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/211/*/*")]))
-    #          list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/304/*/*")]))]
+    AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/171/*/*/*', '/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
+                '/Volumes/CoronalHole/AIA_lev15/211/*/*/*', '/Volumes/CoronalHole/AIA_lev15/304/*/*/*']
+    EUVI_dirs = ['/Volumes/CoronalHole/EUVI/171*/*', '/Volumes/CoronalHole/EUVI/195*/*',
+                 '/Volumes/CoronalHole/EUVI/304*/*']
+    SWAP_dirs = ['/Volumes/CoronalHole/SWAP/*/*/*']
+    EIT_dirs = ['/Volumes/CoronalHole/EIT_lev1/171/*', '/Volumes/CoronalHole/EIT_lev1/195/*',
+                '/Volumes/CoronalHole/EIT_lev1/304/*']
 
-    # AIA
-    #all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/AIA_lev15/*/*/*")]))
+    all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
 
-    # EUVI
-    all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/EUVI/195*/*")]))
+    for inst_dir in all_dirs:
+        all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))
+        all_files.sort()
 
-    # SWAP
-    #all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/SWAP/*/*/*")]))
+        if not all_files:
+            raise IOError('No files in input directory')
 
-    # EIT
-    #all_files = list(set([os.path.abspath(p) for p in glob.glob("/Volumes/CoronalHole/EIT_lev1/*/*")]))
+        #all_files = all_files[0:1000]
+        tstart = time.time()
 
-    #for
-    all_files.sort()
-    all_files = all_files[0:1000]
+        point_detections = detect_hole(all_files)
+        point_detections = add_harvey(point_detections)
+        point_detections.sort('Harvey_Rotation')
 
-    point_detections = detect_hole(all_files)
-    point_detections.add_column(np.arange(len(point_detections)), name='Index')
+        point_detections.add_column(np.arange(len(point_detections)), name='Index')
 
-    point_detections = calc_area(point_detections)
+        ascii.write(point_detections, '/Users/mskirk/data/PCH_Project/Temp.csv', format='ecsv', overwrite=True)
 
-    save_table(all_files, point_detections)
+        nprocesses = 26
 
-    # calc_area(point_detections, np.arange(len(point_detections)))
+        index_list = list(np.arange(len(point_detections['Harvey_Rotation'])))
+
+        with Pool(nprocesses) as p:
+            area_dict_pool = p.map(hole_area_parallel, index_list)
+
+        area_table = pool_to_table(area_dict_pool)
+        area_table.sort('Index')
+
+        elapsed_time = time.time() - tstart
+        print('Hole area compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+
+        save_table(all_files, join(point_detections, area_table))
+

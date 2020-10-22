@@ -632,9 +632,11 @@ def run_detection(image_file):
                 dimensions = u.Quantity([2048, 2048], u.pixel)
                 solar_image = solar_image.resample(dimensions)
 
-            pch_mask(solar_image)
+            try:
+                pch_mask(solar_image)
+            except ValueError:
+                solar_image.mask = np.zeros_like(solar_image.data[:])
             pts = pch_mark(solar_image)
-
             print(pts)
 
             if len(pts) > 0:
@@ -764,9 +766,13 @@ def hole_area(point_detection, h_rotation_number, northern=True):
         return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)
 
 
-def hole_area_parallel(point_detection, index):
+def hole_area_parallel(index):
     # Returns the area as a fraction of the total solar surface area
     # Returns the location of the perimeter fit for the given h_rotation_number
+
+    warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
+
+    point_detection = Table(ascii.read('/Users/mskirk/data/PCH_Project/Temp.csv'))
 
     if point_detection[index]['StartLat'] > 0:
         northern = True
@@ -779,24 +785,32 @@ def hole_area_parallel(point_detection, index):
     end = np.max(np.where(point_detection['Harvey_Rotation'] == h_rotation_number))
 
     if northern:
-        # A northern hole with Arclength Filter for eliminating small holes but not zeros
-        index_measurements = np.where((point_detection[begin:end]['StartLat'] > 0) & np.logical_not(
-            point_detection[begin:end]['ArcLength'] < 3.0))
+        # A northern hole
+        index_measurements = np.where(point_detection[begin:end]['StartLat'] > 0)[0]
+        null_fit = (90, 90, 90)
+        null_center = (90, 0)
     else:
-        # A southern hole with Arclength Filter for eliminating small holes
-        index_measurements = np.where((point_detection[begin:end]['StartLat'] < 0) & np.logical_not(
-            point_detection[begin:end]['ArcLength'] < 3.0))
+        # A southern hole
+        index_measurements = np.where(point_detection[begin:end]['StartLat'] < 0)[0]
+        null_fit = (-90, -90, -90)
+        null_center = (-90, 0)
 
     index_measurements += begin
 
-    # Filters for incomplete hole measurements: at least 10 points and half a harvey rotation needs to be defined
-    if len(index_measurements[0]) < 10:
-        return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
-
-    elif point_detection['Harvey_Rotation'][index_measurements[0][-1]] - point_detection['Harvey_Rotation'][index_measurements[0][0]] < 0.5:
-        return np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan]), np.array([np.nan, np.nan, np.nan])
-
+    # Filters for incomplete hole measurements: at least 10 points and a quarter harvey rotation needs to be defined
+    if len(index_measurements) < 10:
+        return {'Index': index, 'area': (np.nan, np.nan, np.nan), 'fit': (np.nan, np.nan, np.nan),
+                'center': (np.nan, np.nan)}
+    elif point_detection['Harvey_Rotation'][index_measurements[-1]] - point_detection['Harvey_Rotation'][index_measurements[0]] < 0.25:
+        return {'Index': index, 'area': (np.nan, np.nan, np.nan), 'fit': (np.nan, np.nan, np.nan),
+                'center': (np.nan, np.nan)}
+    elif np.sum(point_detection[index_measurements]['ArcLength'] > 3.0) < 10:
+        return {'Index': index, 'area': (0, 0, 0), 'fit': null_fit,
+                'center': null_center}
     else:
+        # small hole filter
+        index_measurements = index_measurements[np.where(point_detection[index_measurements]['ArcLength'] > 3.0)]
+
         lons = np.concatenate(np.vstack([point_detection[index_measurements]['H_StartLon'].data.data,
                                          point_detection[index_measurements]['H_EndLon'].data.data])) * u.deg
         lats = np.concatenate(np.vstack([point_detection[index_measurements]['StartLat'].data.data,
@@ -866,8 +880,8 @@ def hole_area_parallel(point_detection, index):
             # in degrees
             hole_perimeter_location = (np.rad2deg(np.nanmin(good_fits)).value, np.rad2deg(np.nanmean(good_fits)).value, np.rad2deg(np.nanmax(good_fits)).value)
         else:
-            percent_hole_area = (np.nan, np.nan, np.nan)
-            hole_perimeter_location = np.array([np.nan, np.nan, np.nan])
+            percent_hole_area = (0, 0, 0)
+            hole_perimeter_location = null_fit
 
         # From co-lat to lat
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Correcting SWAP header values.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Parallelized PCH area calculation.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_detection.py" afterDir="false" />
@@ -17,30 +17,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/aia_image_prep_script.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="11" column="62" selection-start-line="11" selection-end-line="11" selection-end-column="62" />
-              <folding>
-                <element signature="e#0#26#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/correct_swap_header.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="22" selection-start-line="22" selection-end-line="22" />
-              <folding>
-                <element signature="e#0#27#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_series.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -79,11 +55,11 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="846" column="77" lean-forward="true" selection-start-line="846" selection-start-column="77" selection-end-line="846" selection-end-column="77" />
+            <state relative-caret-position="443">
+              <caret line="630" column="59" selection-start-line="630" selection-start-column="59" selection-end-line="630" selection-end-column="59" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -91,11 +67,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="648">
-              <caret line="121" column="5" selection-start-line="121" selection-start-column="5" selection-end-line="121" selection-end-column="5" />
+            <state relative-caret-position="828">
+              <caret line="159" selection-start-line="159" selection-end-line="159" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -106,8 +82,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="29" column="18" selection-start-line="29" selection-start-column="18" selection-end-line="29" selection-end-column="18" />
+            <state relative-caret-position="495">
+              <caret line="38" column="51" selection-start-line="38" selection-start-column="51" selection-end-line="38" selection-end-column="51" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -135,6 +111,8 @@
       <find>self.wav</find>
       <find>self.point_detection</find>
       <find>self.</find>
+      <find>index</find>
+      <find>np.nan</find>
     </findStrings>
     <replaceStrings>
       <replace>cal_map.</replace>
@@ -156,8 +134,8 @@
         <option value="$PROJECT_DIR$/aia_image_prep_script.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/correct_swap_header.py" />
-        <option value="$PROJECT_DIR$/PCH_Detection.py" />
         <option value="$PROJECT_DIR$/main_detection.py" />
+        <option value="$PROJECT_DIR$/PCH_Detection.py" />
       </list>
     </option>
   </component>
@@ -174,7 +152,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -186,6 +163,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -281,14 +259,9 @@
       <workItem from="1602602204334" duration="2597000" />
       <workItem from="1602858401244" duration="7942000" />
       <workItem from="1603121849175" duration="16789000" />
-      <workItem from="1603288108925" duration="7171000" />
-    </task>
-    <task id="LOCAL-00074" summary="Keep wavelength information in pch object.">
-      <created>1536612367242</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
-      <option name="project" value="LOCAL" />
-      <updated>1536612367243</updated>
+      <workItem from="1603288108925" duration="17398000" />
+      <workItem from="1603317407246" duration="18000" />
+      <workItem from="1603373877383" duration="510000" />
     </task>
     <task id="LOCAL-00075" summary="Keep wavelength information in pch object.">
       <created>1536680945574</created>
@@ -626,17 +599,24 @@
       <option name="project" value="LOCAL" />
       <updated>1603206272412</updated>
     </task>
-    <option name="localTasksCounter" value="123" />
+    <task id="LOCAL-00123" summary="Parallelized PCH area calculation.">
+      <created>1603303930687</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1603303930688</updated>
+    </task>
+    <option name="localTasksCounter" value="124" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="223244000" />
+    <option name="totallyTimeSpent" value="233999000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2612" y="208" width="1793" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29011995" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29697317" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -696,7 +676,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Bug fix in structure element calculation." />
     <MESSAGE value="Plotting revised for new table format." />
     <MESSAGE value="Adding bootstrap confidence intervals." />
     <MESSAGE value="Create a dataframe with bootstrapped confidence intervals." />
@@ -721,7 +700,8 @@
     <MESSAGE value="Comments added" />
     <MESSAGE value="Clarify warning messages, added SWAP header cleanup." />
     <MESSAGE value="Correcting SWAP header values." />
-    <option name="LAST_COMMIT_MESSAGE" value="Correcting SWAP header values." />
+    <MESSAGE value="Parallelized PCH area calculation." />
+    <option name="LAST_COMMIT_MESSAGE" value="Parallelized PCH area calculation." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_Plots.ipynb">
@@ -786,7 +766,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/aia_image_prep_script.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
+        <state relative-caret-position="164">
           <caret line="11" column="62" selection-start-line="11" selection-end-line="11" selection-end-column="62" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
@@ -796,7 +776,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/correct_swap_header.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
+        <state relative-caret-position="330">
           <caret line="22" selection-start-line="22" selection-end-line="22" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
@@ -836,30 +816,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="29" column="18" selection-start-line="29" selection-start-column="18" selection-end-line="29" selection-end-column="18" />
+        <state relative-caret-position="495">
+          <caret line="38" column="51" selection-start-line="38" selection-start-column="51" selection-end-line="38" selection-end-column="51" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
+    <entry file="file://$PROJECT_DIR$/main_detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="846" column="77" lean-forward="true" selection-start-line="846" selection-start-column="77" selection-end-line="846" selection-end-column="77" />
+        <state relative-caret-position="828">
+          <caret line="159" selection-start-line="159" selection-end-line="159" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main_detection.py">
+    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="121" column="5" selection-start-line="121" selection-start-column="5" selection-end-line="121" selection-end-column="5" />
+        <state relative-caret-position="443">
+          <caret line="630" column="59" selection-start-line="630" selection-start-column="59" selection-end-line="630" selection-end-column="59" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
