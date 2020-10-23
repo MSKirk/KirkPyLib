@@ -111,74 +111,74 @@ def pool_to_table(area_dict_pool):
     return area_table
 
 
-# if __name__ == '__main__':
-#     warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
-#
-#     AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/171/*/*/*', '/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
-#                 '/Volumes/CoronalHole/AIA_lev15/211/*/*/*', '/Volumes/CoronalHole/AIA_lev15/304/*/*/*']
-#     AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
-#                 '/Volumes/CoronalHole/AIA_lev15/211/*/*/*', '/Volumes/CoronalHole/AIA_lev15/304/*/*/*']
-#     EUVI_dirs = ['/Volumes/CoronalHole/EUVI/171*/*', '/Volumes/CoronalHole/EUVI/195*/*',
-#                  '/Volumes/CoronalHole/EUVI/304*/*']
-#     SWAP_dirs = ['/Volumes/CoronalHole/SWAP/*/*/*']
-#     EIT_dirs = ['/Volumes/CoronalHole/EIT_lev1/171/*', '/Volumes/CoronalHole/EIT_lev1/195/*',
-#                 '/Volumes/CoronalHole/EIT_lev1/304/*']
-#
-#     all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
-#
-#     for inst_dir in all_dirs:
-#         all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))
-#         all_files.sort()
-#
-#         if not all_files:
-#             raise IOError('No files in input directory')
-#
-#         #all_files = all_files[0:1000]
-#         tstart = time.time()
-#
-#         point_detections = detect_hole(all_files)
-#         point_detections = add_harvey(point_detections)
-#         point_detections.sort('Harvey_Rotation')
-#
-#         point_detections.add_column(np.arange(len(point_detections)), name='Index')
-#
-#         ascii.write(point_detections, '/Users/mskirk/data/PCH_Project/Temp.csv', format='ecsv', overwrite=True)
-#
-#         nprocesses = 26
-#
-#         index_list = list(np.arange(len(point_detections['Harvey_Rotation'])))
-#
-#         with Pool(nprocesses) as p:
-#             area_dict_pool = p.map(hole_area_parallel, index_list)
-#
-#         area_table = pool_to_table(area_dict_pool)
-#         area_table.sort('Index')
-#
-#         elapsed_time = time.time() - tstart
-#         print('Hole area compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
-#
-#         save_table(all_files, join(point_detections, area_table))
-
-
 if __name__ == '__main__':
+    warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
 
-    inst_dir = '/Volumes/CoronalHole/AIA_lev15/171/*/*/*'
-    all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))
+    # AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/171/*/*/*', '/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
+    #            '/Volumes/CoronalHole/AIA_lev15/211/*/*/*', '/Volumes/CoronalHole/AIA_lev15/304/*/*/*']
+    AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
+                '/Volumes/CoronalHole/AIA_lev15/211/*/*/*', '/Volumes/CoronalHole/AIA_lev15/304/*/*/*']
+    EUVI_dirs = ['/Volumes/CoronalHole/EUVI/171*/*', '/Volumes/CoronalHole/EUVI/195*/*',
+                 '/Volumes/CoronalHole/EUVI/304*/*']
+    SWAP_dirs = ['/Volumes/CoronalHole/SWAP/*/*/*']
+    EIT_dirs = ['/Volumes/CoronalHole/EIT_lev1/171/*', '/Volumes/CoronalHole/EIT_lev1/195/*',
+                '/Volumes/CoronalHole/EIT_lev1/304/*']
 
-    point_detections = Table(ascii.read('/Users/mskirk/data/PCH_Project/Temp.csv'))
-    nprocesses = 26
+    all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
 
-    index_list = list(np.arange(len(point_detections['Harvey_Rotation'])))
+    for inst_dir in all_dirs:
+        all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))
+        all_files.sort()
 
-    tstart = time.time()
+        if not all_files:
+            raise IOError('No files in input directory')
 
-    with Pool(nprocesses) as p:
-        area_dict_pool = p.map(hole_area_parallel, index_list)
+        #all_files = all_files[0:1000]
+        tstart = time.time()
 
-    area_table = pool_to_table(area_dict_pool)
-    area_table.sort('Index')
+        point_detections = detect_hole(all_files)
+        point_detections = add_harvey(point_detections)
+        point_detections.sort('Harvey_Rotation')
 
-    elapsed_time = time.time() - tstart
-    print('Hole area compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+        point_detections.add_column(np.arange(len(point_detections)), name='Index')
 
-    save_table(all_files, join(point_detections, area_table))
+        ascii.write(point_detections, '/Users/mskirk/data/PCH_Project/Temp.csv', format='ecsv', overwrite=True)
+
+        nprocesses = 26
+
+        index_list = list(point_detections['Index'])
+
+        with Pool(nprocesses) as p:
+            area_dict_pool = p.map(hole_area_parallel, index_list)
+
+        area_table = pool_to_table(area_dict_pool)
+        area_table.sort('Index')
+
+        elapsed_time = time.time() - tstart
+        print('Hole area compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+
+        save_table(all_files, join(point_detections, area_table))
+
+
+# if __name__ == '__main__':
+#
+#     inst_dir = '/Volumes/CoronalHole/AIA_lev15/171/*/*/*'
+#     all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))
+#
+#     point_detections = Table(ascii.read('/Users/mskirk/data/PCH_Project/Temp.csv'))
+#     nprocesses = 26
+#
+#     index_list = list(np.arange(len(point_detections['Harvey_Rotation'])))
+#
+#     tstart = time.time()
+#
+#     with Pool(nprocesses) as p:
+#         area_dict_pool = p.map(hole_area_parallel, index_list)
+#
+#     area_table = pool_to_table(area_dict_pool)
+#     area_table.sort('Index')
+#
+#     elapsed_time = time.time() - tstart
+#     print('Hole area compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+#
+#     save_table(all_files, join(point_detections, area_table))

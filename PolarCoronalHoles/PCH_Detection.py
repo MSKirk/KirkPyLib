@@ -898,7 +898,7 @@ def hole_area_parallel(index):
                 offset_cm[1] = (-90 * u.deg) - offset_cm[1]
                 offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
 
-        del point_detection, lamb_x, lamb_y, lats, lons, errors, offset_coords, offset_lats, offset_lons
+        del point_detection, lats, lons, errors, offset_coords, offset_lats, offset_lons
         gc.collect()
 
         # Tuples of shape (Min, Mean, Max)
