@@ -1,4 +1,4 @@
-import os
+import os, gc
 import numpy as np
 import warnings
 from pathlib import Path
@@ -897,6 +897,9 @@ def hole_area_parallel(index):
             else:
                 offset_cm[1] = (-90 * u.deg) - offset_cm[1]
                 offset_cm[0] = np.mod(offset_cm[0]-180*u.deg, 360* u.deg)
+
+        del point_detection, lamb_x, lamb_y, lats, lons, errors, offset_coords, offset_lats, offset_lons
+        gc.collect()
 
         # Tuples of shape (Min, Mean, Max)
         return {'Index': index, 'area': percent_hole_area, 'fit': hole_perimeter_location,
