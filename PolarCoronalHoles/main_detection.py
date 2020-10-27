@@ -114,9 +114,7 @@ def pool_to_table(area_dict_pool):
 if __name__ == '__main__':
     warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
 
-    # AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/171/*/*/*', '/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
-    #            '/Volumes/CoronalHole/AIA_lev15/211/*/*/*', '/Volumes/CoronalHole/AIA_lev15/304/*/*/*']
-    AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
+    AIA_dirs = ['/Volumes/CoronalHole/AIA_lev15/171/*/*/*', '/Volumes/CoronalHole/AIA_lev15/193/*/*/*',
                 '/Volumes/CoronalHole/AIA_lev15/211/*/*/*', '/Volumes/CoronalHole/AIA_lev15/304/*/*/*']
     EUVI_dirs = ['/Volumes/CoronalHole/EUVI/171*/*', '/Volumes/CoronalHole/EUVI/195*/*',
                  '/Volumes/CoronalHole/EUVI/304*/*']
@@ -124,7 +122,8 @@ if __name__ == '__main__':
     EIT_dirs = ['/Volumes/CoronalHole/EIT_lev1/171/*', '/Volumes/CoronalHole/EIT_lev1/195/*',
                 '/Volumes/CoronalHole/EIT_lev1/304/*']
 
-    all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
+    # all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
+    all_dirs = EIT_dirs
 
     for inst_dir in all_dirs:
         all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))

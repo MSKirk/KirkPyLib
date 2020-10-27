@@ -311,20 +311,31 @@ def file_integrity_check(infile):
         head_loc = np.argmax([len(hdu.header) for hdu in hdu1])
             
         hdu1[head_loc].verify('fix')
+        rewrite_needed = False
 
         # SWAP Stacked image fix
         if 'CTYPE1' not in hdu1[head_loc].header:
             hdu1[head_loc].header['CTYPE1'] = 'HPLN-TAN'
+            rewrite_needed = True
 
         if 'CTYPE2' not in hdu1[head_loc].header:
             hdu1[head_loc].header['CTYPE2'] = 'HPLT-TAN'
+            rewrite_needed = True
 
         if 'CUNIT1' not in hdu1[head_loc].header:
             hdu1[head_loc].header['CUNIT1'] = 'arcsec'
+            rewrite_needed = True
 
         if 'CUNIT2' not in hdu1[head_loc].header:
             hdu1[head_loc].header['CUNIT2'] = 'arcsec'
-            hdu1.writeto(file_path, overwrite=True)
+            rewrite_needed = True
+
+        if rewrite_needed:
+            try:
+                hdu1.writeto(file_path, overwrite=True)
+            except (ValueError, fits.verify.VerifyError):
+                print(f'Bad file: {file_path}')
+                return False
 
         if 'NAXIS3' in hdu1[head_loc].header:
             warnings.warn('NAXIS greater than 2')
@@ -368,7 +379,7 @@ def file_integrity_check(infile):
         else:
             return True
     else:
-        warnings.warn('Not a fits file')
+        warnings.warn(f'{file_path} is not a fits file')
         return False
 
 
