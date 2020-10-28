@@ -122,8 +122,7 @@ if __name__ == '__main__':
     EIT_dirs = ['/Volumes/CoronalHole/EIT_lev1/171/*', '/Volumes/CoronalHole/EIT_lev1/195/*',
                 '/Volumes/CoronalHole/EIT_lev1/304/*']
 
-    # all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
-    all_dirs = EIT_dirs
+    all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
 
     for inst_dir in all_dirs:
         all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))
@@ -132,7 +131,7 @@ if __name__ == '__main__':
         if not all_files:
             raise IOError('No files in input directory')
 
-        #all_files = all_files[0:1000]
+        # all_files = all_files[0:1000]
         tstart = time.time()
 
         point_detections = detect_hole(all_files)

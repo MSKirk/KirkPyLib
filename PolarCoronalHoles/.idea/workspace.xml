@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Bug fixes in garbage collection.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Excepts common EIT image errors.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_detection.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -67,10 +66,10 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
+            <state relative-caret-position="-6981">
               <caret line="303" selection-start-line="303" selection-end-line="303" selection-end-column="51" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -79,11 +78,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="496">
-              <caret line="130" selection-start-line="130" selection-end-line="130" />
+            <state relative-caret-position="303">
+              <caret line="134" column="28" lean-forward="true" selection-start-line="134" selection-start-column="28" selection-end-line="134" selection-end-column="28" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -146,8 +145,8 @@
         <option value="$PROJECT_DIR$/aia_image_prep_script.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/correct_swap_header.py" />
-        <option value="$PROJECT_DIR$/main_detection.py" />
         <option value="$PROJECT_DIR$/PCH_Detection.py" />
+        <option value="$PROJECT_DIR$/main_detection.py" />
       </list>
     </option>
   </component>
@@ -164,6 +163,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -175,7 +175,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -275,14 +274,8 @@
       <workItem from="1603317407246" duration="18000" />
       <workItem from="1603373877383" duration="957000" />
       <workItem from="1603396611532" duration="6864000" />
-      <workItem from="1603810523008" duration="2441000" />
-    </task>
-    <task id="LOCAL-00078" summary="Restructured data download to deal with the VSO/FIDO issues.">
-      <created>1537200134596</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
-      <option name="project" value="LOCAL" />
-      <updated>1537200134596</updated>
+      <workItem from="1603810523008" duration="2486000" />
+      <workItem from="1603890018974" duration="618000" />
     </task>
     <task id="LOCAL-00079" summary="Added print statements on soft error.">
       <created>1537200947728</created>
@@ -620,17 +613,24 @@
       <option name="project" value="LOCAL" />
       <updated>1603478251615</updated>
     </task>
-    <option name="localTasksCounter" value="127" />
+    <task id="LOCAL-00127" summary="Excepts common EIT image errors.">
+      <created>1603818245516</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1603818245517</updated>
+    </task>
+    <option name="localTasksCounter" value="128" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="243751000" />
+    <option name="totallyTimeSpent" value="244414000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2612" y="208" width="1793" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3038264" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.307253" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -690,7 +690,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Create a dataframe with bootstrapped confidence intervals." />
     <MESSAGE value="Switching to the median as a statistic. Less sensitive to outliers." />
     <MESSAGE value="Update CI calculation. Added table write for AFRL." />
     <MESSAGE value="Better statistics sampling." />
@@ -715,7 +714,8 @@
     <MESSAGE value="Parallelized PCH area calculation." />
     <MESSAGE value="Added garbage collection to avoid memory leaking." />
     <MESSAGE value="Bug fixes in garbage collection." />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug fixes in garbage collection." />
+    <MESSAGE value="Excepts common EIT image errors." />
+    <option name="LAST_COMMIT_MESSAGE" value="Excepts common EIT image errors." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_Plots.ipynb">
@@ -841,22 +841,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main_detection.py">
+    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="130" selection-start-line="130" selection-end-line="130" />
+        <state relative-caret-position="-6981">
+          <caret line="303" selection-start-line="303" selection-end-line="303" selection-end-column="51" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
+    <entry file="file://$PROJECT_DIR$/main_detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="303" selection-start-line="303" selection-end-line="303" selection-end-column="51" />
+        <state relative-caret-position="303">
+          <caret line="134" column="28" lean-forward="true" selection-start-line="134" selection-start-column="28" selection-end-line="134" selection-end-column="28" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
