@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Excepts common EIT image errors.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Added EIT prepping script.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCH_series.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_series.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -77,10 +76,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.py">
+        <entry file="file://$PROJECT_DIR$/eit_image_prep.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="844">
-              <caret line="98" column="8" selection-start-line="98" selection-start-column="8" selection-end-line="98" selection-end-column="8" />
+            <state relative-caret-position="858">
+              <caret line="103" lean-forward="true" selection-start-line="103" selection-end-line="103" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
               </folding>
@@ -180,6 +179,7 @@
         <option value="$PROJECT_DIR$/PCH_series.py" />
         <option value="$PROJECT_DIR$/PCH_Detection.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_1.py" />
+        <option value="$PROJECT_DIR$/eit_image_prep.py" />
       </list>
     </option>
   </component>
@@ -309,14 +309,7 @@
       <workItem from="1603373877383" duration="957000" />
       <workItem from="1603396611532" duration="6864000" />
       <workItem from="1603810523008" duration="2486000" />
-      <workItem from="1603890018974" duration="10154000" />
-    </task>
-    <task id="LOCAL-00080" summary="Forced JSOC source.">
-      <created>1537203391001</created>
-      <option name="number" value="00080" />
-      <option name="presentableId" value="LOCAL-00080" />
-      <option name="project" value="LOCAL" />
-      <updated>1537203391001</updated>
+      <workItem from="1603890018974" duration="10339000" />
     </task>
     <task id="LOCAL-00081" summary="Forced JSOC source.">
       <created>1537203431121</created>
@@ -654,11 +647,18 @@
       <option name="project" value="LOCAL" />
       <updated>1603915713274</updated>
     </task>
-    <option name="localTasksCounter" value="129" />
+    <task id="LOCAL-00129" summary="Added EIT prepping script.">
+      <created>1604083846182</created>
+      <option name="number" value="00129" />
+      <option name="presentableId" value="LOCAL-00129" />
+      <option name="project" value="LOCAL" />
+      <updated>1604083846182</updated>
+    </task>
+    <option name="localTasksCounter" value="130" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="253950000" />
+    <option name="totallyTimeSpent" value="254135000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2612" y="208" width="1793" height="1057" extended-state="0" />
@@ -724,7 +724,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Switching to the median as a statistic. Less sensitive to outliers." />
     <MESSAGE value="Update CI calculation. Added table write for AFRL." />
     <MESSAGE value="Better statistics sampling." />
     <MESSAGE value="Writing Table Fix." />
@@ -749,7 +748,8 @@
     <MESSAGE value="Added garbage collection to avoid memory leaking." />
     <MESSAGE value="Bug fixes in garbage collection." />
     <MESSAGE value="Excepts common EIT image errors." />
-    <option name="LAST_COMMIT_MESSAGE" value="Excepts common EIT image errors." />
+    <MESSAGE value="Added EIT prepping script." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added EIT prepping script." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_tests.py">
@@ -895,6 +895,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/eit_image_prep.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="59" lean-forward="true" selection-start-line="59" selection-end-line="59" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="192">
@@ -905,10 +915,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.py">
+    <entry file="file://$PROJECT_DIR$/eit_image_prep.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="844">
-          <caret line="98" column="8" selection-start-line="98" selection-start-column="8" selection-end-line="98" selection-end-column="8" />
+        <state relative-caret-position="858">
+          <caret line="103" lean-forward="true" selection-start-line="103" selection-end-line="103" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>
