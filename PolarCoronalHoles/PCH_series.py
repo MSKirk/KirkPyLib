@@ -17,6 +17,7 @@ from multiprocessing import Pool
 
 import PCH_Tools
 
+
 class PCH:
     def __init__(self, directory, interval='11D'):
 
@@ -25,7 +26,7 @@ class PCH:
         self.list_of_obj = []  # initialize a null list
 
         for file in self.filelist:
-            self.list_of_obj += [self.pch_data_parse(os.path.join(self.directory, file))]
+            self.list_of_obj += [pch_csv2df(os.path.join(self.directory, file))]
 
         self.pch_obj = self.combine_pch_obj(self.list_of_obj, interval=interval)
         
@@ -47,67 +48,6 @@ class PCH:
         self.series_plot()
         self.S_Cent_periodogram()
         self.N_Cent_periodogram()
-
-    def pch_data_parse(self, file_path):
-        """
-        :param file_path: full path of the file to readt
-        :return: Parsed PCH data
-        """
-
-#        # Obsolete. Preserved for old IDL parsing.
-#        if os.path.basename(file_path).split('.')[1] == 'txt':
-#            pch_obj = np.loadtxt(file_path, skiprows=3, dtype={'names': ('Harvey_Rotation', 'North_Size', 'North_Spread',
-#                                                                         'South_Size', 'South_Spread', 'N_Cent_Lon',
-#                                                                         'N_Cent_CoLat', 'S_Cent_Lon', 'S_Cent_CoLat'),
-#                                                               'formats': ('f', 'f', 'f', 'f', 'f', 'f', 'f', 'f', 'f')})
-#
-#           pch_obj = pd.DataFrame(data=pch_obj, index=parse_time(self.HarRot2JD(pch_obj['Harvey_Rotation'], duplicates=False)))
-#
-#            # Create data masks for non-measurements - less than 0 or unphysical.
-#            pch_obj['North_Size'] = pch_obj['North_Size'].mask(pch_obj['North_Size'] < 0)
-#            pch_obj['North_Spread'] = pch_obj['North_Spread'].mask(pch_obj['North_Size'] < 0)
-#            pch_obj['N_Cent_Lon'] = pch_obj['N_Cent_Lon'].mask(pch_obj['North_Size'] < 0)
-#            pch_obj['N_Cent_CoLat'] = pch_obj['N_Cent_CoLat'].mask(pch_obj['North_Size'] < 0)
-#
-#            pch_obj['South_Size'] = pch_obj['South_Size'].mask(pch_obj['South_Size'] < 0)
-#            pch_obj['South_Spread'] = pch_obj['South_Spread'].mask(pch_obj['South_Size'] < 0)
-#            pch_obj['S_Cent_Lon'] = pch_obj['S_Cent_Lon'].mask(pch_obj['South_Size'] < 0)
-#            pch_obj['S_Cent_CoLat'] = pch_obj['S_Cent_CoLat'].mask(pch_obj['South_Size'] < 0)
-
-            # NAN hunting - periodogram does not deal with nans so well.
-#
-#            pch_obj = pch_obj.dropna(subset=['North_Size'])
-#
-#            pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Spread'] = \
-#                pch_obj.loc[pch_obj['North_Spread'] > pch_obj['North_Size'], 'North_Size']
-#
-#            pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Spread'] = \
-#                pch_obj.loc[pch_obj['South_Spread'] > pch_obj['South_Size'], 'South_Size']
-#
-#            # Adding explicit Filters for periodogram
-#            name = ''
-#            name = name.join(file_path.split('/')[-1].split('_Area')[0].split('_'))
-#            pch_obj['Filter'] = np.repeat(name[0]+name[-4]+name[-1], pch_obj['North_Size'].size)
-#
-#            pch_obj['Hole_Separation'] = self.haversine(pch_obj['N_Cent_Lon'], pch_obj['N_Cent_CoLat']-90.,
-#                                                        pch_obj['S_Cent_Lon'],pch_obj['S_Cent_CoLat']-90.)
-
-        if os.path.basename(file_path).split('.')[1] == 'csv':
-            table = Table.read(file_path, format='ascii.ecsv')
-            pch_obj = table.to_pandas()
-
-            pch_obj = pch_obj.dropna(subset=['Area'])
-            pch_obj['Filter'] = np.repeat(os.path.basename(file_path).split('_')[0], pch_obj['StartLat'].size)
-
-            datetime = [Time(ii).to_datetime() for ii in pch_obj['Date']]
-            pch_obj['DateTime'] = datetime
-            pch_obj = pch_obj.set_index('DateTime')
-
-        else:
-            print('File type not yet supported.')
-            pch_obj = []
-
-        return pch_obj
 
     def centroid_separation(self, data_key):
 
@@ -1233,6 +1173,33 @@ def generic_hole_area(detection_df, h_rotation_number, northern=True, use_fit=Fa
 
         # Tuples of shape (Min, Mean, Max)
         return np.asarray(percent_hole_area), np.asarray(hole_perimeter_location), np.asarray(offset_cm)
+
+
+def pch_csv2df(file_path):
+    """
+    :param file_path: full path of the file to readt
+    :return: Parsed PCH data
+    """
+
+    table = Table.read(file_path, format='ascii.ecsv')
+    pch_obj = table.to_pandas()
+
+    pch_obj = pch_obj.dropna(subset=['Area'])
+
+    all_ints = ['AIA', 'SWAP', 'EUVI', 'EIT']
+    all_waves = ['171', '193', '195', '211', '304', 'STACKED', '174']
+    ints_string = [ints for ints in all_ints if ints in os.path.basename(file_path).upper()][0]
+    wave_string = [wv for wv in all_waves if wv in os.path.basename(file_path).upper()][0]
+    if wave_string == 'STACKED':
+        wave_string = '174'
+
+    pch_obj['Filter'] = np.repeat(ints_string+wave_string, pch_obj['StartLat'].size)
+
+    datetime = [Time(ii).to_datetime() for ii in pch_obj['Date']]
+    pch_obj['DateTime'] = datetime
+    pch_obj = pch_obj.set_index('DateTime')
+
+    return pch_obj
 
 
 def pch_obj_recompile(pch_obj):
