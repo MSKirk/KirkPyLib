@@ -67,8 +67,8 @@ if __name__ == '__main__':
     dfs_dict = agg_results(wav_list, df_pool)
     dfs_dict.update(agg_results(['Agg'+ii for ii in window_filter_list], df_pool2))
 
-    with open('/Users/mskirk/data/PCH_Project/pch_stats_dic.pkl') as handle:
-        pickle.dump(dfs_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('/Users/mskirk/data/PCH_Project/pch_stats_dic.pkl', 'wb') as ff:
+        pickle.dump(dfs_dict, ff, protocol=pickle.HIGHEST_PROTOCOL)
 
     elapsed_time = time.time() - tstart
     print('Compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
