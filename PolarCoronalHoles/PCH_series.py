@@ -14,6 +14,8 @@ from sklearn.utils import resample
 import scipy.signal as sg
 from datetime import datetime
 from multiprocessing import Pool
+from astropy.utils.exceptions import AstropyDeprecationWarning
+import warnings
 
 import PCH_Tools
 
@@ -1034,6 +1036,8 @@ def generic_hole_area(detection_df, h_rotation_number, northern=True, use_fit=Fa
         # Returns the area as a fraction of the total solar surface area
         # Returns the location of the perimeter fit for the given h_rotation_number
 
+        warnings.simplefilter('ignore', category=AstropyDeprecationWarning)
+
         begin = np.min(np.where(detection_df['Harvey_Rotation'] > (h_rotation_number - 1)))
         end = np.max(np.where(detection_df['Harvey_Rotation'] == h_rotation_number))
 
@@ -1200,6 +1204,32 @@ def pch_csv2df(file_path):
     pch_obj = pch_obj.set_index('DateTime')
 
     return pch_obj
+
+
+def agg_individual_detections(directory):
+    """
+
+    :param directory: directory of where the detection csv files are
+    :return: A cleaned up data frame ready for main.py
+    """
+    filelist = fnmatch.filter(os.listdir(directory), '*PCH_Detections*.csv')
+
+    all_detectors =[]
+
+    for file in filelist:
+        all_detectors += [pch_csv2df(os.path.join(directory, file))]
+
+    all_pch = pd.concat(all_detectors).sort_index()
+
+    concat_df = pd.concat([all_pch[['StartLat', 'H_StartLon', 'Filter', 'Harvey_Rotation']].rename(
+        columns={'StartLat': 'Lat', 'H_StartLon': 'Lon'}),
+        all_pch[['EndLat', 'H_EndLon', 'Filter', 'Harvey_Rotation']].rename(
+            columns={'EndLat': 'Lat', 'H_EndLon': 'Lon'})]).sort_index()
+
+    save_file = os.path.join(directory, 'pch_obj_concat.pkl')
+
+    concat_df.to_pickle(save_file)
+    print(f'Aggregated PCH dataframe successfully saved to: {save_file}')
 
 
 def pch_obj_recompile(pch_obj):

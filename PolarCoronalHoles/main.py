@@ -4,6 +4,7 @@ import pandas as pd
 from multiprocessing import Pool
 from functools import partial
 import time
+import pickle
 
 
 def prep_params(wav_filter_list):
@@ -30,18 +31,21 @@ def agg_results(wav_filter_list, df_pool):
     return df_dict
 
 
-if __name__ == '__main__':
-
-    # Read the dataframe and do not put in the local scope of the function parallelized.
+def run_stat(dict_params):
+    # Read the dataframe  in the local scope of the function parallelized.
     pch_df = pd.read_pickle(os.path.expanduser('/Users/mskirk/data/PCH_Project/pch_obj_concat.pkl'))
+    hem_df = PCH_stats.df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter=dict_params['wav_filter'], northern=dict_params['northern'], window_size='11D')
+    return hem_df
 
-    def run_stat(dict_params):
-        hem_df = PCH_stats.df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter=dict_params['wav_filter'], northern=dict_params['northern'], window_size='11D')
-        return hem_df
 
-    def run_concat_stat(dict_params):
-        hem_df = PCH_stats.df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=dict_params['northern'], window_size=dict_params['window_size'])
-        return hem_df
+def run_concat_stat(dict_params):
+    # Read the dataframe in the local scope of the function parallelized.
+    pch_df = pd.read_pickle(os.path.expanduser('/Users/mskirk/data/PCH_Project/pch_obj_concat.pkl'))
+    hem_df = PCH_stats.df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=dict_params['northern'], window_size=dict_params['window_size'])
+    return hem_df
+
+
+if __name__ == '__main__':
 
     wav_list = ['EIT171', 'EIT195', 'EIT304', 'EUVI171', 'EUVI195', 'EUVI304', 'AIA171', 'AIA193', 'AIA304', 'AIA211', 'SWAP174']
     params = prep_params(wav_list)
@@ -62,6 +66,9 @@ if __name__ == '__main__':
 
     dfs_dict = agg_results(wav_list, df_pool)
     dfs_dict.update(agg_results(['Agg'+ii for ii in window_filter_list], df_pool2))
+
+    with open('/Users/mskirk/data/PCH_Project/pch_stats_dic.pkl') as handle:
+        pickle.dump(dfs_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     elapsed_time = time.time() - tstart
     print('Compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))

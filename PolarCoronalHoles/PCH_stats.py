@@ -1,8 +1,6 @@
-import PCH_Tools
-import astropy.stats.circstats as cs
+import PCH_Tools, PCH_series
 from scipy.stats import circmean, circstd
 import time
-import matplotlib.pyplot as plt
 from astropy.coordinates import Longitude, Latitude
 import astropy.units as u
 from astropy.time import Time
@@ -30,6 +28,22 @@ def sph_center_of_mass(lats, lons, **kwargs):
     return sphere_center
 
 
+def lon_circmean(x):
+    return circmean(x, low=0, high=360)
+
+
+def lon_circstd(x):
+    return circstd(x, low=0, high=360)
+
+
+def lat_circmean(x):
+    return circmean(x, low=-90, high=90)
+
+
+def lat_circstd(x):
+    return circstd(x, low=-90, high=90)
+
+
 def circular_rebinning(pch_obj, binsize=5):
     # Bin size in degrees; split into N and S
 
@@ -37,53 +51,38 @@ def circular_rebinning(pch_obj, binsize=5):
     south = pch_obj.where(pch_obj.StartLat < 0).dropna(how='all')
 
     # Aggregation Rules
-    n_startagg = {
-        'H_StartLon': {
-            'Mean': lambda x: circmean(x, low=0, high=360),
-            'Std': lambda x: circstd(x, low=0, high=360)},
-        'StartLat': {
-            'Mean': lambda x: circmean(x, low=-90, high=90),
-            'Std': lambda x: circstd(x, low=-90, high=90)}
-    }
-    n_endagg = {
-        'H_EndLon': {
-            'Mean': lambda x: circmean(x, low=0, high=360),
-            'Std': lambda x: circstd(x, low=0, high=360)},
-        'EndLat': {
-            'Mean': lambda x: circmean(x, low=-90, high=90),
-            'Std': lambda x: circstd(x, low=-90, high=90)}
-    }
-    s_endagg = {
-        'H_EndLon': {
-            'Mean': lambda x: circmean(x, low=0, high=360),
-            'Std': lambda x: circstd(x, low=0, high=360)},
-        'EndLat': {
-            'Mean': lambda x: circmean(x, low=-90, high=90),
-            'Std': lambda x: circstd(x, low=-90, high=90)}
-    }
-    s_startagg = {
-        'H_StartLon': {
-            'Mean': lambda x: circmean(x, low=0, high=360),
-            'Std': lambda x: circstd(x, low=0, high=360)},
-        'StartLat': {
-            'Mean': lambda x: circmean(x, low=-90, high=90),
-            'Std': lambda x: circstd(x, low=-90, high=90)}
-    }
+    n_startmean = {'H_StartLon': lambda x: lon_circmean(x), 'StartLat': lambda x: lat_circmean(x)}
+    n_endmean = {'H_EndLon': lambda x: lon_circmean(x), 'EndLat': lambda x: lat_circmean(x)}
+    s_endmean = {'H_EndLon': lambda x: lon_circmean(x), 'EndLat': lambda x: lat_circmean(x)}
+    s_startmean = {'H_StartLon': lambda x: lon_circmean(x), 'StartLat': lambda x: lat_circmean(x)}
 
-    north_end = north.groupby(north['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(n_endagg)
-    north_end.columns = ["_".join(x) for x in north_end.columns.ravel()]
+    n_startstd = {'H_StartLon': lambda x: lon_circstd(x), 'StartLat': lambda x: lat_circstd(x)}
+    n_endstd = {'H_EndLon': lambda x: lon_circstd(x), 'EndLat': lambda x: lat_circstd(x)}
+    s_endstd = {'H_EndLon': lambda x: lon_circstd(x), 'EndLat': lambda x: lat_circstd(x)}
+    s_startstd = {'H_StartLon': lambda x: lon_circstd(x), 'StartLat': lambda x: lat_circstd(x)}
 
-    north_start = north.groupby(north['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(n_startagg)
-    north_start.columns = ["_".join(x) for x in north_start.columns.ravel()]
+    north_endmean = north.groupby(north['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(n_endmean).\
+        rename(columns={'H_EndLon': 'H_EndLon_Mean', 'EndLat': 'EndLat_Mean'})
+    north_endstd = north.groupby(north['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(n_endstd).\
+        rename(columns={'H_EndLon': 'H_EndLon_Std', 'EndLat': 'EndLat_Std'})
 
-    south_end = south.groupby(south['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(s_endagg)
-    south_end.columns = ["_".join(x) for x in south_end.columns.ravel()]
+    north_startmean = north.groupby(north['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(n_startmean).\
+        rename(columns={'H_StartLon': 'H_StartLon_Mean', 'StartLat': 'StartLat_Mean'})
+    north_startstd = north.groupby(north['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(n_startstd).\
+        rename(columns={'H_StartLon': 'H_StartLon_Std', 'StartLat': 'StartLat_Std'})
 
-    south_start = south.groupby(south['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(s_startagg)
-    south_start.columns = ["_".join(x) for x in south_start.columns.ravel()]
+    south_endmean = south.groupby(south['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(s_endmean).\
+        rename(columns={'H_EndLon': 'H_EndLon_Mean', 'EndLat': 'EndLat_Mean'})
+    south_endstd = south.groupby(south['H_EndLon'].apply(lambda x: np.round(x / binsize))).agg(s_endstd).\
+        rename(columns={'H_EndLon': 'H_EndLon_Std', 'EndLat': 'EndLat_Std'})
 
-    northern = pd.concat([north_start, north_end], join='outer', axis=1)
-    southern = pd.concat([south_start, south_end], join='outer', axis=1)
+    south_startmean = south.groupby(south['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(s_startmean).\
+        rename(columns={'H_StartLon': 'H_StartLon_Mean', 'StartLat': 'StartLat_Mean'})
+    south_startstd = south.groupby(south['H_StartLon'].apply(lambda x: np.round(x / binsize))).agg(s_startstd).\
+        rename(columns={'H_StartLon': 'H_StartLon_Std', 'StartLat': 'StartLat_Std'})
+
+    northern = pd.concat([north_startmean, north_startstd, north_endmean, north_endstd], join='outer', axis=1)
+    southern = pd.concat([south_startmean, south_startstd, south_endmean, south_endstd], join='outer', axis=1)
 
     # Clean up of nan values
     values = {'H_StartLon_Std': 0, 'StartLat_Std': 0, 'H_EndLon_Std': 0, 'EndLat_Std': 0}
@@ -116,40 +115,24 @@ def aggregation_rebinning(hole_stats, binsize=5):
 
     # Aggregation Rules
     n_agg = {
-        'N_lon_mean': {
-            '': lambda x: circmean(x, low=0, high=360)},
-        'N_lon_std': {
-            '': lambda x: np.sqrt(np.nansum(x ** 2))},
-        'N_lat_mean': {
-            '': lambda x: circmean(x, low=-90, high=90)},
-        'N_lat_lower': {
-            '': lambda x: np.sqrt(np.nansum(x ** 2))},
-        'N_lat_upper': {
-            '': lambda x: np.sqrt(np.nansum(x ** 2))},
-        'N_mean_area': {
-            'agg': 'mean'},
-    }
+        'N_lon_mean': lambda x: circmean(x, low=0, high=360),
+        'N_lon_std': lambda x: np.sqrt(np.nansum(x ** 2)),
+        'N_lat_mean': lambda x: circmean(x, low=-90, high=90),
+        'N_lat_lower': lambda x: np.sqrt(np.nansum(x ** 2)),
+        'N_lat_upper': lambda x: np.sqrt(np.nansum(x ** 2)),
+        'N_mean_area_agg': 'mean'}
 
     s_agg = {
-        'S_lon_mean': {
-            '': lambda x: circmean(x, low=0, high=360)},
-        'S_lon_std': {
-            '': lambda x: np.sqrt(np.nansum(x ** 2))},
-        'S_lat_mean': {
-            '': lambda x: circmean(x, low=-90, high=90)},
-        'S_lat_lower': {
-            '': lambda x: np.sqrt(np.nansum(x ** 2))},
-        'S_lat_upper': {
-            '': lambda x: np.sqrt(np.nansum(x ** 2))},
-        'S_mean_area': {
-            'agg': 'mean'},
-    }
+        'S_lon_mean': lambda x: circmean(x, low=0, high=360),
+        'S_lon_std': lambda x: np.sqrt(np.nansum(x ** 2)),
+        'S_lat_mean': lambda x: circmean(x, low=-90, high=90),
+        'S_lat_lower': lambda x: np.sqrt(np.nansum(x ** 2)),
+        'S_lat_upper': lambda x: np.sqrt(np.nansum(x ** 2)),
+        'S_mean_area_agg': 'mean'}
 
     northern = hole_stats.groupby(hole_stats['N_lon_mean'].apply(lambda x: np.round(x / binsize))).agg(n_agg)
-    northern.columns = ["".join(x) for x in northern.columns.ravel()]
 
     southern = hole_stats.groupby(hole_stats['S_lon_mean'].apply(lambda x: np.round(x / binsize))).agg(s_agg)
-    southern.columns = ["".join(x) for x in southern.columns.ravel()]
 
     bin_stats = pd.concat([northern, southern], join='outer', axis=1)
 
@@ -832,22 +815,11 @@ def test_run_area_calc(mydf, window_size='33D'):
     return res
 
 
-def read_all_pch_df():
-    # Hardcoded shortcut
+def make_PCH_df(source_dir):
+    """
 
-    aia171 = pd.read_pickle('/Users/mskirk/data/PCH_Project/AIA171.pkl')
-    aia193 = pd.read_pickle('/Users/mskirk/data/PCH_Project/AIA193.pkl')
-    aia211 = pd.read_pickle('/Users/mskirk/data/PCH_Project/AIA211.pkl')
-    aia304 = pd.read_pickle('/Users/mskirk/data/PCH_Project/AIA304.pkl')
+    :param source_dir: dir where .csv detection files are saved generated by PCH_Detection
+    :return: none
+    """
+    PCH_series.agg_individual_detections(source_dir)
 
-    eit171 = pd.read_pickle('/Users/mskirk/data/PCH_Project/EIT171.pkl')
-    eit195 = pd.read_pickle('/Users/mskirk/data/PCH_Project/EIT195.pkl')
-    eit304 = pd.read_pickle('/Users/mskirk/data/PCH_Project/EIT304.pkl')
-
-    euvi171 = pd.read_pickle('/Users/mskirk/data/PCH_Project/EUVI171.pkl')
-    euvi195 = pd.read_pickle('/Users/mskirk/data/PCH_Project/EUVI195.pkl')
-    euvi304 = pd.read_pickle('/Users/mskirk/data/PCH_Project/EUVI304.pkl')
-
-    swap174 = pd.read_pickle('/Users/mskirk/data/PCH_Project/swap174.pkl')
-
-    return aia171, aia193, aia211, aia304, eit171, eit195, eit304, euvi171, euvi195, euvi304, swap174

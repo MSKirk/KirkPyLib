@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Added EIT prepping script.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PCH_series.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_series.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PCH_stats.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_stats.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,8 +21,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_series.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8160">
-              <caret line="544" column="25" selection-start-line="544" selection-start-column="25" selection-end-line="544" selection-end-column="25" />
+            <state relative-caret-position="255">
+              <caret line="1208" column="4" lean-forward="true" selection-start-line="1208" selection-start-column="4" selection-end-line="1208" selection-end-column="30" />
               <folding>
                 <element signature="e#1#19#0" expanded="true" />
               </folding>
@@ -28,24 +31,24 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
+        <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1275">
-              <caret line="85" selection-start-line="85" selection-end-line="85" />
+            <state relative-caret-position="770">
+              <caret line="360" column="48" lean-forward="true" selection-start-line="360" selection-start-column="48" selection-end-line="360" selection-end-column="48" />
               <folding>
-                <element signature="e#0#25#0" expanded="true" />
+                <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/hackweek.py">
+        <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="888">
-              <caret line="102" selection-start-line="102" selection-end-line="102" />
+            <state relative-caret-position="296">
+              <caret line="855" column="28" selection-start-line="855" selection-start-column="27" selection-end-line="855" selection-end-column="28" />
               <folding>
-                <element signature="e#0#31#0" expanded="true" />
+                <element signature="e#0#13#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -54,7 +57,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1290">
+            <state relative-caret-position="-194">
               <caret line="86" selection-start-line="86" selection-end-line="88" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
@@ -64,34 +67,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
+        <entry file="file://$PROJECT_DIR$/pch_plots.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="162" selection-start-line="162" selection-end-line="169" selection-end-column="34" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/eit_image_prep.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="858">
-              <caret line="103" lean-forward="true" selection-start-line="103" selection-end-line="103" />
-              <folding>
-                <element signature="e#0#58#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../AIA-reloaded/calibration.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="303">
-              <caret line="59" selection-start-line="59" selection-end-line="82" selection-end-column="19" />
+            <state relative-caret-position="-670">
+              <caret line="207" column="68" selection-start-line="207" selection-start-column="64" selection-end-line="207" selection-end-column="68" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -100,10 +79,22 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/aia_image_prep_script.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+              <folding>
+                <element signature="e#0#26#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="648">
-              <caret line="55" column="31" selection-start-line="55" selection-start-column="31" selection-end-line="55" selection-end-column="31" />
+            <state relative-caret-position="378">
+              <caret line="44" column="17" lean-forward="true" selection-start-line="44" selection-start-column="17" selection-end-line="44" selection-end-column="17" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -114,8 +105,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PCH_stats.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3222">
-              <caret line="355" column="65" selection-start-line="355" selection-start-column="65" selection-end-line="355" selection-end-column="65" />
+            <state relative-caret-position="800">
+              <caret line="825" lean-forward="true" selection-start-line="825" selection-end-line="825" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -134,19 +125,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>EUVI</find>
-      <find>urlretrieve</find>
-      <find>request</find>
-      <find>im.</find>
-      <find>write_table</find>
-      <find>self.detector</find>
-      <find>self.wav</find>
-      <find>self.point_detection</find>
       <find>self.</find>
       <find>index</find>
       <find>np.nan</find>
       <find>read_all_</find>
-      <find>.pkl</find>
       <find>save</find>
       <find>eit304</find>
       <find>pch_data</find>
@@ -154,10 +136,31 @@
       <find>pch_obj</find>
       <find>pch_df</find>
       <find>get_horizons_coord</find>
+      <find>quality</find>
+      <find>H_startLon</find>
+      <find>Fit</find>
+      <find>generic_hole_area</find>
+      <find>P</find>
+      <find>pch_obj_</find>
+      <find>agg</find>
+      <find>S_</find>
+      <find>lambda</find>
+      <find>.agg</find>
+      <find>circular</find>
+      <find>N_lat_upper</find>
+      <find>PCH_Detection</find>
+      <find>concat</find>
+      <find>lat</find>
+      <find>.</find>
+      <find>vstack</find>
+      <find>.pkl</find>
+      <find>harvey</find>
     </findStrings>
     <replaceStrings>
       <replace>cal_map.</replace>
       <replace>point_detections</replace>
+      <replace>std</replace>
+      <replace>N_</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -167,19 +170,19 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/PCH_Plots.ipynb" />
-        <option value="$PROJECT_DIR$/PCH_stats.py" />
         <option value="$PROJECT_DIR$/PCH_tests.py" />
         <option value="$PROJECT_DIR$/eit_wavelet_toy.py" />
         <option value="$PROJECT_DIR$/hackweek.py" />
         <option value="$PROJECT_DIR$/PCH_Data_Download.py" />
         <option value="$PROJECT_DIR$/aia_image_prep_script.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/correct_swap_header.py" />
         <option value="$PROJECT_DIR$/main_detection.py" />
-        <option value="$PROJECT_DIR$/PCH_series.py" />
-        <option value="$PROJECT_DIR$/PCH_Detection.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_1.py" />
         <option value="$PROJECT_DIR$/eit_image_prep.py" />
+        <option value="$PROJECT_DIR$/PCH_Detection.py" />
+        <option value="$PROJECT_DIR$/PCH_series.py" />
+        <option value="$PROJECT_DIR$/PCH_stats.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -309,14 +312,9 @@
       <workItem from="1603373877383" duration="957000" />
       <workItem from="1603396611532" duration="6864000" />
       <workItem from="1603810523008" duration="2486000" />
-      <workItem from="1603890018974" duration="10339000" />
-    </task>
-    <task id="LOCAL-00081" summary="Forced JSOC source.">
-      <created>1537203431121</created>
-      <option name="number" value="00081" />
-      <option name="presentableId" value="LOCAL-00081" />
-      <option name="project" value="LOCAL" />
-      <updated>1537203431121</updated>
+      <workItem from="1603890018974" duration="10811000" />
+      <workItem from="1604327822019" duration="414000" />
+      <workItem from="1604328741851" duration="13853000" />
     </task>
     <task id="LOCAL-00082" summary="Forced JSOC source">
       <created>1537289606543</created>
@@ -654,17 +652,24 @@
       <option name="project" value="LOCAL" />
       <updated>1604083846182</updated>
     </task>
-    <option name="localTasksCounter" value="130" />
+    <task id="LOCAL-00130" summary="Added EIT prepping script.">
+      <created>1604083896121</created>
+      <option name="number" value="00130" />
+      <option name="presentableId" value="LOCAL-00130" />
+      <option name="project" value="LOCAL" />
+      <updated>1604083896121</updated>
+    </task>
+    <option name="localTasksCounter" value="131" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="254135000" />
+    <option name="totallyTimeSpent" value="268874000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2612" y="208" width="1793" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.307253" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.31410623" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -771,13 +776,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" selection-start-line="6" selection-end-line="6" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/correct_swap_header.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
@@ -788,28 +786,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/aia_image_prep_script.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-272">
-          <caret line="11" column="62" selection-start-line="11" selection-end-line="11" selection-end-column="62" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/AreaInt_MatlabPython.txt">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hackweek.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="888">
-          <caret line="102" selection-start-line="102" selection-end-line="102" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/eit_wavelet_toy.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -821,13 +799,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Merged PCH Data.ipynb">
-      <provider selected="true" editor-type-id="ipnb-editor">
-        <state>
-          <selected id="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Plots.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
@@ -835,32 +806,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main_detection.py">
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/eit_image_prep.py" />
+    <entry file="file://$PROJECT_DIR$/eit_image_prep.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1290">
-          <caret line="86" selection-start-line="86" selection-end-line="88" />
+        <state relative-caret-position="405">
+          <caret line="27" column="32" selection-start-line="27" selection-start-column="32" selection-end-line="27" selection-end-column="32" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#0#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
+    <entry file="file://$PROJECT_DIR$/hackweek.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1275">
-          <caret line="85" selection-start-line="85" selection-end-line="85" />
+        <state relative-caret-position="1530">
+          <caret line="102" selection-start-line="102" selection-end-line="102" />
           <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="55" column="31" selection-start-line="55" selection-start-column="31" selection-end-line="55" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -875,52 +837,99 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_stats.py">
+    <entry file="file://$PROJECT_DIR$/PCH_Data_Download.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3222">
-          <caret line="355" column="65" selection-start-line="355" selection-start-column="65" selection-end-line="355" selection-end-column="65" />
+        <state relative-caret-position="191">
+          <caret line="13" selection-start-line="13" selection-end-line="15" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Merged PCH Data.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pch_plots.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-670">
+          <caret line="207" column="68" selection-start-line="207" selection-start-column="64" selection-end-line="207" selection-end-column="68" />
           <folding>
-            <element signature="e#0#16#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PCH_series.py">
+    <entry file="file://$PROJECT_DIR$/aia_image_prep_script.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8160">
-          <caret line="544" column="25" selection-start-line="544" selection-start-column="25" selection-end-line="544" selection-end-column="25" />
+        <state relative-caret-position="195">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
           <folding>
-            <element signature="e#1#19#0" expanded="true" />
+            <element signature="e#0#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/eit_image_prep.py">
+    <entry file="file://$PROJECT_DIR$/PCH_Tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="59" lean-forward="true" selection-start-line="59" selection-end-line="59" />
+        <state relative-caret-position="770">
+          <caret line="360" column="48" lean-forward="true" selection-start-line="360" selection-start-column="48" selection-end-line="360" selection-end-column="48" />
           <folding>
-            <element signature="e#0#58#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="162" selection-start-line="162" selection-end-line="169" selection-end-column="34" />
+        <state relative-caret-position="296">
+          <caret line="855" column="28" selection-start-line="855" selection-start-column="27" selection-end-line="855" selection-end-column="28" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/eit_image_prep.py">
+    <entry file="file://$PROJECT_DIR$/PCH_series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="858">
-          <caret line="103" lean-forward="true" selection-start-line="103" selection-end-line="103" />
+        <state relative-caret-position="255">
+          <caret line="1208" column="4" lean-forward="true" selection-start-line="1208" selection-start-column="4" selection-end-line="1208" selection-end-column="30" />
           <folding>
-            <element signature="e#0#58#0" expanded="true" />
+            <element signature="e#1#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main_detection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-194">
+          <caret line="86" selection-start-line="86" selection-end-line="88" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PCH_stats.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="800">
+          <caret line="825" lean-forward="true" selection-start-line="825" selection-end-line="825" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="44" column="17" lean-forward="true" selection-start-line="44" selection-start-column="17" selection-end-line="44" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
