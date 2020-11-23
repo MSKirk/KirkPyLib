@@ -50,7 +50,7 @@ if __name__ == '__main__':
     wav_list = ['EIT171', 'EIT195', 'EIT304', 'EUVI171', 'EUVI195', 'EUVI304', 'AIA171', 'AIA193', 'AIA304', 'AIA211', 'SWAP174']
     params = prep_params(wav_list)
 
-    window_filter_list = ['8.25D', '11D', '16.5D', '33D']
+    window_filter_list = ['1D','8.25D', '11D', '16.5D', '33D']
     #window_filter_list = ['11D']
     params2 = prep_window_params(window_filter_list)
 

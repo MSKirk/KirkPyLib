@@ -397,6 +397,11 @@ def df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter='AIA171', north
     upper_area = df_area_calc(df_upper[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
     lower_area = df_area_calc(df_lower[['Lat', 'Lon', 'c_lat', 'c_lon']], window_size=window_size)
 
+    # Sensitivity filter for small holes to account for a B-angle of less than 7-deg
+    mean_area[mean_area < 0.004] = 0
+    upper_area[upper_area < 0.004] = 0
+    lower_area[lower_area < 0.004] = 0
+
     if northern:
         df_hem = pd.concat([mean_area.rename('N_mean_area'),
                             com_mean.rename(columns={'c_lat': 'N_mean_lat', 'c_lon': 'N_mean_lon'}),
@@ -520,6 +525,9 @@ def df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=True, window_size
 
     # Area Calculation  *** df_area_calc *** is the expensive function
     mean_area = df_area_calc(df_mean[['Lat','Lon','c_lat','c_lon']], window_size=window_size)
+
+    # Sensitivity filter for small holes to account for a B-angle of less than 7-deg
+    mean_area[mean_area < 0.004] = 0
 
     if northern:
         df_hem = pd.concat([mean_area.rename('N_mean_area'),
