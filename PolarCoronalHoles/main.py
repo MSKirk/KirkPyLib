@@ -1,10 +1,11 @@
 from PolarCoronalHoles import PCH_stats
 import os
 import pandas as pd
-from multiprocessing import Pool
-from functools import partial
+from multiprocessing import Pool, cpu_count
+from sunpy.sun import constants
 import time
 import pickle
+import numpy as np
 
 
 def prep_params(wav_filter_list):
@@ -34,15 +35,33 @@ def agg_results(wav_filter_list, df_pool):
 def run_stat(dict_params):
     # Read the dataframe  in the local scope of the function parallelized.
     pch_df = pd.read_pickle(os.path.expanduser('/Users/mskirk/data/PCH_Project/pch_obj_concat.pkl'))
-    hem_df = PCH_stats.df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter=dict_params['wav_filter'], northern=dict_params['northern'], window_size='11D')
+
+    pch_df = pch_df.set_index('DateTime')
+    window = '11D'
+
+    hem_df = PCH_stats.df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter=dict_params['wav_filter'], northern=dict_params['northern'], window_size=window)
     return hem_df
 
 
 def run_concat_stat(dict_params):
     # Read the dataframe in the local scope of the function parallelized.
     pch_df = pd.read_pickle(os.path.expanduser('/Users/mskirk/data/PCH_Project/pch_obj_concat.pkl'))
+
+    pch_df = pch_df.set_index('DateTime')
+
     hem_df = PCH_stats.df_concat_stats_hem(pch_df, binsize=5, sigma=1.0, northern=dict_params['northern'], window_size=dict_params['window_size'])
     return hem_df
+
+
+def num_cores(guess):
+    # guess is the number of CPU cores in an ideal world you would use
+
+    cores_avail = cpu_count() - 2
+
+    if cores_avail >= guess:
+        return guess
+    else:
+        return cores_avail
 
 
 if __name__ == '__main__':
@@ -50,17 +69,19 @@ if __name__ == '__main__':
     wav_list = ['EIT171', 'EIT195', 'EIT304', 'EUVI171', 'EUVI195', 'EUVI304', 'AIA171', 'AIA193', 'AIA304', 'AIA211', 'SWAP174']
     params = prep_params(wav_list)
 
-    window_filter_list = ['1D','8.25D', '11D', '16.5D', '33D']
-    #window_filter_list = ['11D']
+    # Using datetime as index or Carrington Rotation number
+    window_filter_list = ['1D', '3D', '8.25D', '11D', '16.5D', '33D']
+    #window_filter_list = list(np.array([1, 8.25, 11, 16.5, 33])/constants.mean_synodic_period.value)
+
     params2 = prep_window_params(window_filter_list)
 
     tstart = time.time()
     # set number of parallel jobs to run at a time and run the pool of workers
-    nprocesses = 22
+    nprocesses = num_cores(len(params))
     with Pool(nprocesses) as p:
         df_pool = p.map(run_stat, params)
 
-    nprocesses = 4
+    nprocesses = num_cores(len(params2))
     with Pool(nprocesses) as p:
         df_pool2 = p.map(run_concat_stat, params2)
 
@@ -71,4 +92,4 @@ if __name__ == '__main__':
         pickle.dump(dfs_dict, ff, protocol=pickle.HIGHEST_PROTOCOL)
 
     elapsed_time = time.time() - tstart
-    print('Compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))
+    print('Total compute time: {:1.0f} sec ({:1.1f} min)'.format(elapsed_time, elapsed_time / 60))

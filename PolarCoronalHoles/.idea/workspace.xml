@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Fix pkl save error.">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="Add small hole filter, 1 day smoothing.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PCH_stats.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_stats.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -56,7 +56,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="888">
+            <state relative-caret-position="191">
               <caret line="86" selection-start-line="86" selection-end-line="88" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
@@ -92,8 +92,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="866">
-              <caret line="66" column="45" selection-start-line="66" selection-start-column="45" selection-end-line="66" selection-end-column="45" />
+            <state relative-caret-position="800">
+              <caret line="95" lean-forward="true" selection-start-line="95" selection-end-line="95" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -104,8 +104,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PCH_stats.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="688">
-              <caret line="546" column="97" selection-start-line="546" selection-start-column="97" selection-end-line="546" selection-end-column="97" />
+            <state relative-caret-position="335">
+              <caret line="847" column="41" lean-forward="true" selection-start-line="847" selection-start-column="41" selection-end-line="847" selection-end-column="41" />
+              <folding>
+                <element signature="e#0#28#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -121,10 +124,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.</find>
-      <find>index</find>
-      <find>np.nan</find>
-      <find>read_all_</find>
       <find>save</find>
       <find>eit304</find>
       <find>pch_data</find>
@@ -138,7 +137,6 @@
       <find>generic_hole_area</find>
       <find>P</find>
       <find>pch_obj_</find>
-      <find>agg</find>
       <find>S_</find>
       <find>lambda</find>
       <find>.agg</find>
@@ -151,12 +149,20 @@
       <find>vstack</find>
       <find>.pkl</find>
       <find>harvey</find>
+      <find>make_pch</find>
+      <find>agg</find>
+      <find>north</find>
+      <find>groupby</find>
+      <find>'1D'</find>
     </findStrings>
     <replaceStrings>
       <replace>cal_map.</replace>
       <replace>point_detections</replace>
       <replace>std</replace>
       <replace>N_</replace>
+      <replace>south</replace>
+      <replace>resample('1D')</replace>
+      <replace>resolution</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -177,8 +183,8 @@
         <option value="$PROJECT_DIR$/eit_image_prep.py" />
         <option value="$PROJECT_DIR$/PCH_Detection.py" />
         <option value="$PROJECT_DIR$/PCH_series.py" />
-        <option value="$PROJECT_DIR$/PCH_stats.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/PCH_stats.py" />
       </list>
     </option>
   </component>
@@ -313,14 +319,7 @@
       <workItem from="1604328741851" duration="17962000" />
       <workItem from="1604692534997" duration="305000" />
       <workItem from="1604704587943" duration="358000" />
-      <workItem from="1606167011533" duration="365000" />
-    </task>
-    <task id="LOCAL-00084" summary="AIA HDU list correction">
-      <created>1538602493278</created>
-      <option name="number" value="00084" />
-      <option name="presentableId" value="LOCAL-00084" />
-      <option name="project" value="LOCAL" />
-      <updated>1538602493278</updated>
+      <workItem from="1606167011533" duration="8178000" />
     </task>
     <task id="LOCAL-00085" summary="AIA HDU list correction">
       <created>1538602499122</created>
@@ -658,11 +657,18 @@
       <option name="project" value="LOCAL" />
       <updated>1604524191570</updated>
     </task>
-    <option name="localTasksCounter" value="133" />
+    <task id="LOCAL-00133" summary="Add small hole filter, 1 day smoothing.">
+      <created>1606167430166</created>
+      <option name="number" value="00133" />
+      <option name="presentableId" value="LOCAL-00133" />
+      <option name="project" value="LOCAL" />
+      <updated>1606167430167</updated>
+    </task>
+    <option name="localTasksCounter" value="134" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="274011000" />
+    <option name="totallyTimeSpent" value="281824000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2593" y="208" width="1793" height="1057" extended-state="0" />
@@ -728,7 +734,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Writing Table Fix." />
     <MESSAGE value="Fetching new ephemeris from JPL Horizons for SOHO" />
     <MESSAGE value="Tested and refined factors in EIT mask_map." />
     <MESSAGE value="Indexing correction for h_loc." />
@@ -753,7 +758,8 @@
     <MESSAGE value="Added EIT prepping script." />
     <MESSAGE value="Added helper routines to get from csv to pandas. Fixed deprecation error in pandas .agg function. Fixed multiprocessor pool error in main.py." />
     <MESSAGE value="Fix pkl save error." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix pkl save error." />
+    <MESSAGE value="Add small hole filter, 1 day smoothing." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add small hole filter, 1 day smoothing." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/PCH_tests.py">
@@ -893,16 +899,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main_detection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="888">
-          <caret line="86" selection-start-line="86" selection-end-line="88" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PCH_Detection.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1174">
@@ -913,10 +909,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/main_detection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="86" selection-start-line="86" selection-end-line="88" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="866">
-          <caret line="66" column="45" selection-start-line="66" selection-start-column="45" selection-end-line="66" selection-end-column="45" />
+        <state relative-caret-position="800">
+          <caret line="95" lean-forward="true" selection-start-line="95" selection-end-line="95" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
@@ -925,8 +931,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PCH_stats.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="688">
-          <caret line="546" column="97" selection-start-line="546" selection-start-column="97" selection-end-line="546" selection-end-column="97" />
+        <state relative-caret-position="335">
+          <caret line="847" column="41" lean-forward="true" selection-start-line="847" selection-start-column="41" selection-end-line="847" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
