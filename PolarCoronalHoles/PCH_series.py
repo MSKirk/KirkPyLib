@@ -30,14 +30,14 @@ class PCH:
         for file in self.filelist:
             self.list_of_obj += [pch_csv2df(os.path.join(self.directory, file))]
 
-        self.pch_obj = self.combine_pch_obj(self.list_of_obj, interval=interval)
+        #self.pch_obj = self.combine_pch_obj(self.list_of_obj, interval=interval)
         
-        self.northern = self.pch_obj.StartLat > 0
-        self.southern = self.pch_obj.StartLat < 0
+        #self.northern = self.pch_obj.StartLat > 0
+        #self.southern = self.pch_obj.StartLat < 0
         
-        self.confidence_obj(confidence=0.99, interval=interval)
+        #self.confidence_obj(confidence=0.99, interval=interval)
 
-        self.area_of_all_measures()
+        #self.area_of_all_measures()
 
         plt.ion()
 
@@ -422,7 +422,7 @@ class PCH:
         set_time, north_colat, north_lon, north_filts, south_colat, south_lon, south_filts, hole_separation = \
             self._assemble_pch_set(cent_series=True)
 
-        jd_time = HarRot2JD(set_time)
+        jd_time = harrot2jd(set_time)
 
         # Complete the LS for each data set, nyquist freq is 66 days
         periods = np.linspace(1, 900, 9000)

@@ -382,7 +382,7 @@ def df_chole_stats_hem(pch_df, binsize=5, sigma=1.0, wave_filter='AIA171', north
 
     # Northern Mean, Upper, and Lower ---------------------------------------------------
     df_mean, df_upper, df_lower = df_pre_process(pch_df, northern=northern, wave_filter=wave_filter, sigma=sigma,
-                                                 binsize=binsize, window_size='33D')
+                                                 binsize=binsize, window_size=window_size)
 
     # Center of Mass Calculation *** df_CoM_calc *** is the expensive function
     com_mean = df_CoM_calc(df_mean, window_size=window_size)
@@ -626,17 +626,30 @@ def df_pre_process(pch_df, northern=True, resample=False, **kwargs):
 
         df_std = df_std.groupby('bin').resample('1D').std()[['Lat', 'Lon']].dropna(how='all').reset_index().set_index(['DateTime']).sort_index()
 
-    df_upper = df_mean + (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
-    df_upper.Lat[df_upper.Lat > 90] = 90
-    df_upper.Lat[df_upper.Lat < 50] = 50
-    df_upper.Lon[df_upper.Lat >= 360] -= 360
-    df_upper.Lon[df_upper.Lat <= 0] += 360
+    if northern:
+        df_upper = df_mean + (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
+        df_upper.Lat[df_upper.Lat > 90] = 90
+        df_upper.Lat[df_upper.Lat < 50] = 50
+        df_upper.Lon[df_upper.Lat >= 360] -= 360
+        df_upper.Lon[df_upper.Lat <= 0] += 360
 
-    df_lower = df_mean - (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
-    df_lower.Lat[df_lower.Lat > 90] = 90
-    df_lower.Lat[df_lower.Lat < 50] = 50
-    df_lower.Lon[df_lower.Lat >= 360] -= 360
-    df_lower.Lon[df_lower.Lat <= 0] += 360
+        df_lower = df_mean - (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
+        df_lower.Lat[df_lower.Lat > 90] = 90
+        df_lower.Lat[df_lower.Lat < 50] = 50
+        df_lower.Lon[df_lower.Lat >= 360] -= 360
+        df_lower.Lon[df_lower.Lat <= 0] += 360
+    else:
+        df_upper = df_mean - (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
+        df_upper.Lat[df_upper.Lat < -90] = -90
+        df_upper.Lat[df_upper.Lat > -50] = -50
+        df_upper.Lon[df_upper.Lat >= 360] -= 360
+        df_upper.Lon[df_upper.Lat <= 0] += 360
+
+        df_lower = df_mean + (kwargs.get('sigma', 1) * df_std).drop(columns='bin')
+        df_lower.Lat[df_lower.Lat < -90] = -90
+        df_lower.Lat[df_lower.Lat > -50] = -50
+        df_lower.Lon[df_lower.Lat >= 360] -= 360
+        df_lower.Lon[df_lower.Lat <= 0] += 360
 
     return df_mean, df_upper, df_lower
 

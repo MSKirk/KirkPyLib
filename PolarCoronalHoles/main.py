@@ -67,6 +67,7 @@ def num_cores(guess):
 if __name__ == '__main__':
 
     wav_list = ['EIT171', 'EIT195', 'EIT304', 'EUVI171', 'EUVI195', 'EUVI304', 'AIA171', 'AIA193', 'AIA304', 'AIA211', 'SWAP174']
+    #wav_list = ['AIA171', 'SWAP174']
     params = prep_params(wav_list)
 
     # Using datetime as index or Carrington Rotation number
