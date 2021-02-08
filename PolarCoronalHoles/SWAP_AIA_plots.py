@@ -9,6 +9,8 @@ from aiapy.calibrate import register, update_pointing
 from sunpy import coordinates
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+import glob
+import random
 
 pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_stats_dic_swap.pkl')
 
@@ -190,7 +192,7 @@ def latitude_difference_plot(pch_obj):
     print(f'Mean southern offset: {np.rad2deg(beta.mean())} degrees')
 
 
-def overplot_coords(aiaimg, pch_obj):
+def overplot_aia_coords(aiaimg, pch_obj):
 
     aia = Map(aiaimg)
 
@@ -251,4 +253,78 @@ def overplot_coords(aiaimg, pch_obj):
     ax.plot_coord(s_pts_hpc, 'x', color='rebeccapurple', label='South PCH')
     plt.legend()
     plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_AIA171_'+str(aia.date.to_datetime().date())+'.png')
-    plt.show()
+    # plt.show()
+
+
+def overplot_swap_coords(swapimg, pch_obj):
+
+    swap = Map(swapimg)
+
+    swap_north = pch_obj['SWAP174'][0]
+    #swap_north = pch_obj['SWAP174'][0].resample('0.5D').median()
+
+    n_lat = swap_north[np.abs(pd.to_datetime(swap_north.index).date - swap.date.to_datetime().date()) <=
+                      datetime.timedelta(days=8.25)].N_lower_lat.values * u.rad
+    n_lon = swap_north[np.abs(pd.to_datetime(swap_north.index).date - swap.date.to_datetime().date()) <=
+                      datetime.timedelta(days=8.25)].N_mean_lon.values * u.rad
+    times = swap_north[np.abs(pd.to_datetime(swap_north.index).date - swap.date.to_datetime().date()) <=
+                      datetime.timedelta(days=8.25)].index
+    n_pts = coordinates.HeliographicStonyhurst(n_lon, n_lat, obstime=times)
+    n_pts_hpc = n_pts.transform_to(swap.coordinate_frame)
+
+    #fov = 800 * u.arcsec
+    #mid_pt = n_pts_hpc[int(np.floor((len(n_pts_hpc)-1)/2))]
+    #bottom_left = SkyCoord(mid_pt.Tx - fov/2, mid_pt.Ty - fov/2, frame=swap.coordinate_frame)
+    #smap = swap.submap(bottom_left, width=fov, height=fov)
+
+
+    #ax = plt.subplot(projection=smap)
+    #smap.plot()
+    #smap.draw_limb()
+    #ax.grid(False)
+    #ax.plot_coord(n_pts_hpc, 'x', color='deepskyblue', label='North PCH')
+    #plt.legend()
+    #plt.show()
+
+    #------------------------------------
+
+    #swap_south = pch_obj['SWAP174'][1].resample('0.5D').median()
+    swap_south = pch_obj['SWAP174'][1]
+    s_lat = swap_south[np.abs(pd.to_datetime(swap_south.index).date - swap.date.to_datetime().date()) <=
+                      datetime.timedelta(days=8.25)].S_lower_lat.values * u.rad
+    s_lon = swap_south[np.abs(pd.to_datetime(swap_south.index).date - swap.date.to_datetime().date()) <=
+                      datetime.timedelta(days=8.25)].S_mean_lon.values * u.rad
+    times = swap_south[np.abs(pd.to_datetime(swap_south.index).date - swap.date.to_datetime().date()) <=
+                      datetime.timedelta(days=8.25)].index
+    s_pts = coordinates.HeliographicStonyhurst(s_lon, s_lat, obstime=times)
+    s_pts_hpc = s_pts.transform_to(swap.coordinate_frame)
+
+    fov = 800 * u.arcsec
+    mid_pt = s_pts_hpc[int(np.floor((len(s_pts_hpc)-1)/2))]
+    bottom_left = SkyCoord(mid_pt.Tx - fov/2, mid_pt.Ty - fov/2, frame=swap.coordinate_frame)
+    smap = swap.submap(bottom_left, width=fov, height=fov)
+    smap= swap
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = plt.subplot(projection=smap)
+    smap.plot()
+    ax.grid(False)
+    ax.plot_coord(n_pts_hpc, 'x', color='cornflowerblue', label='North PCH')
+    ax.plot_coord(s_pts_hpc, 'x', color='rebeccapurple', label='South PCH')
+    plt.legend()
+    plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_SWAP174_'+str(swap.date.to_datetime().date())+'.png')
+    # plt.show()
+
+
+def generate_plot_example(number=10):
+    aia_fls = glob.glob('/Volumes/CoronalHole/AIA_lev15/171/*/*/*')
+    swap_fls = glob.glob('/Volumes/CoronalHole/SWAP/*/*/*')
+
+    for ii in range(number):
+        test_img = random.choice(swap_fls)
+        overplot_swap_coords(test_img, pch_obj)
+
+    for ii in range(number):
+        test_img = random.choice(aia_fls)
+        overplot_aia_coords(test_img, pch_obj)
+        
