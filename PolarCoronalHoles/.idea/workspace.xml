@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="AFRL data set generation">
-      <change beforePath="$PROJECT_DIR$/.idea/PolarCoronalHoles.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PolarCoronalHoles.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="SWAP Paper plots and corrections">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PCH_Detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/PCH_Detection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SWAP_AIA_plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/SWAP_AIA_plots.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_detection.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,13 +174,6 @@
       <workItem from="1604692534997" duration="305000" />
       <workItem from="1604704587943" duration="358000" />
       <workItem from="1606167011533" duration="8424000" />
-    </task>
-    <task id="LOCAL-00086" summary="Resample AIA images to 2048x2048">
-      <created>1539291110580</created>
-      <option name="number" value="00086" />
-      <option name="presentableId" value="LOCAL-00086" />
-      <option name="project" value="LOCAL" />
-      <updated>1539291110581</updated>
     </task>
     <task id="LOCAL-00087" summary="Resample AIA images to 2048x2048">
       <created>1539805005046</created>
@@ -523,7 +511,14 @@
       <option name="project" value="LOCAL" />
       <updated>1606347312966</updated>
     </task>
-    <option name="localTasksCounter" value="135" />
+    <task id="LOCAL-00135" summary="SWAP Paper plots and corrections">
+      <created>1614373407947</created>
+      <option name="number" value="00135" />
+      <option name="presentableId" value="LOCAL-00135" />
+      <option name="project" value="LOCAL" />
+      <updated>1614373407947</updated>
+    </task>
+    <option name="localTasksCounter" value="136" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -559,7 +554,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Tested and refined factors in EIT mask_map." />
     <MESSAGE value="Indexing correction for h_loc." />
     <MESSAGE value="Updating coronal data hole fetching script to Sunpy 2.x" />
     <MESSAGE value="Updating to use parfive and Sunpy v2.x" />
@@ -584,6 +578,7 @@
     <MESSAGE value="Fix pkl save error." />
     <MESSAGE value="Add small hole filter, 1 day smoothing." />
     <MESSAGE value="AFRL data set generation" />
-    <option name="LAST_COMMIT_MESSAGE" value="AFRL data set generation" />
+    <MESSAGE value="SWAP Paper plots and corrections" />
+    <option name="LAST_COMMIT_MESSAGE" value="SWAP Paper plots and corrections" />
   </component>
 </project>

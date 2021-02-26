@@ -197,6 +197,7 @@ def latitude_difference_plot(pch_obj):
 
 def overplot_aia_coords(aiaimg, pch_obj):
 
+    plt.rcParams.update({'font.size': 16})
     aia = Map(aiaimg)
 
     if aia.fits_header['lvl_num'] == 1:
@@ -261,6 +262,7 @@ def overplot_aia_coords(aiaimg, pch_obj):
 
 def overplot_swap_coords(swapimg, pch_obj):
 
+    plt.rcParams.update({'font.size': 16})
     swap = Map(swapimg)
 
     swap_north = pch_obj['SWAP174'][0]
