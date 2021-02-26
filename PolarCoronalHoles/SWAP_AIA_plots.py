@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import gridspec
+from skimage import exposure
 import datetime
 import seaborn as sns
 from sunpy.map import Map
@@ -89,6 +90,7 @@ def latitude_range_plot(pch_obj):
     plt.tight_layout()
     plt.show()
 
+
 def area_plot(pch_obj, smoothing='16.5D'):
     fig, (ax, ax1) = plt.subplots(2, 1, sharex=True, figsize=(15, 10))
 
@@ -133,6 +135,7 @@ def area_plot(pch_obj, smoothing='16.5D'):
     ax1.legend(fontsize=14, loc=4)
     plt.tight_layout()
     plt.show()
+
 
 def latitude_difference_plot(pch_obj):
 
@@ -299,11 +302,16 @@ def overplot_swap_coords(swapimg, pch_obj):
     s_pts = coordinates.HeliographicStonyhurst(s_lon, s_lat, obstime=times)
     s_pts_hpc = s_pts.transform_to(swap.coordinate_frame)
 
-    fov = 800 * u.arcsec
+    fov = 2454 * u.arcsec
     mid_pt = s_pts_hpc[int(np.floor((len(s_pts_hpc)-1)/2))]
-    bottom_left = SkyCoord(mid_pt.Tx - fov/2, mid_pt.Ty - fov/2, frame=swap.coordinate_frame)
+    #bottom_left = SkyCoord(mid_pt.Tx - fov/2, mid_pt.Ty - fov/2, frame=swap.coordinate_frame)
+    bottom_left = SkyCoord(-fov/2, -fov/2, frame=swap.coordinate_frame)
     smap = swap.submap(bottom_left, width=fov, height=fov)
-    smap= swap
+
+    #Contrast Adjustment
+    p2, p99 = np.percentile(smap.data, (2, 99))
+    img_rescale = exposure.rescale_intensity(smap.data, in_range=(p2, p99))
+    smap.data[:] = img_rescale
 
     fig = plt.figure(figsize=(10, 10))
     ax = plt.subplot(projection=smap)
@@ -316,7 +324,7 @@ def overplot_swap_coords(swapimg, pch_obj):
     # plt.show()
 
 
-def generate_plot_example(number=10):
+def generate_plot_example(number=10, pch_obj=pch_obj):
     aia_fls = glob.glob('/Volumes/CoronalHole/AIA_lev15/171/*/*/*')
     swap_fls = glob.glob('/Volumes/CoronalHole/SWAP/*/*/*')
 
@@ -327,4 +335,3 @@ def generate_plot_example(number=10):
     for ii in range(number):
         test_img = random.choice(aia_fls)
         overplot_aia_coords(test_img, pch_obj)
-        

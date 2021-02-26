@@ -66,13 +66,12 @@ def num_cores(guess):
 
 if __name__ == '__main__':
 
-    wav_list = ['EIT171', 'EIT195', 'EIT304', 'EUVI171', 'EUVI195', 'EUVI304', 'AIA171', 'AIA193', 'AIA304', 'AIA211', 'SWAP174']
-    #wav_list = ['AIA171', 'SWAP174']
+    #wav_list = ['EIT171', 'EIT195', 'EIT304', 'EUVI171', 'EUVI195', 'EUVI304', 'AIA171', 'AIA193', 'AIA304', 'AIA211', 'SWAP174']
+    wav_list = ['AIA171', 'SWAP174']
     params = prep_params(wav_list)
 
     # Using datetime as index or Carrington Rotation number
     window_filter_list = ['1D', '3D', '8.25D', '11D', '16.5D', '33D']
-    #window_filter_list = list(np.array([1, 8.25, 11, 16.5, 33])/constants.mean_synodic_period.value)
 
     params2 = prep_window_params(window_filter_list)
 
@@ -89,7 +88,8 @@ if __name__ == '__main__':
     dfs_dict = agg_results(wav_list, df_pool)
     dfs_dict.update(agg_results(['Agg'+ii for ii in window_filter_list], df_pool2))
 
-    with open('/Users/mskirk/data/PCH_Project/pch_stats_dic.pkl', 'wb') as ff:
+    #with open('/Users/mskirk/data/PCH_Project/pch_stats_dic.pkl', 'wb') as ff:
+    with open('/Users/mskirk/data/PCH_Project/pch_stats_dic_swap.pkl', 'wb') as ff:
         pickle.dump(dfs_dict, ff, protocol=pickle.HIGHEST_PROTOCOL)
 
     elapsed_time = time.time() - tstart

@@ -96,6 +96,7 @@ def pch_mask(mask_map, factor=0.5):
                 factor = 0.30
             if mask_map.wavelength == 171 * u.AA:
                 factor = 0.62
+                #factor = 0.65
             if mask_map.wavelength == 304 * u.AA:
                 factor = 0.15
             if mask_map.wavelength == 211 * u.AA:
@@ -120,7 +121,8 @@ def pch_mask(mask_map, factor=0.5):
                 factor = 0.22
         if mask_map.detector == 'SWAP':
             if mask_map.wavelength == 174 * u.AA:
-                factor = 0.55
+                #factor = 0.55
+                factor = 0.78
 
         # Creating a kernel for the morphological transforms
         if mask_map.wavelength == 304 * u.AA:

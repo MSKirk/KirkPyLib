@@ -123,6 +123,7 @@ if __name__ == '__main__':
                 '/Volumes/CoronalHole/EIT_lev1/304/*']
 
     all_dirs = AIA_dirs + EUVI_dirs + SWAP_dirs + EIT_dirs
+    all_dirs = ['/Volumes/CoronalHole/AIA_lev15/171/*/*/*'] + SWAP_dirs
 
     for inst_dir in all_dirs:
         all_files = list(set([os.path.abspath(p) for p in glob.glob(inst_dir)]))
