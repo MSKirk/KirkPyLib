@@ -175,13 +175,6 @@
       <workItem from="1604704587943" duration="358000" />
       <workItem from="1606167011533" duration="8424000" />
     </task>
-    <task id="LOCAL-00087" summary="Resample AIA images to 2048x2048">
-      <created>1539805005046</created>
-      <option name="number" value="00087" />
-      <option name="presentableId" value="LOCAL-00087" />
-      <option name="project" value="LOCAL" />
-      <updated>1539805005047</updated>
-    </task>
     <task id="LOCAL-00088" summary="Added in Center of Mass output">
       <created>1539809932668</created>
       <option name="number" value="00088" />
@@ -518,7 +511,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614373407947</updated>
     </task>
-    <option name="localTasksCounter" value="136" />
+    <task id="LOCAL-00136" summary="SWAP Paper plots and corrections">
+      <created>1614374913551</created>
+      <option name="number" value="00136" />
+      <option name="presentableId" value="LOCAL-00136" />
+      <option name="project" value="LOCAL" />
+      <updated>1614374913551</updated>
+    </task>
+    <option name="localTasksCounter" value="137" />
     <servers />
   </component>
   <component name="TimeTrackingManager">

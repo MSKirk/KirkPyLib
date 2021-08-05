@@ -12,6 +12,7 @@ import astropy.units as u
 from astropy.coordinates import SkyCoord
 import glob
 import random
+from scipy import fftpack
 
 pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_stats_dic_swap.pkl')
 
@@ -337,3 +338,19 @@ def generate_plot_example(number=10, pch_obj=pch_obj):
     for ii in range(number):
         test_img = random.choice(aia_fls)
         overplot_aia_coords(test_img, pch_obj)
+        
+        
+def series_powerspectrum(series):
+    series.fillna(value=series.mean(), inplace=True)
+    series = series * np.hamming(series.size)
+    temp_fft = fftpack.fft(series.values)
+    temp_psd = np.abs(temp_fft) ** 2
+    duration = (series.index[-1] -series.index[0]).days + (series.index[-1] -series.index[0]).seconds/86400
+    fftfreq = fftpack.fftfreq(len(temp_psd), 1. / duration)
+    i = fftfreq > 0
+    
+    fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+    ax.plot(fftfreq[i], 10 * np.log10(temp_psd[i]))
+    ax.set_xlabel('Frequency (days)')
+    ax.set_ylabel('PSD (dB)')
+    plt.show()
