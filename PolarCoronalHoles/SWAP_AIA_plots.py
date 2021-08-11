@@ -36,20 +36,26 @@ def latitude_range_plot(pch_obj):
 
     smoothing_window = '67D'
 
-    line, = ax.plot(savgol_smooth(smoothing_window, np.rad2deg(north.N_upper_lat - north.N_lower_lat)
-                                  .interpolate(method='linear')), label='Northern PCH', color='C1')
-    line2, = ax.plot(savgol_smooth(smoothing_window, np.rad2deg(south.S_lower_lat - south.S_upper_lat)
-                                   .interpolate(method='linear')), label='Southern PCH', color='C9')
-    ax.set_ylim(0.0, 20)
-    ax.set_xlim(datetime.date(2010, 1, 1), datetime.date(2020, 7, 1))
-    ax.set_ylabel('Measured Latitude Range [deg]', fontsize=12)
-    ax.set_title(aia_title, fontsize=14)
-    ax.legend(fontsize=14, loc=2)
+    n_smooth = savgol_smooth(smoothing_window, np.rad2deg(north.N_upper_lat - north.N_lower_lat)
+                             .interpolate(method='linear'))
+    s_smooth = savgol_smooth(smoothing_window, np.rad2deg(south.S_lower_lat - south.S_upper_lat)
+                             .interpolate(method='linear'))
 
     nmean = np.rad2deg(np.mean(north.N_upper_lat - north.N_lower_lat))
     nstd = np.rad2deg(np.std(north.N_upper_lat - north.N_lower_lat))
     smean = np.rad2deg(np.mean(south.S_lower_lat - south.S_upper_lat))
     sstd = np.rad2deg(np.std(south.S_lower_lat - south.S_upper_lat))
+
+    line, = ax.plot(n_smooth, label='Northern PCH', color='C1')
+    line2, = ax.plot(s_smooth, label='Southern PCH', color='C9')
+
+    ax.fill_between(n_smooth.index, n_smooth+nstd, n_smooth-nstd, alpha=0.6, color="C0")
+    ax.fill_between(s_smooth.index, s_smooth+sstd, s_smooth-sstd, alpha=0.6, color="C8")
+    ax.set_ylim(0.0, 20)
+    ax.set_xlim(datetime.date(2010, 1, 1), datetime.date(2020, 7, 1))
+    ax.set_ylabel('Measured Latitude Range [deg]', fontsize=12)
+    ax.set_title(aia_title, fontsize=14)
+    ax.legend(fontsize=14, loc=2)
 
     textstr = '\n'.join((
         r'$\mathrm{Northern \ mean}=%.2f \degree$' % (nmean, ),
@@ -67,21 +73,27 @@ def latitude_range_plot(pch_obj):
     north = pch_obj['SWAP174'][0].resample('1D').median()
     south = pch_obj['SWAP174'][1].resample('1D').median()
 
-    line, = ax1.plot(savgol_smooth(smoothing_window, np.rad2deg(north.N_upper_lat - north.N_lower_lat)
-                                   .interpolate(method='linear')),  label='Northern PCH', color='C3')
-    line2, = ax1.plot(savgol_smooth(smoothing_window, np.rad2deg(south.S_lower_lat - south.S_upper_lat).
-                                    interpolate(method='linear')), label='Southern PCH', color='C7')
+    n_smooth = savgol_smooth(smoothing_window, np.rad2deg(north.N_upper_lat - north.N_lower_lat)
+                             .interpolate(method='linear'))
+    s_smooth = savgol_smooth(smoothing_window, np.rad2deg(south.S_lower_lat - south.S_upper_lat)
+                             .interpolate(method='linear'))
+
+    nmean = np.rad2deg(np.mean(north.N_upper_lat - north.N_lower_lat))
+    nstd = np.rad2deg(np.std(north.N_upper_lat - north.N_lower_lat))
+    smean = np.rad2deg(np.mean(south.S_lower_lat - south.S_upper_lat))
+    sstd = np.rad2deg(np.std(south.S_lower_lat - south.S_upper_lat))
+
+    line, = ax1.plot(n_smooth,  label='Northern PCH', color='C3')
+    line2, = ax1.plot(s_smooth, label='Southern PCH', color='C7')
+
+    ax1.fill_between(n_smooth.index, n_smooth+nstd, n_smooth-nstd, alpha=0.6, color="C2")
+    ax1.fill_between(s_smooth.index, s_smooth+sstd, s_smooth-sstd, alpha=0.6, color="C6")
     ax1.set_ylim(0.0, 20)
     ax1.set_xlim(datetime.date(2010, 1, 1), datetime.date(2020, 7, 1))
     ax1.set_xlabel('Year', fontsize=12)
     ax1.set_ylabel('Measured Latitude Range [deg]', fontsize=12)
     ax1.set_title(swap_title, fontsize=14)
     ax1.legend(fontsize=14, loc=2)
-
-    nmean = np.rad2deg(np.mean(north.N_upper_lat - north.N_lower_lat))
-    nstd = np.rad2deg(np.std(north.N_upper_lat - north.N_lower_lat))
-    smean = np.rad2deg(np.mean(south.S_lower_lat - south.S_upper_lat))
-    sstd = np.rad2deg(np.std(south.S_lower_lat - south.S_upper_lat))
 
     textstr = '\n'.join((
         r'$\mathrm{Northern \ mean}=%.2f \degree$' % (nmean, ),
