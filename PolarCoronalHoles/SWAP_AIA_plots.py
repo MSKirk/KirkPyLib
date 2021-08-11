@@ -13,6 +13,7 @@ from astropy.coordinates import SkyCoord
 import glob
 import random
 from scipy import fftpack
+from scipy.signal import savgol_filter
 
 pch_obj = pd.read_pickle('/Users/mskirk/data/PCH_Project/pch_stats_dic_swap.pkl')
 
@@ -33,8 +34,12 @@ def latitude_range_plot(pch_obj):
     north = pch_obj['AIA171'][0].resample('1D').median()
     south = pch_obj['AIA171'][1].resample('1D').median()
 
-    line, = ax.plot(np.rad2deg(north.N_upper_lat - north.N_lower_lat), label='Northern PCH', color='C1')
-    line2, = ax.plot(np.rad2deg(south.S_lower_lat - south.S_upper_lat), label='Southern PCH', color='C9')
+    smoothing_window = '67D'
+
+    line, = ax.plot(savgol_smooth(smoothing_window, np.rad2deg(north.N_upper_lat - north.N_lower_lat)
+                                  .interpolate(method='linear')), label='Northern PCH', color='C1')
+    line2, = ax.plot(savgol_smooth(smoothing_window, np.rad2deg(south.S_lower_lat - south.S_upper_lat)
+                                   .interpolate(method='linear')), label='Southern PCH', color='C9')
     ax.set_ylim(0.0, 20)
     ax.set_xlim(datetime.date(2010, 1, 1), datetime.date(2020, 7, 1))
     ax.set_ylabel('Measured Latitude Range [deg]', fontsize=12)
@@ -62,8 +67,10 @@ def latitude_range_plot(pch_obj):
     north = pch_obj['SWAP174'][0].resample('1D').median()
     south = pch_obj['SWAP174'][1].resample('1D').median()
 
-    line, = ax1.plot(np.rad2deg(north.N_upper_lat - north.N_lower_lat), label='Northern PCH', color='C3')
-    line2, = ax1.plot(np.rad2deg(south.S_lower_lat - south.S_upper_lat), label='Southern PCH', color='C7')
+    line, = ax1.plot(savgol_smooth(smoothing_window, np.rad2deg(north.N_upper_lat - north.N_lower_lat)
+                                   .interpolate(method='linear')),  label='Northern PCH', color='C3')
+    line2, = ax1.plot(savgol_smooth(smoothing_window, np.rad2deg(south.S_lower_lat - south.S_upper_lat).
+                                    interpolate(method='linear')), label='Southern PCH', color='C7')
     ax1.set_ylim(0.0, 20)
     ax1.set_xlim(datetime.date(2010, 1, 1), datetime.date(2020, 7, 1))
     ax1.set_xlabel('Year', fontsize=12)
@@ -338,8 +345,26 @@ def generate_plot_example(number=10, pch_obj=pch_obj):
     for ii in range(number):
         test_img = random.choice(aia_fls)
         overplot_aia_coords(test_img, pch_obj)
-        
-        
+
+
+def freq_to_window(freq_string, series_freq):
+    # convert a series freqency to a window size.
+    # e.g. '10D' into 100 elements. Returns an int size of window.
+    return int(pd.to_timedelta(freq_string)/pd.to_timedelta(series_freq))
+
+
+def savgol_smooth(freq, df, poly_degree=3):
+
+    window = freq_to_window(freq, df.index.freq)
+
+    try:
+        df_smoothed = pd.DataFrame(savgol_filter(df, window, poly_degree, axis=0), columns=df.columns, index=df.index)
+    except AttributeError:
+        df_smoothed = pd.Series(savgol_filter(df, window, poly_degree, axis=0), index=df.index)
+
+    return df_smoothed
+
+
 def series_powerspectrum(series):
     series.fillna(value=series.mean(), inplace=True)
     series = series * np.hamming(series.size)
