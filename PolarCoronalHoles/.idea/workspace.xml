@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="SWAP Paper plots and corrections">
+    <list default="true" id="8198cf9b-1793-49e3-99ae-6569a6ccde0b" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SWAP_AIA_plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/SWAP_AIA_plots.py" afterDir="false" />
     </list>
@@ -174,13 +177,6 @@
       <workItem from="1604692534997" duration="305000" />
       <workItem from="1604704587943" duration="358000" />
       <workItem from="1606167011533" duration="8424000" />
-    </task>
-    <task id="LOCAL-00088" summary="Added in Center of Mass output">
-      <created>1539809932668</created>
-      <option name="number" value="00088" />
-      <option name="presentableId" value="LOCAL-00088" />
-      <option name="project" value="LOCAL" />
-      <updated>1539809932668</updated>
     </task>
     <task id="LOCAL-00089" summary="Added in Center of Mass output">
       <created>1539811139222</created>
@@ -518,7 +514,14 @@
       <option name="project" value="LOCAL" />
       <updated>1614374913551</updated>
     </task>
-    <option name="localTasksCounter" value="137" />
+    <task id="LOCAL-00137" summary="powerspectrum addition">
+      <created>1628194257688</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1628194257688</updated>
+    </task>
+    <option name="localTasksCounter" value="138" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -554,7 +557,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Indexing correction for h_loc." />
     <MESSAGE value="Updating coronal data hole fetching script to Sunpy 2.x" />
     <MESSAGE value="Updating to use parfive and Sunpy v2.x" />
     <MESSAGE value="Using aiapy 0.3 and adapting AIA Reloaded for sunpy maps." />
@@ -579,6 +581,7 @@
     <MESSAGE value="Add small hole filter, 1 day smoothing." />
     <MESSAGE value="AFRL data set generation" />
     <MESSAGE value="SWAP Paper plots and corrections" />
-    <option name="LAST_COMMIT_MESSAGE" value="SWAP Paper plots and corrections" />
+    <MESSAGE value="powerspectrum addition" />
+    <option name="LAST_COMMIT_MESSAGE" value="powerspectrum addition" />
   </component>
 </project>

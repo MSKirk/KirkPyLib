@@ -263,11 +263,21 @@ def overplot_aia_coords(aiaimg, pch_obj):
     s_pts = coordinates.HeliographicStonyhurst(s_lon, s_lat, obstime=times)
     s_pts_hpc = s_pts.transform_to(aia.coordinate_frame)
 
-    fov = 800 * u.arcsec
-    mid_pt = s_pts_hpc[int(np.floor((len(s_pts_hpc)-1)/2))]
-    bottom_left = SkyCoord(mid_pt.Tx - fov/2, mid_pt.Ty - fov/2, frame=aia.coordinate_frame)
-    smap = aia.submap(bottom_left, width=fov, height=fov)
-    smap= aia
+    # fov = 800 * u.arcsec
+    # mid_pt = s_pts_hpc[int(np.floor((len(s_pts_hpc)-1)/2))]
+    # bottom_left = SkyCoord(mid_pt.Tx - fov/2, mid_pt.Ty - fov/2, frame=aia.coordinate_frame)
+    # smap = aia.submap(bottom_left, width=fov, height=fov)
+    smap = aia
+
+    n_zoom_coords = SkyCoord(Tx=(-200, 200) * u.arcsec, Ty=(850, 1050) * u.arcsec, frame=smap.coordinate_frame)
+    s_zoom_coords = SkyCoord(Tx=(-500, 500) * u.arcsec, Ty=(-1050, -850) * u.arcsec, frame=smap.coordinate_frame)
+
+    n_zoom = smap.submap(n_zoom_coords)
+    n_zoom.data[0, 0] = smap.min()
+    n_zoom.data[-1, -1] = smap.max()
+    s_zoom = smap.submap(s_zoom_coords)
+    s_zoom.data[0, 0] = smap.min()
+    s_zoom.data[-1, -1] = smap.max()
 
     fig = plt.figure(figsize=(10, 10))
     ax = plt.subplot(projection=smap)
@@ -275,9 +285,30 @@ def overplot_aia_coords(aiaimg, pch_obj):
     ax.grid(False)
     ax.plot_coord(n_pts_hpc, 'x', color='cornflowerblue', label='North PCH')
     ax.plot_coord(s_pts_hpc, 'x', color='rebeccapurple', label='South PCH')
+    smap.draw_quadrangle(n_zoom_coords, edgecolor="white", linestyle="-", linewidth=2)
+    smap.draw_quadrangle(s_zoom_coords, edgecolor="white", linestyle="-", linewidth=2)
     plt.legend()
     plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_AIA171_'+str(aia.date.to_datetime().date())+'.png')
-    # plt.show()
+
+    fig2 = plt.figure(figsize=(4, 2), frameon=False)
+    ax2 = plt.subplot(projection=n_zoom)
+    n_zoom.plot()
+    ax2.grid(False)
+    ax2.set_axis_off()
+    ax2.set_title('')
+    ax2.plot_coord(n_pts_hpc, 'x', color='cornflowerblue', label='North PCH')
+    plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_AIA171N_'+str(aia.date.to_datetime().date())+'.png')
+
+    fig3 = plt.figure(figsize=(10, 2), frameon=False)
+    ax2 = plt.subplot(projection=s_zoom)
+    s_zoom.plot()
+    ax2.grid(False)
+    ax2.set_axis_off()
+    ax2.set_title('')
+    ax2.plot_coord(s_pts_hpc, 'x', color='rebeccapurple', label='South PCH')
+    plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_AIA171S_'+str(aia.date.to_datetime().date())+'.png')
+
+    #plt.show()
 
 
 def overplot_swap_coords(swapimg, pch_obj):
@@ -330,10 +361,21 @@ def overplot_swap_coords(swapimg, pch_obj):
     bottom_left = SkyCoord(-fov/2, -fov/2, frame=swap.coordinate_frame)
     smap = swap.submap(bottom_left, width=fov, height=fov)
 
+    n_zoom_coords = SkyCoord(Tx=(-200, 200) * u.arcsec, Ty=(850, 1050) * u.arcsec, frame=smap.coordinate_frame)
+    s_zoom_coords = SkyCoord(Tx=(-500, 500) * u.arcsec, Ty=(-1050, -850) * u.arcsec, frame=smap.coordinate_frame)
+
     #Contrast Adjustment
     p2, p99 = np.percentile(smap.data, (2, 99))
     img_rescale = exposure.rescale_intensity(smap.data, in_range=(p2, p99))
     smap.data[:] = img_rescale
+
+    n_zoom = smap.submap(n_zoom_coords)
+    n_zoom.data[0, 0] = smap.min()
+    n_zoom.data[-1, -1] = smap.max()
+    s_zoom = smap.submap(s_zoom_coords)
+    s_zoom.data[0, 0] = smap.min()
+    s_zoom.data[-1, -1] = smap.max()
+
 
     fig = plt.figure(figsize=(10, 10))
     ax = plt.subplot(projection=smap)
@@ -341,9 +383,30 @@ def overplot_swap_coords(swapimg, pch_obj):
     ax.grid(False)
     ax.plot_coord(n_pts_hpc, 'x', color='cornflowerblue', label='North PCH')
     ax.plot_coord(s_pts_hpc, 'x', color='rebeccapurple', label='South PCH')
+    smap.draw_quadrangle(n_zoom_coords, edgecolor="white", linestyle="-", linewidth=2)
+    smap.draw_quadrangle(s_zoom_coords, edgecolor="white", linestyle="-", linewidth=2)
     plt.legend()
     plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_SWAP174_'+str(swap.date.to_datetime().date())+'.png')
-    # plt.show()
+
+    fig2 = plt.figure(figsize=(4, 2), frameon=False)
+    ax2 = plt.subplot(projection=n_zoom)
+    n_zoom.plot()
+    ax2.grid(False)
+    ax2.set_axis_off()
+    ax2.set_title('')
+    ax2.plot_coord(n_pts_hpc, 'x', color='cornflowerblue', label='North PCH')
+    plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_SWAP174N_'+str(swap.date.to_datetime().date())+'.png')
+
+    fig3 = plt.figure(figsize=(10, 2), frameon=False)
+    ax2 = plt.subplot(projection=s_zoom)
+    s_zoom.plot()
+    ax2.grid(False)
+    ax2.set_axis_off()
+    ax2.set_title('')
+    ax2.plot_coord(s_pts_hpc, 'x', color='rebeccapurple', label='South PCH')
+    plt.savefig('/Users/mskirk/Desktop/SWAP Paper Plots/PCH_SWAP174S_'+str(swap.date.to_datetime().date())+'.png')
+
+    #plt.show()
 
 
 def generate_plot_example(number=10, pch_obj=pch_obj):
@@ -357,6 +420,17 @@ def generate_plot_example(number=10, pch_obj=pch_obj):
     for ii in range(number):
         test_img = random.choice(aia_fls)
         overplot_aia_coords(test_img, pch_obj)
+
+
+def generate_paper_plot(pch_obj=pch_obj):
+    aia_fls = glob.glob('/Volumes/CoronalHole/AIA_lev15/171/*/*/*')
+    swap_fls = glob.glob('/Volumes/CoronalHole/SWAP/*/*/*')
+
+    swap_img = swap_fls[5020]
+    overplot_swap_coords(swap_img, pch_obj)
+
+    aia_img = aia_fls[18602]
+    overplot_aia_coords(aia_img, pch_obj)
 
 
 def freq_to_window(freq_string, series_freq):
